@@ -52,7 +52,7 @@ if not exist "!PY_SERVER!" (
 )
 
 :: 6. Launch FastAPI + SQLite backend in independent console
-echo [*] Launching Bharat Explore AI & Tourism Backend...
+echo [*] Launching Bharat Explore AI ^& Tourism Backend...
 start "Bharat Explore Backend Server" "!PYTHON_EXE!" "!PY_SERVER!"
 
 :: 7. Launch web application in default browser

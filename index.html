@@ -14,10 +14,6 @@
   <!-- Leaflet Map CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Leaflet MarkerCluster -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -120,37 +116,16 @@
     </section>
 
     <!-- Interactive Leaflet Map Section -->
-    <section class="map-section map-section--dark" id="mapSection">
+    <section class="map-section" id="mapSection">
       <div class="section-head">
         <div>
-          <p class="eyebrow">INTERACTIVE DISCOVERY • 50+ DESTINATIONS</p>
-          <h2>Explore India's Treasures.</h2>
+          <p class="eyebrow">INTERACTIVE DISCOVERY</p>
+          <h2>India, State by State.</h2>
         </div>
-        <p>Discover heritage monuments, sacred temples, alpine lakes, dark sky sanctuaries, and hidden villages across the subcontinent. Click any marker for details.</p>
-      </div>
-      <div class="poi-filter-bar" id="poiFilterBar">
-        <button class="poi-filter active" data-poi-cat="all"><span>🗺️</span> All</button>
-        <button class="poi-filter" data-poi-cat="monument"><span>🏛️</span> Monuments</button>
-        <button class="poi-filter" data-poi-cat="nature"><span>🏔️</span> Nature</button>
-        <button class="poi-filter" data-poi-cat="spiritual"><span>🛕</span> Spiritual</button>
-        <button class="poi-filter" data-poi-cat="adventure"><span>⚡</span> Adventure</button>
-        <button class="poi-filter" data-poi-cat="culture"><span>🎭</span> Culture</button>
-        <button class="poi-filter" data-poi-cat="beach"><span>🏖️</span> Beaches</button>
-        <button class="poi-filter" data-poi-cat="wildlife"><span>🐾</span> Wildlife</button>
+        <p>Interactive spatial discovery powered by Leaflet.js. Click any regional node to reveal altitude telemetry, seasons, and fast itinerary handoff.</p>
       </div>
       <div class="map-layout">
-        <div class="india-map" id="map" aria-label="Interactive India Destination Map">
-          <div class="map-legend" id="mapLegend">
-            <h4>POI Categories</h4>
-            <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span> Monuments</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#2ecc71"></span> Nature</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#f39c12"></span> Spiritual</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#3498db"></span> Adventure</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#9b59b6"></span> Culture</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#1abc9c"></span> Beaches</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#e67e22"></span> Wildlife</div>
-          </div>
-        </div>
+        <div class="india-map" id="map" aria-label="Interactive India Destination Map"></div>
         <article class="state-panel" id="statePanel">
           <p class="eyebrow">SELECT A REGION</p>
           <h3>Discover a state</h3>
@@ -363,23 +338,41 @@
           <div class="resp-pill active-pill" onclick="triggerEcoAction('wildlife')"><span>🐾 Snow leopard habitat respect</span> <b>+5 pts</b></div>
           <div class="resp-pill active-pill" onclick="triggerEcoAction('local')"><span>🧑‍🌾 Direct artisan commerce pledge</span> <b>+10 pts</b></div>
         </div>
+        <div class="eco-toggle-row">
+          <button class="eco-toggle-btn" id="plasticPledgeBtn" onclick="togglePlasticFree(this)">
+            <span class="toggle-dot"></span>
+            🫙 Pledge Plastic-Free / Reusable Flask
+          </button>
+        </div>
       </div>
 
       <div class="score-card">
         <p class="score-title">RESPONSIBLE TRAVELLER SCORE</p>
-        <div class="score-display">
-          <strong id="score">85</strong>
-          <small>/100</small>
+        <div id="levelBadge" class="level-badge silver">🥈 Silver Eco-Traveler</div>
+        <div class="score-ring-wrapper">
+          <svg class="score-ring-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff6b35"/>
+                <stop offset="100%" stop-color="#ffb703"/>
+              </linearGradient>
+            </defs>
+            <circle class="score-ring-track" cx="80" cy="80" r="65"/>
+            <circle class="score-ring-fill" id="scoreRingFill" cx="80" cy="80" r="65"/>
+          </svg>
+          <div class="score-ring-text">
+            <strong id="score">85</strong>
+            <small>/100</small>
+          </div>
         </div>
-        <div class="progress">
-          <i id="scoreBar" style="width: 85%;"></i>
-        </div>
+        <!-- Legacy progress bar (hidden, kept for JS compatibility) -->
+        <div class="progress" style="display:none;"><i id="scoreBar" style="width: 85%;"></i></div>
         <div class="score-perk-badge" id="scoreBadge">
           ✦ ECO-CHAMPION TIER UNLOCKED
         </div>
         <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
           <button id="scoreBtn" class="btn light">Simulate Eco-Action (+5)</button>
-          <button id="redeemRewardsBtn" class="btn primary">Redeem Rewards 🎁</button>
+          <button id="redeemRewardsBtn" class="btn primary">Redeem Perks 🎁</button>
         </div>
       </div>
     </section>
@@ -461,12 +454,20 @@
       <h2>Local Cooperative Digital Vouchers</h2>
       <p>Thank you for traveling responsibly! Present these digital vouchers to our verified grassroots partners in Ladakh and the Himalayas:</p>
       
-      <div class="rewards-grid">
+      <div class="reward-tier-header">🥈 SILVER ECO-TRAVELER — Score 80+</div>
+      <div class="rewards-grid" id="rewardsGrid80">
         <div class="reward-coupon">
           <div class="coupon-tag">15% DISCOUNT</div>
-          <h3>Dzomsa Eco-Refill Store, Leh</h3>
-          <p>15% discount on solar-purified drinking water refills, organic seabuckthorn juice, and handmade apricot kernel soaps.</p>
-          <div class="coupon-code">CODE: <code>BHARAT-ECO-15</code></div>
+          <h3>Leh Women's Handloom Cooperative</h3>
+          <p>15% off authentic hand-woven Ladakhi pashmina shawls, felt bags, and natural-dye textiles sourced directly from Changthang artisans.</p>
+          <div class="coupon-code">CODE: <code>BHARAT-HANDLOOM-15</code></div>
+        </div>
+
+        <div class="reward-coupon">
+          <div class="coupon-tag">COMPLIMENTARY</div>
+          <h3>Tingmo Community Homestay, Nubra</h3>
+          <p>Complimentary traditional salted butter tea (Gur Gur) & authentic Tingmo steamed bread at this community-run eco-homestay.</p>
+          <div class="coupon-code">CODE: <code>TINGMO-WELCOME</code></div>
         </div>
 
         <div class="reward-coupon">
@@ -475,11 +476,21 @@
           <p>₹500 direct voucher toward your booking at any affiliated village homestay in Rumbak, Hemis Shukpachan, or Turtuk.</p>
           <div class="coupon-code">CODE: <code>HOMESTAY-LADAKH</code></div>
         </div>
+      </div>
 
-        <div class="reward-coupon">
-          <div class="coupon-tag">10% DISCOUNT</div>
+      <div class="reward-tier-header tier-95" id="tier95Header" style="display:none;">🏔 HIMALAYAN GUARDIAN — Score 95+</div>
+      <div class="rewards-grid" id="rewardsGrid95" style="display:none;">
+        <div class="reward-coupon" style="border-color: rgba(255,183,3,0.4);">
+          <div class="coupon-tag" style="background: var(--gold-pop);">PRIORITY ACCESS</div>
+          <h3>Hanle Dark Sky Stargazing Session</h3>
+          <p>Priority access pass for an exclusive guided Milky Way stargazing session at India's first Dark Sky Sanctuary — hosted by Hanle village astronomers.</p>
+          <div class="coupon-code">CODE: <code>HANLE-GUARDIAN-PASS</code></div>
+        </div>
+
+        <div class="reward-coupon" style="border-color: rgba(255,183,3,0.4);">
+          <div class="coupon-tag" style="background: var(--gold-pop);">10% DISCOUNT</div>
           <h3>Leh Tibetan Artisan Bakery</h3>
-          <p>Complimentary artisanal butter tea and 10% off organic buckwheat cookies & apricot pies.</p>
+          <p>Complimentary artisanal butter tea and 10% off organic buckwheat cookies & apricot pies baked on traditional clay hearths.</p>
           <div class="coupon-code">CODE: <code>APRICOT-HEAVEN</code></div>
         </div>
       </div>
