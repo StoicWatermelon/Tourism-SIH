@@ -14,6 +14,10 @@
   <!-- Leaflet Map CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -116,16 +120,37 @@
     </section>
 
     <!-- Interactive Leaflet Map Section -->
-    <section class="map-section" id="mapSection">
+    <section class="map-section map-section--dark" id="mapSection">
       <div class="section-head">
         <div>
-          <p class="eyebrow">INTERACTIVE DISCOVERY</p>
-          <h2>India, State by State.</h2>
+          <p class="eyebrow">INTERACTIVE DISCOVERY • 50+ DESTINATIONS</p>
+          <h2>Explore India's Treasures.</h2>
         </div>
-        <p>Interactive spatial discovery powered by Leaflet.js. Click any regional node to reveal altitude telemetry, seasons, and fast itinerary handoff.</p>
+        <p>Discover heritage monuments, sacred temples, alpine lakes, dark sky sanctuaries, and hidden villages across the subcontinent. Click any marker for details.</p>
+      </div>
+      <div class="poi-filter-bar" id="poiFilterBar">
+        <button class="poi-filter active" data-poi-cat="all"><span>🗺️</span> All</button>
+        <button class="poi-filter" data-poi-cat="monument"><span>🏛️</span> Monuments</button>
+        <button class="poi-filter" data-poi-cat="nature"><span>🏔️</span> Nature</button>
+        <button class="poi-filter" data-poi-cat="spiritual"><span>🛕</span> Spiritual</button>
+        <button class="poi-filter" data-poi-cat="adventure"><span>⚡</span> Adventure</button>
+        <button class="poi-filter" data-poi-cat="culture"><span>🎭</span> Culture</button>
+        <button class="poi-filter" data-poi-cat="beach"><span>🏖️</span> Beaches</button>
+        <button class="poi-filter" data-poi-cat="wildlife"><span>🐾</span> Wildlife</button>
       </div>
       <div class="map-layout">
-        <div class="india-map" id="map" aria-label="Interactive India Destination Map"></div>
+        <div class="india-map" id="map" aria-label="Interactive India Destination Map">
+          <div class="map-legend" id="mapLegend">
+            <h4>POI Categories</h4>
+            <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span> Monuments</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#2ecc71"></span> Nature</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#f39c12"></span> Spiritual</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#3498db"></span> Adventure</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#9b59b6"></span> Culture</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#1abc9c"></span> Beaches</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#e67e22"></span> Wildlife</div>
+          </div>
+        </div>
         <article class="state-panel" id="statePanel">
           <p class="eyebrow">SELECT A REGION</p>
           <h3>Discover a state</h3>
