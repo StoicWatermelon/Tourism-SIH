@@ -1,0 +1,620 @@
+/* ═══════════════════════════════════════════════════════
+   BHARAT EXPLORE — INTERACTIVE MAP & SPATIAL DISCOVERY CSS
+   Modular stylesheet for Leaflet, state borders & pulse nodes
+   ═══════════════════════════════════════════════════════ */
+
+/* Section Layout */
+.map-section {
+  padding: 85px 8vw;
+  background: linear-gradient(180deg, var(--paper, #f7f5f0) 0%, #e5e0d7 100%);
+  position: relative;
+  z-index: 1;
+}
+
+.map-section > .section-head {
+  position: relative;
+  z-index: 2;
+}
+
+/* Map Category Filter Bar */
+.map-filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.map-filter-pill {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(10, 18, 26, 0.06);
+  border: 1.5px solid rgba(10, 18, 26, 0.14);
+  color: var(--ink, #0a121a);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.map-filter-pill:hover {
+  background: rgba(10, 18, 26, 0.12);
+  transform: translateY(-1px);
+}
+
+.map-filter-pill.active {
+  background: var(--ink, #0a121a);
+  border-color: var(--ink, #0a121a);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(10, 18, 26, 0.28);
+}
+
+/* Grid Layout */
+.map-layout {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 32px;
+  align-items: stretch;
+  position: relative;
+  z-index: 2;
+}
+
+/* Leaflet Container */
+#map,
+.india-map {
+  height: 600px;
+  min-height: 600px;
+  width: 100%;
+  position: relative;
+  border-radius: var(--radius, 16px);
+  overflow: hidden;
+  box-shadow: var(--depth-lg, 0 18px 48px rgba(10, 18, 26, 0.14));
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  background: #b5dbff;
+  display: block;
+}
+
+#map.leaflet-container,
+.india-map.leaflet-container,
+.india-map .leaflet-container {
+  background: #b5dbff !important;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  border-radius: var(--radius, 16px);
+  overflow: hidden;
+}
+
+/* Vibrant CartoDB Voyager tiles with rich saturation and crisp contrast */
+.india-map .leaflet-tile-container img,
+.india-map .leaflet-tile {
+  filter: saturate(1.35) contrast(1.08) brightness(1.02);
+  will-change: transform;
+}
+
+.india-map .leaflet-overlay-pane {
+  z-index: 450 !important;
+}
+
+.india-map .leaflet-top,
+.india-map .leaflet-bottom {
+  z-index: 850 !important;
+}
+
+.india-map .leaflet-marker-pane {
+  z-index: 650 !important;
+}
+
+.india-map .leaflet-tooltip-pane {
+  z-index: 1500 !important;
+  pointer-events: auto !important;
+}
+
+.india-map .leaflet-popup-pane {
+  z-index: 1600 !important;
+}
+
+/* Map Administrative Layer Controls & Border Toggles */
+.map-layer-toggles {
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+  margin-top: 10px !important;
+  margin-left: 10px !important;
+}
+
+.map-toggle-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: var(--ink, #0a121a);
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.map-toggle-btn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.map-toggle-btn.active {
+  background: var(--ink, #0a121a);
+  color: #ffffff;
+  border-color: var(--ink, #0a121a);
+}
+
+.map-toggle-btn.active b {
+  color: var(--gold-pop, #ffb703);
+}
+
+/* State Boundary Hover Tooltip */
+.leaflet-tooltip.state-boundary-tooltip {
+  background: rgba(12, 22, 32, 0.95) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 183, 3, 0.7) !important;
+  border-radius: 6px !important;
+  padding: 4px 9px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  pointer-events: none !important;
+}
+
+.leaflet-tooltip.state-boundary-tooltip::before {
+  border-top-color: rgba(12, 22, 32, 0.95) !important;
+}
+
+/* Floating Reset View Button */
+.map-floating-reset {
+  background: #ffffff;
+  color: var(--ink, #0a121a);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: none;
+  margin: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-floating-reset:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+
+.map-floating-reset.visible {
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LEAFLET CUSTOM ANIMATED PULSE HOTSPOT MARKERS
+   ═══════════════════════════════════════════════════════ */
+
+.hotspot-marker-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
+
+.hotspot-pin {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.hotspot-core {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--pin-color, #ff6b35);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px var(--pin-color, #ff6b35), 0 2px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+}
+
+.hotspot-pin:hover .hotspot-core,
+.hotspot-pin.active .hotspot-core {
+  transform: scale(1.4);
+  box-shadow: 0 0 18px var(--pin-color, #ff6b35), 0 0 0 3px rgba(255, 255, 255, 0.7);
+}
+
+.hotspot-pulse {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--pin-color, #ff6b35);
+  opacity: 0.6;
+  animation: hotspotRadar 2.2s infinite ease-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hotspot-pin.mega-hub {
+  width: 32px;
+  height: 32px;
+}
+.hotspot-pin.mega-hub .hotspot-core {
+  width: 16px;
+  height: 16px;
+  border-width: 2.5px;
+}
+.hotspot-pin.mega-hub .hotspot-pulse {
+  width: 32px;
+  height: 32px;
+  animation-duration: 1.8s;
+}
+
+/* Category Color Variations */
+.hotspot-pin.cat-mountains { --pin-color: #ff6b35; }
+.hotspot-pin.cat-heritage  { --pin-color: #ffb703; }
+.hotspot-pin.cat-nature    { --pin-color: #2a9d8f; }
+.hotspot-pin.cat-coastal   { --pin-color: #00b4d8; }
+
+@keyframes hotspotRadar {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.85;
+  }
+  65% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   INTERACTIVE MAP HOVER CARD (Leaflet Tooltip)
+   ═══════════════════════════════════════════════════════ */
+
+.leaflet-tooltip.map-hover-card {
+  background: rgba(12, 22, 32, 0.98) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.24) !important;
+  border-radius: 14px !important;
+  padding: 0 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65) !important;
+  color: #fff !important;
+  font-family: var(--font-body, 'DM Sans', sans-serif) !important;
+  width: 290px !important;
+  max-width: 90vw !important;
+  pointer-events: auto !important; /* Critical: user can enter card & click actions! */
+  overflow: hidden !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  /* Only transition opacity, NEVER transform - prevents fight with Leaflet's translate3d engine! */
+  transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: opacity;
+  z-index: 1500 !important;
+}
+
+/* 4-Direction Tooltip Arrows */
+.leaflet-tooltip-top.map-hover-card::before {
+  border-top-color: rgba(12, 22, 32, 0.98) !important;
+  border-width: 8px 8px 0 !important;
+  bottom: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.leaflet-tooltip-bottom.map-hover-card::before {
+  border-bottom-color: rgba(12, 22, 32, 0.98) !important;
+  border-width: 0 8px 8px !important;
+  top: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.leaflet-tooltip-left.map-hover-card::before {
+  border-left-color: rgba(12, 22, 32, 0.98) !important;
+  border-width: 8px 0 8px 8px !important;
+  right: -8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.leaflet-tooltip-right.map-hover-card::before {
+  border-right-color: rgba(12, 22, 32, 0.98) !important;
+  border-width: 8px 8px 8px 0 !important;
+  left: -8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.map-hover-card-inner {
+  display: flex;
+  flex-direction: column;
+  animation: cardSmoothFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes cardSmoothFadeIn {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.975);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.map-card-banner {
+  height: 105px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.map-card-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(12, 22, 32, 0.92) 100%);
+  pointer-events: none;
+}
+
+.map-card-banner-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.map-card-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.map-card-badge.mountains { border-color: #ff6b35; color: #ff9e79; }
+.map-card-badge.heritage  { border-color: #ffb703; color: #ffc93c; }
+.map-card-badge.nature    { border-color: #2a9d8f; color: #52b788; }
+.map-card-badge.coastal   { border-color: #00b4d8; color: #90e0ef; }
+
+.map-card-alt {
+  font-size: 10px;
+  font-weight: 600;
+  color: #e0e8ed;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 2px 7px;
+  border-radius: 6px;
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.map-card-content {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-card-header h4 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.25;
+}
+
+.map-card-sub {
+  font-size: 11px;
+  color: var(--gold-pop, #ffb703);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.map-card-desc {
+  font-size: 11px;
+  color: #b2c2cc;
+  line-height: 1.35;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.map-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.map-tag {
+  font-size: 9.5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: #d1dde6;
+}
+
+.map-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-card-season {
+  font-size: 10.5px;
+  color: #8fa2b0;
+}
+
+.map-card-season b {
+  color: #fff;
+}
+
+.map-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.map-btn-action {
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-btn-action.detail {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.map-btn-action.detail:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.map-btn-action.plan {
+  background: linear-gradient(135deg, var(--accent, #ff6b35) 0%, #e04b16 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--accent-glow, rgba(255, 107, 53, 0.35));
+}
+
+.map-btn-action.plan:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow, rgba(255, 107, 53, 0.35));
+}
+
+/* ═══════════════════════════════════════════════════════
+   ENHANCED STATE & HOTSPOT PANEL (Side Dossier)
+   ═══════════════════════════════════════════════════════ */
+
+.state-panel {
+  background: var(--surface-dark, #0d1a24);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #fff;
+  padding: 32px;
+  border-radius: var(--radius, 16px);
+  min-height: 480px;
+  box-shadow: var(--depth-lg, 0 18px 48px rgba(10, 18, 26, 0.14));
+  border: 1px solid var(--border-dark, rgba(255, 255, 255, 0.12));
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.state-panel-header-img {
+  width: 100%;
+  height: 145px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.state-panel .panel-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+}
+
+.state-panel .panel-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #d1dde6;
+}
+
+.state-panel h3 {
+  font: 600 30px/1.15 "Playfair Display", serif;
+  margin: 6px 0 8px;
+  color: var(--gold-pop, #ffb703);
+}
+
+.state-panel p:not(.eyebrow) {
+  color: #b2c2cc;
+  margin: 6px 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.map-reset-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Map Responsive Adjustments */
+@media (max-width: 1100px) {
+  .map-layout {
+    grid-template-columns: 1fr;
+  }
+  .india-map {
+    height: 520px;
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .india-map {
+    height: 440px;
+    min-height: 440px;
+  }
+  .state-panel {
+    padding: 20px;
+  }
+}

@@ -282,6 +282,30 @@ const localDestinations = [
 let activeDestinations = [...localDestinations];
 let currentFilter = "all";
 
+// 20 Pan-India Regional Heritage & Eco Circuits with crisp, bounded assets
+const regionalCircuits = [
+  { id: "srinagar", name: "Srinagar & Dal Lake", state: "Jammu & Kashmir", region: "north", img: "assets/images/srinagar.jpg", desc: "Alpine water reflections, floating markets & Shalimar gardens", alt: "5,200 ft" },
+  { id: "kurukshetra", name: "Kurukshetra Sacred Sarovar", state: "Haryana", region: "north", img: "assets/images/kurukshetra.png", desc: "Brahma Sarovar ghats, ancient pilgrimage corridors & epic history", alt: "850 ft" },
+  { id: "rockgarden", name: "Rock Garden Sculptures", state: "Chandigarh", region: "north", img: "assets/images/rockgarden.png", desc: "World-renowned zero-waste visionary sculpture oasis", alt: "1,050 ft" },
+  { id: "tawang", name: "Tawang Monastery Corridor", state: "Arunachal Pradesh", region: "northeast", img: "assets/images/tawang.png", desc: "High-altitude Tibetan monastery perched at 10,000 ft", alt: "10,000 ft" },
+  { id: "cherrapunji", name: "Cherrapunji Living Root Bridges", state: "Meghalaya", region: "northeast", img: "assets/images/cherrapunji.png", desc: "Bio-engineered Ficus elastica bridges & mist-shrouded canyons", alt: "4,860 ft" },
+  { id: "loktaklake", name: "Loktak Floating Lake", state: "Manipur", region: "northeast", img: "assets/images/loktaklake.png", desc: "Unique circular floating biomass phumdis & Sangai deer sanctuary", alt: "2,520 ft" },
+  { id: "kohima", name: "Kohima & Naga Hills", state: "Nagaland", region: "northeast", img: "assets/images/kohima.png", desc: "Hornbill cultural heritage, scenic mountain ridges & tribal crafts", alt: "4,738 ft" },
+  { id: "aizawl", name: "Aizawl & Durtlang Ridge", state: "Mizoram", region: "northeast", img: "assets/images/aizawl.png", desc: "Tranquil cloud-kissed ridges, Mizo bamboo crafts & church spires", alt: "3,700 ft" },
+  { id: "ujjayantapalace", name: "Ujjayanta Royal Palace", state: "Tripura", region: "northeast", img: "assets/images/ujjayantapalace.png", desc: "Neoclassical lakeside palace surrounded by Mughal gardens", alt: "42 ft" },
+  { id: "hampi", name: "Hampi UNESCO Ruins", state: "Karnataka", region: "south-islands", img: "assets/images/hampi.png", desc: "Granite boulder empire, Tungabhadra River & Vijayanagara architecture", alt: "1,530 ft" },
+  { id: "hyderabad", name: "Hyderabad Heritage Core", state: "Telangana", region: "south-islands", img: "assets/images/hyderabad.png", desc: "Charminar, Golconda fortress acoustics & Nizami culinary trail", alt: "1,778 ft" },
+  { id: "visakhapatnam", name: "Visakhapatnam Ghats Coast", state: "Andhra Pradesh", region: "south-islands", img: "assets/images/visakhapatnam.png", desc: "Where the Eastern Ghats plunge dramatically into the Bay of Bengal", alt: "150 ft" },
+  { id: "whitetown", name: "White Town Promenade", state: "Puducherry", region: "south-islands", img: "assets/images/whitetown.png", desc: "Cobblestone French colonial villas, cafes & Bay promenade", alt: "20 ft" },
+  { id: "kavaratti", name: "Kavaratti Coral Lagoon", state: "Lakshadweep", region: "south-islands", img: "assets/images/kavaratti.png", desc: "Pristine white sand atolls, turquoise waters & marine reserves", alt: "10 ft" },
+  { id: "swarajdeep", name: "Swaraj Dweep (Havelock)", state: "Andaman & Nicobar", region: "south-islands", img: "assets/images/swarajdeep.png", desc: "Radhanagar Beach sunsets, bio-luminescent kayaking & reefs", alt: "30 ft" },
+  { id: "mumbai", name: "Mumbai Marine Promenade", state: "Maharashtra", region: "west-central", img: "assets/images/mumbai.png", desc: "Gateway of India, Arabian Sea breeze & Victorian Gothic heritage", alt: "46 ft" },
+  { id: "daman", name: "Moti Daman Coastal Fort", state: "Daman & Diu", region: "west-central", img: "assets/images/daman.png", desc: "16th-century ramparts overlooking the Arabian sea & palm beaches", alt: "16 ft" },
+  { id: "khajuraho", name: "Khajuraho Temple Marvels", state: "Madhya Pradesh", region: "west-central", img: "assets/images/khajuraho.png", desc: "Intricate Chandela dynasty sandstone art & living cultural legacy", alt: "930 ft" },
+  { id: "bastar", name: "Bastar Indigenous Corridors", state: "Chhattisgarh", region: "west-central", img: "assets/images/bastar.png", desc: "Chitrakote horseshoe falls & sacred Dhokra lost-wax bronze crafts", alt: "1,800 ft" },
+  { id: "hundrufalls", name: "Hundru Falls Cascade", state: "Jharkhand", region: "west-central", img: "assets/images/hundrufalls.png", desc: "320 ft Subarnarekha drop carving spectacular granite rock pools", alt: "2,140 ft" }
+];
+
 const categories = [
   ["mountains", "🏔", "Mountains"],
   ["adventure", "🏕", "Adventure"],
@@ -290,11 +314,7 @@ const categories = [
   ["spirituality", "🛕", "Spiritual"],
   ["heritage", "🏛", "Heritage"],
   ["food", "🍛", "Zero-Mile Food"],
-  ["villages", "🏘", "Eco Villages"],
-  ["rivers", "🌊", "Rivers"],
-  ["beaches", "🏖", "Beaches"],
-  ["wildlife", "🌿", "Wildlife"],
-  ["festivals", "🎉", "Festivals"]
+  ["villages", "🏘", "Eco Villages"]
 ];
 
 const states = {
@@ -437,11 +457,12 @@ const stateCoordinates = {
   "West Bengal": [22.5726, 88.3639]
 };
 
-const DEFAULT_MAP_CENTER = [24.5, 78.8];
-const DEFAULT_MAP_ZOOM = 5;
 
-let leafletMap = null;
-let resetControlBtn = null;
+// ═══════════════════════════════════════════════════════
+//  INTERACTIVE MAP & HOTSPOTS ENGINE
+//  Extracted to js/map.js (Leaflet GIS, 44 Hotspots & GeoJSON)
+// ═══════════════════════════════════════════════════════
+
 let currentScore = 85;
 
 const $ = s => document.querySelector(s);
@@ -461,17 +482,20 @@ const toast = (text) => {
 
 async function fetchDestinationsFromAPI() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/destinations");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 600);
+    const res = await fetch("http://127.0.0.1:8000/api/destinations", { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        activeDestinations = localDestinations;
+        activeDestinations = data;
+        renderDestinations();
         console.log(`[API] Loaded destinations and merged with SIH sustainable metadata.`);
       }
     }
   } catch (err) {
-    console.warn("[API] Backend offline; utilizing resilient local destination cache.");
-    activeDestinations = localDestinations;
+    console.warn("[API] Backend offline or delayed; utilizing resilient local destination cache.");
   }
 }
 
@@ -545,12 +569,17 @@ function renderCategories() {
   const grid = $("#categoryGrid");
   if (!grid) return;
   
-  grid.innerHTML = categories.map((c, i) => `
-    <button class="category ${i === 0 ? "active" : ""}" data-category="${c[0]}">
-      <span>${c[1]}</span>
-      <small>${c[2]}</small>
-    </button>
-  `).join("");
+  grid.innerHTML = categories.map((c, i) => {
+    const label = (window.i18n && typeof window.i18n.getCategoryName === "function")
+      ? (window.i18n.getCategoryName(c[0]) || c[2])
+      : c[2];
+    return `
+      <button class="category ${i === 0 ? "active" : ""}" data-category="${c[0]}">
+        <span>${c[1]}</span>
+        <small>${label}</small>
+      </button>
+    `;
+  }).join("");
 
   $$(".category").forEach(b => {
     b.onclick = () => {
@@ -574,19 +603,28 @@ function renderResults(cat = "mountains") {
   }
 
   if (arr.length) {
-    target.innerHTML = arr.slice(0, 4).map(d => `
-      <article class="result-card">
-        <span class="mini">${d.location} • ${d.type}</span>
-        <h3>${d.name}</h3>
-        <p>${d.desc}</p>
-        <div style="margin-top:auto;">
-          <span style="font-size:11px; color:var(--emerald-pop); font-weight:700; display:block; margin-bottom:4px;">
-            ✦ ${d.communityBenefit || "Direct Community Benefit"}
-          </span>
-          <small>Best Season: ${d.bestSeason || d.best_season || "May–Sep"}</small>
-        </div>
-      </article>
-    `).join("");
+    target.innerHTML = arr.slice(0, 4).map(d => {
+      const trans = (window.i18n && typeof window.i18n.getDestinationTranslation === "function")
+        ? window.i18n.getDestinationTranslation(d.id)
+        : null;
+      const dName = (trans && trans.name) ? trans.name : d.name;
+      const dDesc = (trans && trans.desc) ? trans.desc : d.desc;
+      const seasonLbl = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("lbl_season") : "Best Season:";
+
+      return `
+        <article class="result-card">
+          <span class="mini">${d.location} • ${d.type}</span>
+          <h3>${dName}</h3>
+          <p>${dDesc}</p>
+          <div style="margin-top:auto;">
+            <span style="font-size:11px; color:var(--emerald-pop); font-weight:700; display:block; margin-bottom:4px;">
+              ✦ ${d.communityBenefit || "Direct Community Benefit"}
+            </span>
+            <small>${seasonLbl} ${d.bestSeason || d.best_season || "May–Sep"}</small>
+          </div>
+        </article>
+      `;
+    }).join("");
   } else {
     target.innerHTML = `
       <div class="result-card" style="grid-column: span 4; text-align:center;">
@@ -594,6 +632,48 @@ function renderResults(cat = "mountains") {
         <p>Connecting verified regional routes for ${cat} via Bharat Explore Smart Database.</p>
       </div>
     `;
+  }
+}
+
+function renderCircuits(region = "all") {
+  const grid = $("#circuitsGrid");
+  if (!grid) return;
+
+  const filtered = region === "all" 
+    ? regionalCircuits 
+    : regionalCircuits.filter(c => c.region === region);
+
+  const actionText = (window.i18n && typeof window.i18n.t === "function")
+    ? window.i18n.t("btn_explore_node")
+    : "Explore Regional Node →";
+
+  grid.innerHTML = filtered.map(c => {
+    const customDesc = (window.i18n && typeof window.i18n.getCircuitTranslation === "function")
+      ? (window.i18n.getCircuitTranslation(c.id) || c.desc)
+      : c.desc;
+
+    return `
+      <article class="circuit-card" style="background-image: url('${c.img}')" onclick="selectCircuit('${c.state}')" title="Explore ${c.name} (${c.state})">
+        <div class="circuit-card-overlay">
+          <span class="circuit-tag">${c.state} • ${c.alt}</span>
+          <h3>${c.name}</h3>
+          <p>${customDesc}</p>
+          <span class="circuit-action">${actionText}</span>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  // Add 3D perspective tilt & specular glow to circuit cards
+  addCard3D(grid.querySelectorAll(".circuit-card"), { maxTilt: 9, glow: true });
+}
+
+function selectCircuit(stateName) {
+  toast(`Selected ${stateName} regional circuit.`);
+  statePanel(stateName);
+  const mapSec = $("#mapSection");
+  if (mapSec) {
+    mapSec.scrollIntoView({ behavior: "smooth" });
   }
 }
 
@@ -610,9 +690,22 @@ function renderDestinations() {
     filtered = activeDestinations.filter(d => (d.communityBenefit || "").includes("9") || d.category === "villages");
   }
 
+  const addText = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("btn_add_journey") : "♥ Add to Journey";
+  const exploreText = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("btn_explore_details") : "Explore Details";
+  const seasonLabel = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("lbl_season") : "Season:";
+  const budgetLabel = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("lbl_budget") : "Budget:";
+  const ecoGemLabel = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("badge_eco_gem") : "🌱 Eco-Dispersion Gem";
+  const pledgeTitle = (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t("title_eco_pledge") : "Click to commit eco-action (+5 pts)";
+
   grid.innerHTML = filtered.map(d => {
+    const trans = (window.i18n && typeof window.i18n.getDestinationTranslation === "function") 
+      ? window.i18n.getDestinationTranslation(d.id) 
+      : null;
+    const displayName = (trans && trans.name) ? trans.name : d.name;
+    const displayDesc = (trans && trans.desc) ? trans.desc : d.desc;
+
     const offbeatBadgeHtml = d.isOffbeat 
-      ? `<span class="offbeat-badge">🌱 Eco-Dispersion Gem</span>` 
+      ? `<span class="offbeat-badge">${ecoGemLabel}</span>` 
       : `<span style="font-size:10px; opacity:0.85;">📍 ${d.altitude || "Himalayas"}</span>`;
     
     const benefitBadgeHtml = d.communityBenefit 
@@ -620,7 +713,7 @@ function renderDestinations() {
       : "";
 
     const chipsHtml = (d.ecoBadges || []).map(b => `
-      <span class="eco-chip" onclick="pledgeEcoBadge(event, '${b}')" title="Click to commit eco-action (+5 pts)">
+      <span class="eco-chip" onclick="pledgeEcoBadge(event, '${b}')" title="${pledgeTitle}">
         ${b}
       </span>
     `).join("");
@@ -634,27 +727,34 @@ function renderDestinations() {
 
         <div class="dest-info">
           <span class="eyebrow">${d.location.toUpperCase()} • ${d.type}</span>
-          <h3>${d.name}</h3>
-          <p>${d.desc}</p>
+          <h3>${displayName}</h3>
+          <p>${displayDesc}</p>
           <div class="eco-chips">${chipsHtml}</div>
-          <p><b>Season:</b> ${d.bestSeason || d.best_season} • <b>Budget:</b> ₹${(d.budget || 3000).toLocaleString()}</p>
+          <p><b>${seasonLabel}</b> ${d.bestSeason || d.best_season} • <b>${budgetLabel}</b> ₹${(d.budget || 3000).toLocaleString()}</p>
           <div class="dest-actions">
-            <button onclick="saveDestination('${d.id}')">♥ Add to Journey</button>
-            <button onclick="showDestination('${d.id}')">Explore Details</button>
+            <button onclick="saveDestination('${d.id}')">${addText}</button>
+            <button onclick="showDestination('${d.id}')">${exploreText}</button>
           </div>
         </div>
       </article>
     `;
   }).join("");
 
-  // Pillar 2: Specular mouse-tracking glow — update CSS vars on mousemove
+  // Specular mouse-tracking glow — cached rect on enter to avoid layout thrashing
   grid.querySelectorAll(".destination").forEach(card => {
+    let rect = null;
+    card.addEventListener("mouseenter", () => {
+      rect = card.getBoundingClientRect();
+    }, { passive: true });
     card.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
+      if (!rect) rect = card.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
       const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
       card.style.setProperty("--mouse-x", `${x}%`);
       card.style.setProperty("--mouse-y", `${y}%`);
+    }, { passive: true });
+    card.addEventListener("mouseleave", () => {
+      rect = null;
     }, { passive: true });
   });
 }
@@ -675,15 +775,25 @@ function renderFood() {
   const grid = $("#foodGrid");
   if (!grid) return;
 
+  const supportTitle = (window.i18n && typeof window.i18n.t === "function") 
+    ? window.i18n.t("title_food_support") 
+    : "Click to support zero-food-mile local produce (+5 pts)";
+
   grid.innerHTML = foods.map(f => {
+    const trans = (window.i18n && typeof window.i18n.getFoodTranslation === "function")
+      ? window.i18n.getFoodTranslation(f.name)
+      : null;
+    const displayName = (trans && trans.name) ? trans.name : f.name;
+    const displayDesc = (trans && trans.desc) ? trans.desc : f.desc;
+
     const tagsHtml = f.tags.map(t => `<span class="food-tag">${t}</span>`).join("");
     return `
-      <article class="food" style="background-image:url('${f.img}')" onclick="supportLocalFood(event, '${f.name}')" title="Click to support zero-food-mile local produce (+5 pts)">
+      <article class="food" style="background-image:url('${f.img}')" onclick="supportLocalFood(event, '${f.name}')" title="${supportTitle}">
         <div>
           <span class="eyebrow">${f.origin.toUpperCase()}</span>
-          <h3>${f.name}</h3>
+          <h3>${displayName}</h3>
           <div class="food-tags">${tagsHtml}</div>
-          <p>${f.desc}</p>
+          <p>${displayDesc}</p>
           <span class="food-revenue-share">🤝 ${f.revenueShare}</span>
         </div>
       </article>
@@ -700,12 +810,17 @@ function addCard3D(cards, opts = {}) {
   const glow = opts.glow !== false;   // default true
 
   cards.forEach(card => {
+    let rect = null;
     let rafId = null;
 
+    card.addEventListener("mouseenter", () => {
+      rect = card.getBoundingClientRect();
+    }, { passive: true });
+
     card.addEventListener("mousemove", (e) => {
+      if (!rect) rect = card.getBoundingClientRect();
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const rect = card.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         const dx = (e.clientX - cx) / (rect.width / 2);   // -1 to 1
@@ -726,6 +841,7 @@ function addCard3D(cards, opts = {}) {
     }, { passive: true });
 
     card.addEventListener("mouseleave", () => {
+      rect = null;
       if (rafId) cancelAnimationFrame(rafId);
       card.style.transform = "";
     }, { passive: true });
@@ -736,13 +852,17 @@ function renderJourney() {
   const track = $("#journeyTrack");
   if (!track) return;
 
+  const nodes = (window.i18n && typeof window.i18n.getJourneyNodes === "function") 
+    ? window.i18n.getJourneyNodes() 
+    : journeyNodes;
+
   const icons = ["🏔", "🌌", "🌲", "🕉", "🗻", "🏰", "🥥"];
-  track.innerHTML = journeyNodes.map((x, i) => `
+  track.innerHTML = nodes.map((x, i) => `
     <div class="journey-node">
       <div class="circle">${icons[i % icons.length]}</div>
       <b>${x}</b>
     </div>
-    ${i < journeyNodes.length - 1 ? '<div class="journey-line"></div>' : ''}
+    ${i < nodes.length - 1 ? '<div class="journey-line"></div>' : ''}
   `).join("");
 }
 
@@ -802,10 +922,13 @@ function renderJourneyDrawer() {
   const savedItems = activeDestinations.filter(d => savedIds.includes(d.id));
 
   if (!savedItems.length) {
+    const emptyMsg = (window.i18n && typeof window.i18n.t === "function") 
+      ? window.i18n.t("drawer_empty") 
+      : "No saved destinations yet. Click \"♥ Add to Journey\" on any destination card to bookmark your dream route.";
     container.innerHTML = `
       <div class="empty-state">
         <span style="font-size:36px;">🗺️</span>
-        <p>No saved destinations yet. Click "♥ Add to Journey" on any card to curate your expedition.</p>
+        <p>${emptyMsg}</p>
       </div>
     `;
     if (totalBudgetEl) totalBudgetEl.textContent = "₹0";
@@ -815,11 +938,16 @@ function renderJourneyDrawer() {
   let totalBudget = 0;
   container.innerHTML = savedItems.map(item => {
     totalBudget += (item.budget || 3500);
+    const trans = (window.i18n && typeof window.i18n.getDestinationTranslation === "function")
+      ? window.i18n.getDestinationTranslation(item.id)
+      : null;
+    const itemName = (trans && trans.name) ? trans.name : item.name;
+
     return `
       <div class="drawer-item">
-        <img src="${item.img}" alt="${item.name}">
+        <img src="${item.img}" alt="${itemName}">
         <div class="drawer-item-info">
-          <h4>${item.name}</h4>
+          <h4>${itemName}</h4>
           <p>📍 ${item.location} • ₹${(item.budget || 3500).toLocaleString()}</p>
           <span style="font-size:10.5px; color:var(--emerald-pop); font-weight:700;">${item.communityBenefit || "Eco Certified"}</span>
         </div>
@@ -833,363 +961,16 @@ function renderJourneyDrawer() {
 
 // --- Leaflet Map & State Discovery Engine ---
 
-function resetMapView() {
-  if (!leafletMap) return;
-  leafletMap.flyTo(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, { duration: 1.0 });
-  if (resetControlBtn) resetControlBtn.classList.remove("visible");
-  const panel = $("#statePanel");
-  if (panel) {
-    panel.innerHTML = `
-      <p class="eyebrow">SELECT A REGION</p>
-      <h3>Discover a state</h3>
-      <p>Click any pulse marker on the map to inspect regional highlights, local delicacies, and connect immediately to the Smart Itinerary Planner.</p>
-    `;
-  }
-}
 
-function statePanel(name) {
-  const s = states[name];
-  const panel = $("#statePanel");
-  if (!s || !panel) return;
+// ═══════════════════════════════════════════════════════
+//  LEAFLET MAP & STATE DISCOVERY ENGINE
+//  Extracted to js/map.js (Tile layer, cards, boundaries & filters)
+// ═══════════════════════════════════════════════════════
 
-  panel.innerHTML = `
-    <p class="eyebrow">${name.toUpperCase()}</p>
-    <h3>${name}</h3>
-    <p><b>Capital:</b> ${s.capital} • <b>Altitude:</b> ${s.altitude || "Variable"}</p>
-    <p><b>Prime Season:</b> ${s.season}</p>
-    <p><b>Highlights:</b> ${s.top.join(" • ")}</p>
-    <p><b>Signature Experiences:</b> ${s.exp}</p>
-    <p><b>Living Culture:</b> ${s.culture}</p>
-    <p><b>Local Flavors:</b> ${s.food}</p>
-    <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
-      <button class="btn primary" style="padding:9px 18px; font-size:13px;" onclick="loadStateIntoPlanner('${name}')">
-        Plan Itinerary for ${name} →
-      </button>
-      <button class="map-reset-btn" onclick="resetMapView()">↺ Overview Map</button>
-    </div>
-  `;
-}
-
-function loadStateIntoPlanner(stateName) {
-  const select = $("#planDestination");
-  if (!select) return;
-
-  let exists = false;
-  for (let i = 0; i < select.options.length; i++) {
-    if (select.options[i].value.toLowerCase() === stateName.toLowerCase()) {
-      select.selectedIndex = i;
-      exists = true;
-      break;
-    }
-  }
-
-  if (!exists) {
-    const opt = document.createElement("option");
-    opt.value = stateName;
-    opt.text = stateName;
-    select.add(opt);
-    select.value = stateName;
-  }
-
-  toast(`Selected ${stateName} for safety-audited itinerary generation.`);
-  const plannerSec = $("#planner");
-  if (plannerSec) {
-    plannerSec.scrollIntoView({ behavior: "smooth" });
-  }
-
-  const form = $("#plannerForm");
-  if (form) form.dispatchEvent(new Event("submit"));
-}
-
-function initMap() {
-  const mapContainer = document.getElementById("map");
-  if (typeof L === "undefined" || !mapContainer) return;
-
-  mapContainer.innerHTML = "";
-  leafletMap = L.map(mapContainer, {
-    scrollWheelZoom: false,
-    zoomControl: true
-  }).setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
-    maxZoom: 18
-  }).addTo(leafletMap);
-
-  const ResetControl = L.Control.extend({
-    options: { position: 'topright' },
-    onAdd: function () {
-      const btn = L.DomUtil.create('button', 'map-floating-reset');
-      btn.innerHTML = '↺ India Overview';
-      btn.title = 'Zoom out to all India';
-      L.DomEvent.disableClickPropagation(btn);
-      btn.onclick = resetMapView;
-      resetControlBtn = btn;
-      return btn;
-    }
-  });
-  leafletMap.addControl(new ResetControl());
-
-  Object.entries(stateCoordinates).forEach(([stateName, coords]) => {
-    const isLadakh = stateName === "Ladakh";
-    const marker = L.circleMarker(coords, {
-      radius: isLadakh ? 11 : 8.5,
-      fillColor: isLadakh ? "#ff6b35" : "#00b4d8",
-      color: "#ffffff",
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.95
-    }).addTo(leafletMap);
-
-    marker.bindTooltip(`<b>${stateName}</b>${isLadakh ? ' <span style="color:#ff6b35;">(Altitude Focus)</span>' : ''}`, {
-      permanent: false,
-      direction: 'top'
-    });
-
-    marker.on('click', () => {
-      leafletMap.flyTo(coords, 7, { duration: 1.0 });
-      if (resetControlBtn) resetControlBtn.classList.add("visible");
-      statePanel(stateName);
-    });
-  });
-
-  leafletMap.on('zoomend', () => {
-    if (resetControlBtn) {
-      if (leafletMap.getZoom() > DEFAULT_MAP_ZOOM) resetControlBtn.classList.add("visible");
-      else resetControlBtn.classList.remove("visible");
-    }
-  });
-
-  setTimeout(() => leafletMap.invalidateSize(), 200);
-}
-
-// --- AI Agent Streaming Assistant ---
-
-// Minimal markdown renderer for AI responses (bold, bullets, newlines)
-function renderMarkdown(text) {
-  return text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^[•\-] (.+)$/gm, '<span class="ai-bullet">•</span> $1')
-    .replace(/\n\n/g, '</p><p class="ai-para">')
-    .replace(/\n/g, '<br>');
-}
-
-const aiReply = q => {
-  const s = q.toLowerCase();
-  if (s.includes("decongest") || s.includes("offbeat") || s.includes("turtuk") || s.includes("hanle")) {
-    return "Smart Decongestion Strategy: Visiting secondary corridors like Turtuk, Hanle, and Sham Valley diverts tourist footprint away from saturated hotspots like Pangong Lake. This reduces vehicle emissions, relieves alpine water tables, and redistributes 80%+ of tourism revenue directly to remote village families.";
-  }
-  if (s.includes("pack") || s.includes("gear")) {
-    return "High-Pass Himalayan Packing: 1) Thermal base layers (merino wool), 2) Down jacket & windproof shell, 3) Polarized UV-400 sunglasses, 4) Reusable insulated hydration flask (no single-use plastic), 5) High-SPF sunscreen & lip balm, 6) Diamox (consult physician for AMS).";
-  }
-  if (s.includes("acclimat") || s.includes("ams") || s.includes("altitude")) {
-    return "Mandatory Altitude Safety: Leh is situated at 11,500 ft. You MUST allocate 48 hours in Leh for complete rest before ascending Khardung La (17,582 ft) or Pangong Tso. Hydrate with 4+ liters of water daily, avoid alcohol, and carry a pulse oximeter.";
-  }
-  if (s.includes("pass") || s.includes("khardung") || s.includes("road")) {
-    return "Mountain Pass Advisory: Khardung La and Chang La are currently under active monitoring. Pass crossings are permitted between 06:00 and 16:00. Check for black ice on northern descents before early morning departures.";
-  }
-  return "Namaste & Julley! 🙏 I am Bharat AI. I can assist you with real-time pass telemetry, acclimatization pacing, offbeat decongestion corridors, and sustainable village homestays across India.";
-};
-
-async function askAI(q) {
-  if (!q || !q.trim()) return;
-  const box = $("#messages");
-  const orb = $("#aiOrb");
-  const statusText = $("#aiStatusText");
-  const chatForm = $("#chatForm");
-  const submitBtn = chatForm ? chatForm.querySelector("button[type='submit']") : null;
-  const chatInput = $("#chatInput");
-
-  // Safeguard: Disable submit button to prevent parallel conflicting requests
-  if (submitBtn) submitBtn.disabled = true;
-
-  // 1. Instantly append user message synchronously (<10ms)
-  const userMsg = document.createElement("div");
-  userMsg.className = "msg user";
-  userMsg.textContent = q;
-  box.appendChild(userMsg);
-  box.scrollTop = box.scrollHeight;
-
-  // 2. Instantly update orb & status indicator
-  if (orb) orb.className = "ai-orb thinking";
-  if (statusText) statusText.textContent = "Himalayan Intelligence • Connecting...";
-
-  // 3. Mount bot message container synchronously with immediate typing placeholder & blinking cursor
-  const botMsg = document.createElement("div");
-  botMsg.className = "msg bot";
-
-
-  const textSpan = document.createElement("span");
-  textSpan.className = "bot-text";
-  textSpan.textContent = "Connecting to Himalayan Intelligence...";
-  textSpan.style.opacity = "0.7";
-
-  const cursor = document.createElement("span");
-  cursor.textContent = "▍";
-  cursor.className = "typing-cursor";
-
-  botMsg.appendChild(textSpan);
-  botMsg.appendChild(cursor);
-  box.appendChild(botMsg);
-  box.scrollTop = box.scrollHeight;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-  let isFirstChunk = true;
-  let streamText = "";
-
-  try {
-    const res = await fetch("http://127.0.0.1:8000/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: q }),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-    if (!res.ok) throw new Error("Status " + res.status);
-
-    if (orb) orb.className = "ai-orb streaming";
-    if (statusText) statusText.textContent = "Himalayan Intelligence • Streaming...";
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      if (!chunk) continue;
-
-      if (isFirstChunk) {
-        textSpan.textContent = "";
-        textSpan.style.opacity = "1";
-        isFirstChunk = false;
-      }
-
-      streamText += chunk;
-
-      // Render with markdown formatting
-      textSpan.innerHTML = '<p class="ai-para">' + renderMarkdown(streamText.trimStart()) + '</p>';
-      box.scrollTop = box.scrollHeight;
-    }
-
-    if (!streamText.trim()) {
-      textSpan.innerHTML = '<p class="ai-para">' + renderMarkdown(aiReply(q)) + '</p>';
-    }
-  } catch (err) {
-    textSpan.style.opacity = "1";
-    textSpan.innerHTML = '<p class="ai-para">' + renderMarkdown(aiReply(q)) + '</p>';
-    box.scrollTop = box.scrollHeight;
-  } finally {
-    clearTimeout(timeoutId);
-    cursor.remove();
-    if (orb) orb.className = "ai-orb idle";
-    if (statusText) statusText.textContent = "Himalayan Intelligence • Active";
-    if (submitBtn) submitBtn.disabled = false;
-    if (chatInput) chatInput.focus();
-    box.scrollTop = box.scrollHeight;
-  }
-}
-
-// --- Smart Safety-Audited Itinerary Planner ---
-
-async function itinerary(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  
-  const dest = $("#planDestination").value || "Ladakh";
-  const days = Math.min(14, Math.max(1, +$("#planDays").value || 5));
-  const budget = +$("#planBudget").value || 32000;
-  const style = $("#planStyle").value || "Adventure";
-  const interest = $("#planInterest").value || "High Mountain Passes";
-  const ecoHomestays = $("#planEcoHomestays") ? $("#planEcoHomestays").checked : true;
-  const publicTransit = $("#planPublicTransit") ? $("#planPublicTransit").checked : true;
-
-  if (ecoHomestays) updateResponsibleScore(15, "Certified eco-homestay prioritized in trip planner!");
-  if (publicTransit) updateResponsibleScore(10, "EV/shared transit opted in trip planner!");
-
-  const ladakhItinerary = [
-    { title: "Leh Arrival & Mandatory 48-Hour Acclimatization", pass: null, notes: "Complete physical rest. Drink 4L water with electrolytes. Monitor SpO2 levels." },
-    { title: "Sham Valley Offbeat Corridor: Basgo & Alchi", pass: null, notes: "Smart Decongestion route at lower altitude (10,200 ft). Supporting local apricot growers." },
-    { title: "Leh → Nubra Valley Crossing Khardung La Pass", pass: "Khardung La", notes: "Summit stop limited to 15 mins to avoid AMS. 4x4 certified vehicle transfer." },
-    { title: "Turtuk Border Village Heritage Immersion", pass: null, notes: "Decongestion offbeat gem. Supporting women's handwoven pashmina cooperative." },
-    { title: "Nubra → Pangong Tso via Shyok River Scenic Route", pass: null, notes: "Scenic river canyon road. Check water crossing clearance." },
-    { title: "Pangong Lake Sunrise & Hanle Dark Sky Reserve", pass: "Chang La", notes: "Traverse Chang La to reach Hanle Dark Sky Reserve. Experience zero light pollution astrostays." },
-    { title: "Hemis & Thiksey Himalayan Monasteries", pass: null, notes: "Morning prayers, ancient fresco preservation, and living Tibetan Buddhist culture." },
-    { title: "Tso Moriri High-Altitude Wetland Sanctuary", pass: null, notes: "Changthang nomadic settlements, Korzok village homestay, and wildlife respect zone." },
-    { title: "Local Artisan Markets, Seed-paper Packing & Eco-departure", pass: null, notes: "Leave no trace; purchase direct local handicrafts." }
-  ];
-
-  const genericItinerary = [
-    { title: "Arrival, Safety Briefing & Community Orientation", pass: null, notes: "Meet local verified guides and receive regional travel advisory." },
-    { title: "Historic Heritage Trails & Sacred Monastic Centers", pass: null, notes: "Explore architectural gems and traditional craft clusters." },
-    { title: "Eco-Exploration Circuit & Nature Conservation Walk", pass: null, notes: "Zero single-use plastic zone. Support regional biodiversity." },
-    { title: "Community Homestay & Living Culture Immersion", pass: null, notes: "Participate in family meal preparation and local storytelling." },
-    { title: "Local Artisan Markets & Handicraft Cooperative Walk", pass: null, notes: "Direct fair-trade commerce with traditional weavers and artisans." }
-  ];
-
-  const base = dest.toLowerCase().includes("ladakh") ? ladakhItinerary : genericItinerary;
-  const passData = await fetchPassesFromAPI();
-
-  let html = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
-      <div>
-        <p class="eyebrow">YOUR ${days}-DAY SMART ROUTE • ${dest.toUpperCase()}</p>
-        <h3 style="margin:4px 0 0; color:var(--gold-pop); font-size:22px;">${style} • ${interest}</h3>
-      </div>
-      <span style="background:rgba(255,107,53,0.18); color:var(--accent); border:1px solid var(--accent); padding:5px 12px; border-radius:99px; font-size:10.5px; font-weight:800; letter-spacing:0.06em;">
-        ⚡ SMART DECONGESTION AUDITED
-      </span>
-    </div>
-  `;
-
-  for (let i = 0; i < days; i++) {
-    const item = base[i % base.length];
-    const passInfo = item.pass ? passData[item.pass] : null;
-
-    let advisoryBadge = "";
-    if (passInfo) {
-      const isOk = passInfo.status === "OPEN";
-      const isCaution = passInfo.status === "CAUTION";
-      const badgeClass = isOk ? "status-open" : isCaution ? "status-caution" : "status-restricted";
-      const color = isOk ? "#2a9d8f" : isCaution ? "#f4a261" : "#e63946";
-
-      advisoryBadge = `
-        <div class="pass-advisory-badge ${badgeClass}">
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <strong style="color:${color}; font-size:11px; letter-spacing:0.06em;">
-              ⚠️ LIVE PASS ADVISORY: ${item.pass.toUpperCase()}
-            </strong>
-            <span style="font-size:10px; background:${color}; color:#fff; padding:2px 7px; border-radius:4px; font-weight:700;">
-              ${passInfo.status}
-            </span>
-            <span style="font-size:11px; opacity:0.85;">• Altitude: ${passInfo.altitude}</span>
-            <span style="font-size:11px; opacity:0.85;">• Temp: ${passInfo.temperature || "-2°C"}</span>
-          </div>
-          <p style="margin:5px 0 0; font-size:12px; color:#e0e6ed; line-height:1.4;">${passInfo.condition}</p>
-        </div>
-      `;
-    }
-
-    html += `
-      <div class="day">
-        <strong>DAY ${String(i + 1).padStart(2, "0")}</strong>
-        <div>
-          <h3>${item.title}</h3>
-          <p>📍 ${dest} • 🚗 Verified transit • 💰 Est. daily allocation ₹${Math.round(budget / days).toLocaleString()}</p>
-          <p style="margin-top:3px; font-size:12px; color:#9db2be;">📌 <i>Note: ${item.notes}</i></p>
-          ${advisoryBadge}
-        </div>
-      </div>
-    `;
-  }
-
-  const output = $("#itineraryOutput");
-  if (output) output.innerHTML = html;
-}
+// ═══════════════════════════════════════════════════════
+//  AI AGENT & SMART ITINERARY PLANNER
+//  Extracted to js/ai.js (Streaming chat, markdown, pass-audited route generator)
+// ═══════════════════════════════════════════════════════
 
 // --- Gamified Responsible Tourism Score ---
 
@@ -1258,21 +1039,23 @@ function checkRewardUnlock() {
     ringFill.style.strokeDashoffset = CIRCUMFERENCE - (currentScore / 100) * CIRCUMFERENCE;
   }
 
+  const t = (k, fb) => (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t(k) : fb;
+
   if (currentScore >= 95) {
-    if (badge) badge.textContent = "✦ HIMALAYAN GUARDIAN TIER UNLOCKED";
-    if (levelBadge) { levelBadge.className = "level-badge guardian"; levelBadge.textContent = "🏔 Himalayan Guardian"; }
+    if (badge) badge.textContent = t("resp_perk_guardian_unlocked", "✦ HIMALAYAN GUARDIAN TIER UNLOCKED");
+    if (levelBadge) { levelBadge.className = "level-badge guardian"; levelBadge.textContent = t("resp_level_guardian", "🏔 Himalayan Guardian"); }
     if (redeemBtn) redeemBtn.style.boxShadow = "0 0 20px rgba(255, 183, 3, 0.6)";
     if (tier95Header) tier95Header.style.display = "block";
     if (rewardsGrid95) rewardsGrid95.style.display = "grid";
   } else if (currentScore >= 80) {
-    if (badge) badge.textContent = "✦ ECO-CHAMPION TIER UNLOCKED (Vouchers Active)";
-    if (levelBadge) { levelBadge.className = "level-badge silver"; levelBadge.textContent = "🥈 Silver Eco-Traveler"; }
+    if (badge) badge.textContent = t("resp_perk_unlocked", "✦ ECO-CHAMPION TIER UNLOCKED (Vouchers Active)");
+    if (levelBadge) { levelBadge.className = "level-badge silver"; levelBadge.textContent = t("resp_level_silver", "🥈 Silver Eco-Traveler"); }
     if (redeemBtn) redeemBtn.style.boxShadow = "0 0 16px rgba(255, 183, 3, 0.5)";
     if (tier95Header) tier95Header.style.display = "none";
     if (rewardsGrid95) rewardsGrid95.style.display = "none";
   } else {
-    if (badge) badge.textContent = `✦ REACH 80+ TO UNLOCK DIGITAL VOUCHERS (${currentScore}/80)`;
-    if (levelBadge) { levelBadge.className = "level-badge silver"; levelBadge.textContent = "🥈 Silver Eco-Traveler"; }
+    if (badge) badge.textContent = `${t("resp_perk_locked", "✦ REACH 80+ TO UNLOCK DIGITAL VOUCHERS")} (${currentScore}/80)`;
+    if (levelBadge) { levelBadge.className = "level-badge silver"; levelBadge.textContent = t("resp_level_silver", "🥈 Silver Eco-Traveler"); }
     if (redeemBtn) redeemBtn.style.boxShadow = "none";
     if (tier95Header) tier95Header.style.display = "none";
     if (rewardsGrid95) rewardsGrid95.style.display = "none";
@@ -1359,15 +1142,43 @@ async function init() {
   }
   checkRewardUnlock();
 
-  await fetchDestinationsFromAPI();
+  // Instant render with resilient local data (0ms startup delay)
+  activeDestinations = localDestinations;
 
   renderCategories();
   renderResults();
+  renderCircuits();
   renderDestinations();
   renderFood();
   renderJourney();
-  initMap();
   updateSavedCount();
+
+  // Re-render dynamic grids whenever language switches
+  window.addEventListener("bharat-lang-changed", () => {
+    renderCategories();
+    renderCircuits();
+    renderDestinations();
+    renderFood();
+    renderJourney();
+    checkRewardUnlock();
+    renderJourneyDrawer();
+  });
+
+  // Initialize modular subsystems
+  if (typeof window.initMap === "function") window.initMap();
+  if (typeof window.initAI === "function") window.initAI();
+
+  // Background non-blocking API sync
+  fetchDestinationsFromAPI();
+
+  // Circuit region filter pills
+  $$(".circuit-pill").forEach(pill => {
+    pill.onclick = () => {
+      $$(".circuit-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      renderCircuits(pill.dataset.region);
+    };
+  });
 
   // Decongestion & Offbeat filter pills
   $$(".filter-pill").forEach(pill => {
@@ -1385,6 +1196,15 @@ async function init() {
     };
   });
 
+  // Map Hotspot Category Filter Pills
+  $$(".map-filter-pill").forEach(pill => {
+    pill.onclick = () => {
+      $$(".map-filter-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      filterMapHotspots(pill.dataset.mapFilter);
+    };
+  });
+
   // Floating navbar scroll effect
   window.addEventListener("scroll", () => {
     const nav = $("#navbar");
@@ -1399,6 +1219,16 @@ async function init() {
       nav.classList.toggle("open");
       navToggle.setAttribute("aria-expanded", nav.classList.contains("open"));
     };
+
+    $$(".nav nav a").forEach(a => {
+      a.addEventListener("click", () => {
+        const nav = $(".nav");
+        if (nav && nav.classList.contains("open")) {
+          nav.classList.remove("open");
+          navToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
   }
 
   // Itinerary form submission
@@ -1492,10 +1322,9 @@ async function init() {
       $("#journeyDrawer").classList.remove("open");
       const savedIds = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
       const savedItems = activeDestinations.filter(d => savedIds.includes(d.id));
-      if (savedItems.length) {
-        loadStateIntoPlanner(savedItems[0].state || "Ladakh");
-      } else {
-        loadStateIntoPlanner("Ladakh");
+      const targetState = savedItems.length ? (savedItems[0].state || "Ladakh") : "Ladakh";
+      if (typeof window.loadStateIntoPlanner === "function") {
+        window.loadStateIntoPlanner(targetState);
       }
     };
   }
@@ -1565,7 +1394,9 @@ async function init() {
   const cultureBtn = $("#cultureBtn");
   if (cultureBtn) {
     cultureBtn.onclick = () => {
-      askAI("Tell me about the Buddhist culture, monasteries, Losar festival, and traditional attire of Ladakh.");
+      if (typeof window.askAI === "function") {
+        window.askAI("Tell me about the Buddhist culture, monasteries, Losar festival, and traditional attire of Ladakh.");
+      }
       const aiSec = $("#ai");
       if (aiSec) aiSec.scrollIntoView({ behavior: "smooth" });
     };
@@ -1575,13 +1406,129 @@ async function init() {
   const langSelect = $("#language");
   if (langSelect) {
     langSelect.onchange = e => {
-      if (e.target.value === "hi") {
-        toast("हिंदी UI आर्किटेक्चर सक्रिय है; द्विभाषी मोड तैयार। (Hindi mode ready)");
-      } else {
-        toast("English mode active.");
+      if (window.i18n && typeof window.i18n.setLanguage === "function") {
+        window.i18n.setLanguage(e.target.value);
       }
     };
+  }
+
+  // --- 3D Immersive Systems Initialization ---
+  initScrollReveal();
+
+  requestAnimationFrame(() => {
+    initAmbientParticles();
+    initExperienceCard3D();
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCROLL-TRIGGERED REVEAL ANIMATIONS
+//  Fades up section headings and grids as they enter
+//  the viewport using IntersectionObserver.
+// ═══════════════════════════════════════════════════════
+
+function initScrollReveal() {
+  const selectors = [
+    ".section-head",
+    ".category-grid",
+    ".destination-grid",
+    ".experience-grid",
+    ".food-grid",
+    ".planner",
+    ".score-card",
+    ".chat",
+    ".ai-copy",
+    ".responsible-copy",
+    ".culture-copy",
+    ".map-layout",
+    ".journey-track",
+    ".decongestion-container",
+    ".economy-direct-banner",
+    ".final-cta > .eyebrow",
+    ".final-cta > h2",
+    ".final-cta > .btn"
+  ];
+
+  const elements = document.querySelectorAll(selectors.join(","));
+  elements.forEach((el, i) => {
+    el.classList.add("reveal-on-scroll");
+    el.style.transitionDelay = `${Math.min(i * 0.05, 0.3)}s`;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("revealed");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: "0px 0px -20px 0px" });
+
+  elements.forEach(el => observer.observe(el));
+}
+
+// ═══════════════════════════════════════════════════════
+//  AMBIENT FLOATING PARTICLES
+// ═══════════════════════════════════════════════════════
+
+function initAmbientParticles() {
+  const darkSections = document.querySelectorAll(
+    ".hero, .section.dark, .split-section, .journey, .circuit-section"
+  );
+
+  darkSections.forEach(section => {
+    const count = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement("div");
+      particle.className = "ambient-particle";
+
+      const size = 2 + Math.random() * 3;
+      const colors = [
+        "rgba(255, 183, 3, 0.35)",
+        "rgba(0, 180, 216, 0.3)",
+        "rgba(255, 255, 255, 0.18)"
+      ];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      particle.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        background: ${color};
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        --duration: ${14 + Math.random() * 12}s;
+        --delay: ${Math.random() * 10}s;
+        --drift-x: ${(Math.random() - 0.5) * 50}px;
+        --drift-y: ${-20 - Math.random() * 40}px;
+        --max-opacity: ${0.12 + Math.random() * 0.18};
+      `;
+
+      section.appendChild(particle);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPERIENCE CARD 3D TILT
+// ═══════════════════════════════════════════════════════
+
+function initExperienceCard3D() {
+  const cards = document.querySelectorAll(".experience-grid article");
+  if (cards.length) {
+    addCard3D(cards, { maxTilt: 8, glow: true });
   }
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+// ═══════════════════════════════════════════════════════
+//  GLOBAL WINDOW EXPORTS FOR MODULAR SUBSYSTEMS
+// ═══════════════════════════════════════════════════════
+
+window.$ = $;
+window.$$ = $$;
+window.toast = toast;
+window.updateResponsibleScore = updateResponsibleScore;
+window.fetchPassesFromAPI = fetchPassesFromAPI;
+window.activeDestinations = activeDestinations;
+window.localDestinations = localDestinations;
