@@ -6,7 +6,7 @@
 /* Section Layout */
 .map-section {
   padding: 85px 8vw;
-  background: linear-gradient(180deg, var(--paper, #f7f5f0) 0%, #e5e0d7 100%);
+  background: linear-gradient(180deg, var(--paper, #f4efe4) 0%, #e5ddcc 100%);
   position: relative;
   z-index: 1;
 }
@@ -30,9 +30,9 @@
 .map-filter-pill {
   padding: 8px 18px;
   border-radius: 999px;
-  background: rgba(10, 18, 26, 0.06);
-  border: 1.5px solid rgba(10, 18, 26, 0.14);
-  color: var(--ink, #0a121a);
+  background: rgba(10, 28, 20, 0.06);
+  border: 1.5px solid rgba(10, 28, 20, 0.14);
+  color: var(--ink, #0a1c14);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -41,13 +41,13 @@
 }
 
 .map-filter-pill:hover {
-  background: rgba(10, 18, 26, 0.12);
+  background: rgba(10, 28, 20, 0.12);
   transform: translateY(-1px);
 }
 
 .map-filter-pill.active {
   background: var(--ink, #0a121a);
-  border-color: var(--ink, #0a121a);
+  border-color: var(--ink, #0a1c14);
   color: #fff;
   box-shadow: 0 4px 14px rgba(10, 18, 26, 0.28);
 }
@@ -130,7 +130,7 @@
 .map-toggle-btn {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(0, 0, 0, 0.15);
-  color: var(--ink, #0a121a);
+  color: var(--ink, #0a1c14);
   font-family: var(--font-body, 'DM Sans', sans-serif);
   font-size: 11.5px;
   font-weight: 700;
@@ -151,11 +151,11 @@
 .map-toggle-btn.active {
   background: var(--ink, #0a121a);
   color: #ffffff;
-  border-color: var(--ink, #0a121a);
+  border-color: var(--ink, #0a1c14);
 }
 
 .map-toggle-btn.active b {
-  color: var(--gold-pop, #ffb703);
+  color: var(--gold-pop, #e9c46a);
 }
 
 /* State Boundary Hover Tooltip */
@@ -178,7 +178,7 @@
 /* Floating Reset View Button */
 .map-floating-reset {
   background: #ffffff;
-  color: var(--ink, #0a121a);
+  color: var(--ink, #0a1c14);
   border-radius: 999px;
   padding: 8px 18px;
   font-weight: 700;
@@ -265,7 +265,7 @@
 }
 
 /* Category Color Variations */
-.hotspot-pin.cat-mountains { --pin-color: #ff6b35; }
+.hotspot-pin.cat-mountains { --pin-color: #2d6a4f; }
 .hotspot-pin.cat-heritage  { --pin-color: #ffb703; }
 .hotspot-pin.cat-nature    { --pin-color: #2a9d8f; }
 .hotspot-pin.cat-coastal   { --pin-color: #00b4d8; }
@@ -290,7 +290,7 @@
    ═══════════════════════════════════════════════════════ */
 
 .leaflet-tooltip.map-hover-card {
-  background: rgba(12, 22, 32, 0.98) !important;
+  background: rgba(7, 24, 17, 0.98) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.24) !important;
   border-radius: 14px !important;
   padding: 0 !important;
@@ -311,7 +311,7 @@
 
 /* 4-Direction Tooltip Arrows */
 .leaflet-tooltip-top.map-hover-card::before {
-  border-top-color: rgba(12, 22, 32, 0.98) !important;
+  border-top-color: rgba(7, 24, 17, 0.98) !important;
   border-width: 8px 8px 0 !important;
   bottom: -8px !important;
   left: 50% !important;
@@ -319,7 +319,7 @@
 }
 
 .leaflet-tooltip-bottom.map-hover-card::before {
-  border-bottom-color: rgba(12, 22, 32, 0.98) !important;
+  border-bottom-color: rgba(7, 24, 17, 0.98) !important;
   border-width: 0 8px 8px !important;
   top: -8px !important;
   left: 50% !important;
@@ -327,7 +327,7 @@
 }
 
 .leaflet-tooltip-left.map-hover-card::before {
-  border-left-color: rgba(12, 22, 32, 0.98) !important;
+  border-left-color: rgba(7, 24, 17, 0.98) !important;
   border-width: 8px 0 8px 8px !important;
   right: -8px !important;
   top: 50% !important;
@@ -335,7 +335,7 @@
 }
 
 .leaflet-tooltip-right.map-hover-card::before {
-  border-right-color: rgba(12, 22, 32, 0.98) !important;
+  border-right-color: rgba(7, 24, 17, 0.98) !important;
   border-width: 8px 8px 8px 0 !important;
   left: -8px !important;
   top: 50% !important;
@@ -375,7 +375,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(12, 22, 32, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(7, 24, 17, 0.95) 100%);
   pointer-events: none;
 }
 
@@ -400,10 +400,10 @@
   color: #fff;
 }
 
-.map-card-badge.mountains { border-color: #ff6b35; color: #ff9e79; }
-.map-card-badge.heritage  { border-color: #ffb703; color: #ffc93c; }
-.map-card-badge.nature    { border-color: #2a9d8f; color: #52b788; }
-.map-card-badge.coastal   { border-color: #00b4d8; color: #90e0ef; }
+.map-card-badge.mountains { border-color: #52b788; color: #95d5b2; }
+.map-card-badge.heritage  { border-color: #e9c46a; color: #f4d06f; }
+.map-card-badge.nature    { border-color: #2d6a4f; color: #74c69d; }
+.map-card-badge.coastal   { border-color: #40916c; color: #b7e4c7; }
 
 .map-card-alt {
   font-size: 10px;
@@ -434,7 +434,7 @@
 
 .map-card-sub {
   font-size: 11px;
-  color: var(--gold-pop, #ffb703);
+  color: var(--gold-pop, #e9c46a);
   font-weight: 600;
   margin-top: 2px;
 }
@@ -511,7 +511,7 @@
 }
 
 .map-btn-action.plan {
-  background: linear-gradient(135deg, var(--accent, #ff6b35) 0%, #e04b16 100%);
+  background: linear-gradient(135deg, #2d6a4f 0%, #1a4332 100%);
   color: #fff;
   box-shadow: 0 2px 8px var(--accent-glow, rgba(255, 107, 53, 0.35));
 }
@@ -573,7 +573,7 @@
 .state-panel h3 {
   font: 600 30px/1.15 "Playfair Display", serif;
   margin: 6px 0 8px;
-  color: var(--gold-pop, #ffb703);
+  color: var(--gold-pop, #e9c46a);
 }
 
 .state-panel p:not(.eyebrow) {

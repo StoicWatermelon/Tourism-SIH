@@ -6,7 +6,7 @@
 /* AI Split Section & Streaming Chat */
 .split-section {
   padding: 85px 8vw;
-  background: radial-gradient(circle at 75% 25%, #152632 0%, #0c181f 60%, #070e13 100%);
+  background: radial-gradient(circle at 75% 25%, #102d21 0%, #0a2118 60%, #071711 100%);
   color: #fff;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -17,9 +17,9 @@
 .ai-header-badge {
   display: inline-flex;
   padding: 5px 12px;
-  background: rgba(0, 180, 216, 0.15);
-  border: 1px solid rgba(0, 180, 216, 0.35);
-  color: var(--teal-pop, #00b4d8);
+  background: rgba(82, 183, 136, 0.18);
+  border: 1px solid rgba(82, 183, 136, 0.4);
+  color: #74c69d;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.15em;
@@ -37,7 +37,7 @@
 .ai-suggestions button {
   color: #fff;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(116, 198, 157, 0.25);
   border-radius: 999px;
   padding: 8px 16px;
   font-size: 12px;
@@ -47,13 +47,15 @@
 }
 
 .ai-suggestions button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(82, 183, 136, 0.22);
+  border-color: #74c69d;
+  color: #fff;
   transform: translateY(-2px);
 }
 
 .chat {
-  background: #ffffff;
-  color: var(--ink, #0a121a);
+  background: #faf8f2;
+  color: var(--ink, #0a1c14);
   border-radius: var(--radius, 16px);
   height: 540px;
   max-height: 540px;
@@ -61,7 +63,7 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: var(--depth-lg, 0 18px 48px rgba(10, 18, 26, 0.14));
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(82, 183, 136, 0.25);
 }
 
 .chat-head {
@@ -70,7 +72,7 @@
   padding: 18px 22px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.07);
   align-items: center;
-  background: #f8fafb;
+  background: #f4efe4;
   flex-shrink: 0;
 }
 
@@ -87,13 +89,13 @@
 }
 
 .ai-orb.idle {
-  background: linear-gradient(135deg, var(--accent, #ff6b35) 0%, #e04b16 100%);
-  box-shadow: 0 0 12px var(--accent-glow, rgba(255, 107, 53, 0.35));
+  background: linear-gradient(135deg, #2d6a4f 0%, #1a4332 100%);
+  box-shadow: 0 0 12px rgba(82, 183, 136, 0.45);
 }
 
 .ai-orb.thinking {
-  background: linear-gradient(135deg, var(--teal-pop, #00b4d8) 0%, var(--gold-pop, #ffb703) 100%);
-  box-shadow: 0 0 18px rgba(0, 180, 216, 0.6);
+  background: linear-gradient(135deg, #52b788 0%, #e9c46a 100%);
+  box-shadow: 0 0 18px rgba(82, 183, 136, 0.6);
   animation: orbThinking 1.4s linear infinite;
 }
 
@@ -103,8 +105,8 @@
 }
 
 .ai-orb.streaming {
-  background: linear-gradient(135deg, #ff6b35 0%, #ffb703 100%);
-  box-shadow: 0 0 22px rgba(255, 107, 53, 0.7);
+  background: linear-gradient(135deg, #2d6a4f 0%, #74c69d 100%);
+  box-shadow: 0 0 22px rgba(82, 183, 136, 0.7);
 }
 
 .chat-model-tag {
@@ -156,15 +158,16 @@
 }
 
 .msg.bot {
-  background: #f4f6f8;
+  background: #ffffff;
+  border: 1px solid rgba(45, 106, 79, 0.12);
   border-bottom-left-radius: 4px;
   align-self: flex-start;
 }
 
 .msg.user {
-  background: linear-gradient(135deg, var(--accent, #ff6b35) 0%, #dd4b1b 100%);
+  background: linear-gradient(135deg, #2d6a4f 0%, #1a4332 100%);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.35);
   border-bottom-right-radius: 4px;
   align-self: flex-end;
 }
@@ -180,7 +183,8 @@
 .chat-form input {
   flex: 1;
   border: 0;
-  background: #f1f3f4;
+  background: #ffffff;
+  border: 1px solid rgba(45, 106, 79, 0.18);
   outline: 0;
   padding: 11px 16px;
   border-radius: 999px;
@@ -188,7 +192,7 @@
 }
 
 .chat-form button {
-  background: var(--ink, #0a121a);
+  background: #1b4332;
   color: #fff;
   border-radius: 999px;
   padding: 9px 20px;
@@ -200,7 +204,7 @@
 }
 
 .chat-form button:hover:not(:disabled) {
-  background: #1c2e38;
+  background: #2d6a4f;
 }
 
 .chat-form button:disabled {
@@ -210,7 +214,7 @@
 
 .typing-cursor {
   display: inline-block;
-  color: var(--accent, #ff6b35);
+  color: #2d6a4f;
   margin-left: 3px;
   animation: blink 0.7s infinite;
 }
@@ -231,12 +235,12 @@
 }
 
 .bot-text strong {
-  color: var(--ink, #0a121a);
+  color: var(--ink, #0a1c14);
   font-weight: 700;
 }
 
 .ai-bullet {
-  color: var(--emerald-pop, #2a9d8f);
+  color: #52b788;
   font-weight: 800;
   margin-right: 4px;
 }
@@ -245,7 +249,7 @@
   margin: 10px 0 5px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--ink, #0a121a);
+  color: var(--ink, #0a1c14);
 }
 
 .ai-list-item {
@@ -255,7 +259,7 @@
 }
 
 .ai-num {
-  color: var(--accent, #ff6b35);
+  color: #2d6a4f;
   font-weight: 700;
   margin-right: 5px;
 }
@@ -275,13 +279,13 @@
 }
 
 .planner-form {
-  background: #fff;
+  background: #faf8f2;
   border-radius: var(--radius, 16px);
   padding: 30px;
   display: grid;
   gap: 14px;
-  box-shadow: var(--depth-sm, 0 4px 14px rgba(10, 18, 26, 0.08));
-  border: 1px solid rgba(12, 23, 30, 0.08);
+  box-shadow: var(--depth-sm, 0 4px 14px rgba(10, 26, 19, 0.08));
+  border: 1px solid rgba(45, 106, 79, 0.14);
 }
 
 .planner-row {
@@ -301,18 +305,18 @@
 .planner-form label input,
 .planner-form label select {
   width: 100%;
-  border: 1px solid #dfe3e6;
+  border: 1px solid rgba(45, 106, 79, 0.18);
   border-radius: var(--radius-sm, 8px);
   padding: 11px 14px;
   background: #fafaf8;
-  color: var(--ink, #0a121a);
+  color: var(--ink, #0a1c14);
   outline: 0;
   transition: border-color 0.2s ease;
 }
 
 .planner-form label input:focus,
 .planner-form label select:focus {
-  border-color: var(--accent, #ff6b35);
+  border-color: #2d6a4f;
 }
 
 .checkbox-label {
@@ -320,7 +324,7 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  color: var(--ink, #0a121a);
+  color: var(--ink, #0a1c14);
   font-size: 12.5px;
   font-weight: 600;
 }
@@ -328,11 +332,11 @@
 .checkbox-label input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: var(--accent, #ff6b35);
+  accent-color: #2d6a4f;
 }
 
 .itinerary-output {
-  background: var(--surface-dark, #0d1a24);
+  background: var(--surface-dark, #0c231a);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   color: #fff;
@@ -364,7 +368,7 @@
 .day strong {
   font-size: 12px;
   letter-spacing: 0.1em;
-  color: var(--gold-pop, #ffb703);
+  color: var(--gold-pop, #e9c46a);
 }
 
 .day h3 {
@@ -388,7 +392,7 @@
 }
 
 .pass-advisory-badge.status-open {
-  border-left: 4px solid #2a9d8f;
+  border-left: 4px solid #52b788;
 }
 
 .pass-advisory-badge.status-caution {
