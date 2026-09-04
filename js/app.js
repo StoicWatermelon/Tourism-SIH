@@ -1261,6 +1261,21 @@ async function init() {
     };
   }
 
+  // Footer field kit & AMS guidelines links
+  const footerFieldKitLink = $("#footerFieldKitLink");
+  if (footerFieldKitLink) {
+    footerFieldKitLink.onclick = () => {
+      $("#fieldKitModal").classList.add("open");
+    };
+  }
+
+  const footerAmsLink = $("#footerAmsLink");
+  if (footerAmsLink) {
+    footerAmsLink.onclick = () => {
+      $("#fieldKitModal").classList.add("open");
+    };
+  }
+
   // Open field kit from drawer
   const openFieldKitBtn = $("#openFieldKitBtn");
   if (openFieldKitBtn) {

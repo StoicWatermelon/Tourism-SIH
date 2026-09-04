@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Breakerz — Smart India Hackathon</title>
+<meta name="description" content="Code Breakerz — Smart India Hackathon team showcase">
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
+<link rel="shortcut icon" href="assets/images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+  /* =========================================================
+     0. TOKENS
+     ========================================================= */
+  :root{
+    --chalk:#FFFFFF;
+    --platinum:#F4F5F7;
+    --obsidian:#111111;
+    --obsidian-70: rgba(17,17,17,.7);
+    --obsidian-45: rgba(17,17,17,.45);
+    --indigo:#4F46E5;
+    --teal:#06B6D4;
+    --glass: rgba(255,255,255,.5);
+    --glass-strong: rgba(255,255,255,.72);
+    --hair: #E2E8F0;
+    --hair-strong:#D6DBE3;
+    --shadow-soft: 0 1px 2px rgba(17,17,17,.04), 0 20px 40px -20px rgba(17,17,17,.14);
+    --ease-out: cubic-bezier(.16,1,.3,1);
+    --ease-soft: cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html,body{ height:100%; }
+
+  body{
+    background:
+      radial-gradient(ellipse 1200px 700px at 15% -10%, rgba(79,70,229,.07), transparent 60%),
+      radial-gradient(ellipse 1000px 800px at 100% 10%, rgba(6,182,212,.06), transparent 55%),
+      linear-gradient(180deg, #FFFFFF 0%, #F4F5F7 100%);
+    color: var(--obsidian);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .font-display{ font-family: 'Space Grotesk', 'Inter', sans-serif; }
+
+  ::selection{ background: rgba(79,70,229,.16); color: var(--obsidian); }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+
+  img, svg{ display:block; max-width:100%; }
+
+  :focus-visible{
+    outline: 2px solid var(--indigo);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  @media (max-width: 720px){
+    .wrap{ padding: 0 22px; }
+  }
+
+  /* =========================================================
+     1. AMBIENT FIELD (fixed, behind everything)
+     ========================================================= */
+  .field{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .orb{
+    position:absolute;
+    border-radius:50%;
+    filter: blur(60px);
+    opacity:.5;
+    will-change: transform;
+  }
+  .orb--a{ width:520px; height:520px; left:-160px; top:-120px;
+    background: radial-gradient(circle at 35% 30%, rgba(79,70,229,.30), rgba(79,70,229,0) 70%); }
+  .orb--b{ width:600px; height:600px; right:-220px; top:8%;
+    background: radial-gradient(circle at 60% 40%, rgba(6,182,212,.24), rgba(6,182,212,0) 70%); }
+  .orb--c{ width:420px; height:420px; left:8%; top:60%;
+    background: radial-gradient(circle at 50% 50%, rgba(79,70,229,.16), rgba(79,70,229,0) 70%); }
+  .orb--d{ width:380px; height:380px; right:6%; bottom:-4%;
+    background: radial-gradient(circle at 50% 50%, rgba(6,182,212,.18), rgba(6,182,212,0) 70%); }
+
+  .grain{
+    position:absolute; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+
+  /* =========================================================
+     2. NAV
+     ========================================================= */
+  .nav{
+    position: fixed;
+    top:0; left:0; right:0;
+    z-index: 40;
+    padding: 20px 0;
+  }
+  .nav__inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 10px 18px 10px 20px;
+    background: var(--glass-strong);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    box-shadow: var(--shadow-soft);
+  }
+  .nav__mark{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+  .nav__mark .dot{
+    width:9px; height:9px; border-radius:50%;
+    background: linear-gradient(135deg, var(--indigo), var(--teal));
+    box-shadow: 0 0 0 4px rgba(79,70,229,.10);
+  }
+  .nav__cta{
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: var(--obsidian);
+    color: var(--chalk);
+    transition: transform .45s var(--ease-out), background .3s ease;
+  }
+  .nav__cta:hover{ transform: translateY(-1px); background:#000; }
+
+  /* =========================================================
+     3. HERO
+     ========================================================= */
+  .hero{
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+
+  .hero__eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size: 13.5px;
+    color: var(--obsidian-70);
+    margin-bottom: 28px;
+    opacity:0;
+  }
+  .hero__eyebrow .rule{
+    width: 34px; height:1px;
+    background: linear-gradient(90deg, var(--indigo), var(--teal));
+  }
+
+  .hero__title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    line-height: .94;
+    letter-spacing: -0.035em;
+    font-size: clamp(58px, 10.4vw, 168px);
+    color: var(--obsidian);
+    display:flex;
+    flex-wrap: wrap;
+  }
+  .hero__title .word{
+    display:flex;
+    overflow:hidden;
+    margin-right: 0.24em;
+  }
+  .hero__title .char{
+    display:inline-block;
+    transform: translateY(115%) rotate(6deg);
+    will-change: transform;
+  }
+  .hero__title .word--accent .char{
+    background: linear-gradient(120deg, var(--indigo) 10%, var(--teal) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero__sub{
+    max-width: 560px;
+    margin-top: 30px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--obsidian-70);
+    opacity: 0;
+  }
+
+  .hero__meta{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 40px;
+    opacity: 0;
+  }
+  .chip{
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--hair);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    color: var(--obsidian-70);
+  }
+
+  .hero__scroll{
+    position:absolute;
+    bottom: 40px;
+    left: 32px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--obsidian-45);
+    opacity:0;
+  }
+  .hero__scroll .line{
+    width:1px; height:34px;
+    background: linear-gradient(180deg, var(--obsidian-45), transparent);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero__scroll .line::after{
+    content:'';
+    position:absolute; left:0; top:-100%;
+    width:100%; height:100%;
+    background: linear-gradient(180deg, transparent, var(--indigo));
+    animation: scrollDrip 2.2s ease-in-out infinite;
+  }
+  @keyframes scrollDrip{
+    0%{ top:-100%; }
+    60%{ top: 100%; }
+    100%{ top: 100%; }
+  }
+
+  @media (max-width: 720px){
+    .hero{ padding-top: 108px; }
+    .hero__scroll{ left: 22px; }
+  }
+
+  /* =========================================================
+     4. MANIFESTO STRIP
+     ========================================================= */
+  .manifesto{
+    position: relative;
+    z-index: 1;
+    padding: 60px 0 100px;
+    border-top: 1px solid var(--hair);
+  }
+  .manifesto__inner{
+    display:grid;
+    grid-template-columns: 200px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .manifesto__label{
+    font-size: 13.5px;
+    color: var(--obsidian-45);
+    padding-top: 4px;
+  }
+  .manifesto__text{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: clamp(22px, 2.6vw, 32px);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    max-width: 760px;
+    color: var(--obsidian);
+  }
+  .manifesto__text .soft{ color: var(--obsidian-45); }
+
+  @media (max-width: 780px){
+    .manifesto__inner{ grid-template-columns: 1fr; gap: 16px; }
+  }
+
+  /* =========================================================
+     5. TEAM SECTION
+     ========================================================= */
+  .team{
+    position: relative;
+    z-index: 1;
+    padding: 20px 0 140px;
+  }
+  .team__head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap: 24px;
+    margin-bottom: 52px;
+  }
+  .team__title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(32px, 4vw, 48px);
+    letter-spacing: -0.02em;
+  }
+  .team__note{
+    max-width: 300px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--obsidian-45);
+    text-align: right;
+  }
+  @media (max-width: 780px){
+    .team__head{ flex-direction: column; align-items:flex-start; }
+    .team__note{ text-align:left; }
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+  }
+  .card{
+    grid-column: span 3;
+    position: relative;
+  }
+  .card--lead{ grid-column: span 6; }
+  .card--pair{ grid-column: span 3; }
+
+  @media (max-width: 980px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+    .card{ grid-column: span 2; }
+    .card--lead{ grid-column: span 2; }
+  }
+
+  .card__frame{
+    position: relative;
+    height: 100%;
+    padding: 1px;
+    border-radius: 22px;
+    background: var(--hair);
+    transition: background .5s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .card__frame::before{
+    content:'';
+    position:absolute;
+    inset: -1px;
+    border-radius: 22px;
+    padding: 1px;
+    background: conic-gradient(from calc(var(--gx,0) * 1deg) at var(--mx,50%) var(--my,50%),
+      var(--teal), var(--indigo), transparent 40%, transparent 60%, var(--teal));
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                  linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
+
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity .5s ease;
+    pointer-events: none;
+  }
+  .card:hover .card__frame::before{ opacity: 1; }
+
+  .card__inner{
+    position: relative;
+    height: 100%;
+    border-radius: 21px;
+    background: var(--glass);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    padding: 34px 32px 30px;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 232px;
+    overflow: hidden;
+    transition: box-shadow .5s var(--ease-soft);
+  }
+  .card--lead .card__inner{ min-height: 210px; }
+
+  .card__glow{
+    position:absolute;
+    inset:0;
+    background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(79,70,229,.10), transparent 60%);
+    opacity: 0;
+    transition: opacity .4s ease;
+    pointer-events: none;
+  }
+  .card:hover .card__glow{ opacity: 1; }
+  .card:hover .card__inner{ box-shadow: 0 24px 50px -24px rgba(17,17,17,.20); }
+
+  .card__top{
+    display:flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .card__badge{
+    width: 46px; height: 46px;
+    border-radius: 14px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--chalk);
+    background: linear-gradient(135deg, var(--indigo), var(--teal));
+    flex-shrink: 0;
+    box-shadow: 0 8px 18px -8px rgba(79,70,229,.55);
+  }
+
+  .card__arrow{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--hair-strong);
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .5s var(--ease-out), border-color .3s ease, background .3s ease;
+    flex-shrink: 0;
+  }
+  .card__arrow svg{ width:14px; height:14px; transition: transform .5s var(--ease-out); }
+  .card:hover .card__arrow{
+    background: var(--obsidian);
+    border-color: var(--obsidian);
+  }
+  .card:hover .card__arrow svg{ transform: rotate(45deg); stroke: var(--chalk); }
+
+  .card__body{ margin-top: 22px; }
+  .card__name{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 21px;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .card--lead .card__name{ font-size: 25px; }
+
+  .card__role{
+    font-size: 13.5px;
+    color: var(--indigo);
+    font-weight: 500;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .card__desc{
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--obsidian-45);
+    max-width: 46ch;
+  }
+
+  .card{ cursor: pointer; }
+
+  /* =========================================================
+     6. MODAL
+     ========================================================= */
+  .modal-layer{
+    position: fixed; inset:0;
+    z-index: 100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .modal-layer.is-open{ pointer-events: auto; }
+  .modal-backdrop{
+    position:absolute; inset:0;
+    background: rgba(17,17,17,.28);
+    backdrop-filter: blur(6px);
+  }
+  .modal{
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: var(--chalk);
+    border: 1px solid var(--hair);
+    border-radius: 24px;
+    padding: 36px 32px;
+    box-shadow: 0 40px 80px -30px rgba(17,17,17,.35);
+    transform: translateY(24px) scale(.96);
+  }
+  .modal__badge{
+    width: 50px; height:50px;
+    border-radius: 15px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    color: var(--chalk);
+    background: linear-gradient(135deg, var(--indigo), var(--teal));
+    margin-bottom: 20px;
+  }
+  .modal__name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .modal__role{ font-size: 13.5px; color: var(--indigo); font-weight:500; margin-bottom: 16px; }
+  .modal__desc{ font-size: 14.5px; line-height:1.6; color: var(--obsidian-70); margin-bottom: 26px; }
+  .modal__actions{ display:flex; gap: 10px; }
+  .modal__go{
+    flex:1;
+    text-align:center;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: var(--obsidian);
+    color: var(--chalk);
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform .4s var(--ease-out);
+  }
+  .modal__go:hover{ transform: translateY(-1px); }
+  .modal__close{
+    width: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--hair-strong);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .modal__close:hover{ background: var(--platinum); }
+
+  /* =========================================================
+     7. FOOTER
+     ========================================================= */
+  .footer{
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--hair);
+    padding: 46px 0 40px;
+  }
+  .footer__inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .footer__mark{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+  }
+  .footer__meta{
+    font-size: 13px;
+    color: var(--obsidian-45);
+  }
+
+  /* =========================================================
+     8. REDUCED MOTION
+     ========================================================= */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    html{ scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="field" aria-hidden="true">
+    <div class="orb orb--a" data-speed="0.4"></div>
+    <div class="orb orb--b" data-speed="0.6"></div>
+    <div class="orb orb--c" data-speed="0.3"></div>
+    <div class="orb orb--d" data-speed="0.5"></div>
+    <div class="grain"></div>
+  </div>
+
+  <nav class="nav">
+    <div class="wrap">
+      <div class="nav__inner">
+        <div class="nav__mark">
+          <img src="assets/images/favicon.png" alt="Code Breakerz Logo" style="width:26px;height:26px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.15);">
+          <span>CODE BREAKERZ</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <a href="/" class="nav__back" style="font-size:13px;font-weight:500;padding:8px 16px;border-radius:999px;border:1px solid var(--hair);background:var(--glass);color:var(--obsidian-70);transition:all .3s ease;">← Bharat Explore</a>
+          <a href="#team" class="nav__cta">Meet the team</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="wrap">
+      <p class="hero__eyebrow" id="eyebrow"><span class="rule"></span> Smart India Hackathon · Team Dossier</p>
+      <h1 class="hero__title" id="heroTitle">
+        <span class="word" data-word="CODE"></span><span class="word word--accent" data-word="BREAKERZ"></span>
+      </h1>
+      <p class="hero__sub" id="heroSub">
+        Six builders, one problem statement, and a shared refusal to ship anything ordinary. This is the team behind the build — meet the people making it happen.
+      </p>
+      <div class="hero__meta" id="heroMeta">
+        <span class="chip">6 members</span>
+        <span class="chip">1 problem statement</span>
+        <span class="chip">Built under pressure, on purpose</span>
+      </div>
+    </div>
+    <div class="hero__scroll" id="heroScroll"><span class="line"></span> Scroll</div>
+  </header>
+
+  <!-- ============ MANIFESTO ============ -->
+  <section class="manifesto">
+    <div class="wrap manifesto__inner">
+      <span class="manifesto__label">The lineup</span>
+      <p class="manifesto__text">
+        Every hackathon team is a bet on how six different minds handle the same deadline.
+        <span class="soft">Ours splits the weight on purpose — architecture, engineering, research, resourcing, and the occasional reminder to breathe — so nothing important is ever riding on one person alone.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ TEAM ============ -->
+  <section class="team" id="team">
+    <div class="wrap">
+      <div class="team__head">
+        <h2 class="team__title">The Breakers</h2>
+        <p class="team__note">Tap any card for contact details and links.</p>
+      </div>
+
+      <div class="grid" id="cardGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal-layer" id="modalLayer">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal" id="modal">
+      <div class="modal__badge" id="modalBadge"></div>
+      <h3 class="modal__name" id="modalName"></h3>
+      <p class="modal__role" id="modalRole"></p>
+      <p class="modal__desc" id="modalDesc"></p>
+      <div class="modal__actions">
+        <a class="modal__go" id="modalGo" href="javascript:void(0)" target="_blank" rel="noopener">View profile</a>
+        <button class="modal__close" id="modalClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <span class="footer__mark">CODE BREAKERZ</span>
+      <span class="footer__meta">Smart India Hackathon · Built by the team, for the judges</span>
+    </div>
+  </footer>
+
+<script>
+(function(){
+
+  /* =========================================================
+     DATA — roster + EDITABLE LINK PLACEHOLDERS
+     Replace the URL strings below with real links
+     (LinkedIn, GitHub, portfolio, etc.) for each member.
+     ========================================================= */
+  const TEAM = [
+    {
+      id: "sarnajit-dhar",
+      name: "Sarnajit Dhar",
+      role: "Team Captain",
+      desc: "Strategic visionary.",
+      initials: "S",
+      lead: true,
+      link: "https://www.linkedin.com/in/sarnajitdhar" // TODO: replace with Sarnajit's profile URL
+    },
+    {
+      id: "riddhadeb-parua",
+      name: "Riddhadeb Parua",
+      role: "Lead Developer & Principal Core Engineer",
+      desc: "Master of core algorithms, backend scalability, marvelous architechture and heavy-duty logic integration.",
+      initials: "R",
+      link: "#" // TODO: replace with Riddhadeb's profile URL
+    },
+    {
+      id: "piyal-tambuli",
+      name: "Piyal Tambuli",
+      role: "Lead Developer & Principal Core Engineer",
+      desc: "Master of advanced systems architecture, heavy-duty logic integration, and robust infrastructure.",
+      initials: "P",
+      link: "https://piyal9.github.io/Piyal_Web/" // TODO: replace with Piyal's profile URL
+    },
+    {
+      id: "rimil-mukherjee",
+      name: "Rimil Mukherjee",
+      role: "Director of Research & Chief Presentation Strategist",
+      desc: "Transforms complex technical architectures into compelling visual data narratives and pitch decks.",
+      initials: "RM",
+      link: "#" // TODO: replace with Rimil's profile URL
+    },
+    {
+      id: "souryadeep-pandit",
+      name: "Souryadeep Pandit",
+      role: "Chief Resource Officer & Logistics Orchestrator",
+      desc: "Acquires critical assets, manages external dependencies, and ensures frictionless operational workflow.",
+      initials: "SP",
+      link: "#" // TODO: replace with Souryadeep's profile URL
+    },
+    {
+      id: "supratim-das",
+      name: "Supratim Das",
+      role: "Executive Chairman of Leisure & Philosophy",
+      desc: "Maintains structural team equilibrium, oversees high-level morale, and guards conceptual vibes.",
+      initials: "SD",
+      link: "#" // TODO: replace with Supratim's profile URL
+    }
+  ];
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* =========================================================
+     BUILD CARD GRID
+     ========================================================= */
+  const gridEl = document.getElementById('cardGrid');
+
+  TEAM.forEach((member, i) => {
+    const card = document.createElement('article');
+    card.className = 'card' + (member.lead ? ' card--lead' : '');
+    card.setAttribute('data-id', member.id);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `View details for ${member.name}, ${member.role}`);
+
+    card.innerHTML = `
+      <div class="card__frame">
+        <div class="card__inner">
+          <div class="card__glow"></div>
+          <div class="card__top">
+            <div class="card__badge">${member.initials}</div>
+            <div class="card__arrow">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="card__body">
+            <h3 class="card__name">${member.name}</h3>
+            <p class="card__role">${member.role}</p>
+            <p class="card__desc">${member.desc}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    gridEl.appendChild(card);
+
+    const openHandler = () => openModal(member);
+    card.addEventListener('click', openHandler);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openHandler(); }
+    });
+
+    /* Magnetic tilt + border-glow tracking */
+    if (!prefersReduced && window.matchMedia('(hover: hover)').matches) {
+      const frame = card.querySelector('.card__frame');
+      const inner = card.querySelector('.card__inner');
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+        const mx = px * 100, my = py * 100;
+        frame.style.setProperty('--mx', mx + '%');
+        frame.style.setProperty('--my', my + '%');
+        frame.style.setProperty('--gx', Math.round(mx * 3.6));
+
+        const rotY = (px - 0.5) * 8;
+        const rotX = (0.5 - py) * 8;
+        gsap.to(inner, { rotateX: rotX, rotateY: rotY, transformPerspective: 800, duration: 0.5, ease: 'power2.out' });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(inner, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'power3.out' });
+      });
+    }
+  });
+
+  /* =========================================================
+     MODAL
+     ========================================================= */
+  const modalLayer = document.getElementById('modalLayer');
+  const modal = document.getElementById('modal');
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  let activeCard = null;
+
+  function openModal(member){
+    document.getElementById('modalBadge').textContent = member.initials;
+    document.getElementById('modalName').textContent = member.name;
+    document.getElementById('modalRole').textContent = member.role;
+    document.getElementById('modalDesc').textContent = member.desc;
+    const goBtn = document.getElementById('modalGo');
+    goBtn.href = member.link; // EDITABLE per-member link, see TEAM data above
+
+    modalLayer.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+
+    gsap.killTweensOf([modalLayer, modal]);
+    gsap.to(modalLayer, { opacity: 1, duration: 0.35, ease: 'power2.out' });
+    gsap.fromTo(modal, { y: 24, scale: 0.96, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.6)' });
+  }
+
+  function closeModal(){
+    gsap.to(modal, { y: 16, scale: 0.97, opacity: 0, duration: 0.3, ease: 'power2.in' });
+    gsap.to(modalLayer, {
+      opacity: 0, duration: 0.3, ease: 'power2.in',
+      onComplete: () => {
+        modalLayer.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  modalBackdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalLayer.classList.contains('is-open')) closeModal();
+  });
+
+  /* =========================================================
+     HERO TEXT — shatter-in reveal
+     ========================================================= */
+  document.querySelectorAll('.hero__title .word').forEach(wordEl => {
+    const text = wordEl.getAttribute('data-word');
+    text.split('').forEach(ch => {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = ch;
+      wordEl.appendChild(span);
+    });
+  });
+
+  const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+
+  tl.to('#eyebrow', { opacity: 1, duration: 0.6 }, 0.1)
+    .to('.hero__title .char', {
+      y: 0,
+      rotate: 0,
+      duration: 1.1,
+      stagger: { each: 0.028, from: 'start' }
+    }, 0.15)
+    .to('#heroSub', { opacity: 1, duration: 0.8 }, 0.75)
+    .to('#heroMeta', { opacity: 1, duration: 0.8 }, 0.9)
+    .to('#heroScroll', { opacity: 1, duration: 0.6 }, 1.1);
+
+  /* =========================================================
+     SCROLL-TRIGGERED REVEALS + PARALLAX ORBS
+     ========================================================= */
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.utils.toArray('.card').forEach((card, i) => {
+    gsap.fromTo(card,
+      { opacity: 0, y: 36 },
+      {
+        opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+        delay: (i % 2) * 0.06,
+        scrollTrigger: { trigger: card, start: 'top 92%', once: true }
+      }
+    );
+  });
+
+  gsap.fromTo('.manifesto__text',
+    { opacity: 0, y: 24 },
+    { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+      scrollTrigger: { trigger: '.manifesto', start: 'top 80%', once: true } }
+  );
+
+  if (!prefersReduced) {
+    document.querySelectorAll('.orb').forEach(orb => {
+      const speed = parseFloat(orb.getAttribute('data-speed')) || 0.4;
+      gsap.to(orb, {
+        y: () => window.innerHeight * speed * 0.5,
+        ease: 'none',
+        scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.6 }
+      });
+    });
+  }
+
+})();
+</script>
+</body>
+</html>

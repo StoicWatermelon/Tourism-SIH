@@ -1046,6 +1046,24 @@ def serve_index():
         return HTMLResponse(content=html, media_type="text/html")
     return {"message": "Bharat Explore API is running. Access endpoints via /api/destinations or /api/passes"}
 
+@app.get("/CodeBreakerz.html")
+@app.get("/CodeBrekerz.html")
+@app.get("/codebreakerz")
+@app.get("/team")
+def serve_codebreakerz():
+    cb_file = BASE_DIR / "CodeBreakerz.html"
+    if cb_file.exists():
+        return FileResponse(str(cb_file), media_type="text/html")
+    raise HTTPException(status_code=404, detail="CodeBreakerz document not found")
+
+@app.get("/favicon.ico")
+@app.get("/favicon.png")
+def serve_favicon():
+    fav_file = BASE_DIR / "assets" / "images" / "favicon.png"
+    if fav_file.exists():
+        return FileResponse(str(fav_file), media_type="image/png")
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
