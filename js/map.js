@@ -876,6 +876,7 @@ function onEachStateFeature(feature, layer) {
       }
     },
     click: function (e) {
+      closeActiveTooltip();
       leafletMap.fitBounds(e.target.getBounds(), {
         padding: [30, 30],
         maxZoom: 8
@@ -936,7 +937,10 @@ function createHotspotHoverCard(h) {
       <div class="map-card-banner" style="background-image: url('${h.img}')">
         <div class="map-card-banner-top">
           <span class="map-card-badge ${h.category}">${getCategoryEmoji(h.category)} ${h.badge || h.category}</span>
-          <span class="map-card-alt">${h.altitude}</span>
+          <div class="map-card-banner-controls">
+            <span class="map-card-alt">${h.altitude}</span>
+            <button class="map-card-close-btn" onclick="event.stopPropagation(); if (window.closeActiveTooltip) window.closeActiveTooltip();" title="Close card" aria-label="Close card">✕</button>
+          </div>
         </div>
       </div>
       <div class="map-card-content">
@@ -961,6 +965,7 @@ function createHotspotHoverCard(h) {
 }
 
 function resetMapView() {
+  closeActiveTooltip();
   if (!leafletMap) return;
   try {
     leafletMap.flyToBounds([[7.5, 68.0], [35.8, 97.5]], {
@@ -976,7 +981,7 @@ function resetMapView() {
     panel.innerHTML = `
       <p class="eyebrow">SELECT A REGION</p>
       <h3>Discover India</h3>
-      <p>Hover over any pulse marker on the map to preview interactive cards, or click to inspect full regional telemetry and connect immediately to the Smart Itinerary Planner.</p>
+      <p>Click on any pulse marker on the map to inspect full interactive cards and regional telemetry, or connect immediately to the Smart Itinerary Planner.</p>
     `;
   }
 }
@@ -987,22 +992,50 @@ function focusHotspot(id) {
 
   const marker = hotspotMarkersMap[h.id];
 
-  if (leafletMap) {
-    // Dismiss any active tooltip before flight to prevent visual jitter
-    closeActiveTooltip(true);
+  // Dismiss any active tooltip before flight
+  closeActiveTooltip();
+  currentActiveHotspotId = h.id;
+  currentActiveMarker = marker;
 
-    leafletMap.flyTo(h.coords, 8, { duration: 0.95 });
-    if (resetControlBtn) resetControlBtn.classList.add("visible");
-
-    // Once flight finishes, display card and auto-pan if needed so it is never cut off
-    leafletMap.once('moveend', () => {
-      if (marker) {
-        displayHotspotCard(marker, h, true);
-      }
-    });
+  if (marker && marker._icon) {
+    const pin = marker._icon.querySelector('.hotspot-pin');
+    if (pin) pin.classList.add('active-pin');
   }
 
   renderHotspotInPanel(h);
+
+  if (leafletMap) {
+    const currentCenter = leafletMap.getCenter();
+    const currentZoom = leafletMap.getZoom();
+    
+    // Zoom in target: at least 8.5 for a clear, high-fidelity regional focus, or deeper if already zoomed in
+    const targetZoom = Math.min(11, Math.max(currentZoom < 8.5 ? 8.5 : currentZoom + 0.75, 8.5));
+    const isAlreadyAtTarget = Math.abs(currentZoom - targetZoom) < 0.25 && currentCenter.distanceTo(L.latLng(h.coords)) < 200;
+
+    if (isAlreadyAtTarget) {
+      displayHotspotCard(marker, h, true);
+    } else {
+      // Execute cinematic zoom-in flight directly to destination coordinates
+      leafletMap.flyTo(h.coords, targetZoom, {
+        duration: 0.9,
+        easeLinearity: 0.25
+      });
+      if (resetControlBtn) resetControlBtn.classList.add("visible");
+
+      let cardOpened = false;
+      const showCard = () => {
+        if (!cardOpened && currentActiveHotspotId === h.id) {
+          cardOpened = true;
+          displayHotspotCard(marker, h, true);
+        }
+      };
+
+      leafletMap.once('moveend', showCard);
+      setTimeout(showCard, 950);
+    }
+  } else {
+    displayHotspotCard(marker, h, true);
+  }
 
   // Mobile smooth view scroll if needed
   if (window.innerWidth < 900) {
@@ -1158,6 +1191,14 @@ function filterMapHotspots(category) {
     }
   });
 
+  // If active card's hotspot was filtered out, close it
+  if (currentActiveHotspotId) {
+    const isVisible = filtered.some(h => h.id === currentActiveHotspotId);
+    if (!isVisible) {
+      closeActiveTooltip();
+    }
+  }
+
   // Keep markers above state polygons
   if (hotspotMarkersLayer) hotspotMarkersLayer.bringToFront();
 
@@ -1172,28 +1213,22 @@ function filterMapHotspots(category) {
   toast(`Map filtered to ${catNames[category] || category} (${filtered.length} nodes).`);
 }
 
-// --- Hotspot Card Manager (Single-Active, Zero-Jitter, Auto-Pan Prevention) ---
+// --- Hotspot Card Manager (Single-Active, Persistent, Click-Driven) ---
+let currentTooltip = null;
 let currentActiveMarker = null;
-let cardDismissTimer = null;
-let isPointerInsideCard = false;
+let currentActiveHotspotId = null;
 
-function closeActiveTooltip(immediate = false) {
-  clearTimeout(cardDismissTimer);
-  cardDismissTimer = null;
-  if (!currentActiveMarker) return;
-
-  if (immediate) {
-    currentActiveMarker.closeTooltip();
-    currentActiveMarker = null;
-    isPointerInsideCard = false;
-  } else {
-    cardDismissTimer = setTimeout(() => {
-      if (!isPointerInsideCard && currentActiveMarker) {
-        currentActiveMarker.closeTooltip();
-        currentActiveMarker = null;
-      }
-    }, 170);
+function closeActiveTooltip() {
+  if (currentTooltip && leafletMap) {
+    leafletMap.removeLayer(currentTooltip);
+    currentTooltip = null;
   }
+  if (currentActiveMarker && currentActiveMarker._icon) {
+    const pin = currentActiveMarker._icon.querySelector('.hotspot-pin');
+    if (pin) pin.classList.remove('active-pin');
+  }
+  currentActiveMarker = null;
+  currentActiveHotspotId = null;
 }
 
 function calculateOptimalPlacement(marker, h) {
@@ -1277,36 +1312,43 @@ function ensureCardFullyInView(tooltipEl) {
 }
 
 function displayHotspotCard(marker, h, autoPan = true) {
-  if (!marker) return;
-  clearTimeout(cardDismissTimer);
-  cardDismissTimer = null;
+  if (!leafletMap || !h) return;
 
-  // Mutual exclusion: Immediately close previous card so multiple cards never overlap or jitter
-  if (currentActiveMarker && currentActiveMarker !== marker) {
-    currentActiveMarker.closeTooltip();
-  }
+  // Mutual exclusion: Close previous card cleanly
+  closeActiveTooltip();
 
   currentActiveMarker = marker;
+  currentActiveHotspotId = h.id;
 
-  const placement = calculateOptimalPlacement(marker, h);
-  const tt = marker.getTooltip();
-  if (tt) {
-    tt.options.direction = placement.dir;
-    tt.options.offset = placement.offset;
-    if (tt._container) {
-      tt._container.className = `leaflet-tooltip leaflet-zoom-animated leaflet-tooltip-${placement.dir} map-hover-card cat-${h.category}`;
-    }
+  if (marker && marker._icon) {
+    const pin = marker._icon.querySelector('.hotspot-pin');
+    if (pin) pin.classList.add('active-pin');
   }
 
-  marker.openTooltip();
+  const placement = calculateOptimalPlacement(marker, h);
+
+  currentTooltip = L.tooltip({
+    direction: placement.dir,
+    offset: placement.offset,
+    className: `map-hover-card cat-${h.category}`,
+    interactive: true,
+    opacity: 1
+  })
+  .setLatLng(h.coords)
+  .setContent(createHotspotHoverCard(h))
+  .openOn(leafletMap);
+
   renderHotspotInPanel(h);
 
-  if (autoPan) {
+  const tooltipEl = currentTooltip.getElement();
+  if (tooltipEl) {
+    L.DomEvent.disableClickPropagation(tooltipEl);
+    L.DomEvent.disableScrollPropagation(tooltipEl);
+  }
+
+  if (autoPan && tooltipEl) {
     requestAnimationFrame(() => {
-      const tooltipElement = marker.getTooltip() ? marker.getTooltip().getElement() : null;
-      if (tooltipElement) {
-        ensureCardFullyInView(tooltipElement);
-      }
+      ensureCardFullyInView(tooltipEl);
     });
   }
 }
@@ -1467,41 +1509,19 @@ function initMap() {
 
     const marker = L.marker(h.coords, { icon: customIcon });
 
-    const initPlace = calculateOptimalPlacement(marker, h);
-    const cardHtml = createHotspotHoverCard(h);
-    marker.bindTooltip(cardHtml, {
-      interactive: true,
-      direction: initPlace.dir,
-      offset: initPlace.offset,
-      className: `map-hover-card cat-${h.category}`,
-      opacity: 1
-    });
-
-    marker.on("mouseover", () => {
-      displayHotspotCard(marker, h, true);
-    });
-
-    marker.on("mouseout", () => {
-      closeActiveTooltip(false);
-    });
-
-    marker.on("tooltipopen", (e) => {
-      const tooltipEl = e.tooltip.getElement();
-      if (tooltipEl) {
-        tooltipEl.addEventListener("mouseenter", () => {
-          isPointerInsideCard = true;
-          clearTimeout(cardDismissTimer);
-        });
-        tooltipEl.addEventListener("mouseleave", () => {
-          isPointerInsideCard = false;
-          closeActiveTooltip(false);
-        });
-      }
-    });
-
     marker.on("click", (e) => {
-      if (e && e.originalEvent) e.originalEvent.stopPropagation();
-      focusHotspot(h.id);
+      if (e) {
+        if (e.originalEvent) {
+          L.DomEvent.stopPropagation(e.originalEvent);
+        }
+        L.DomEvent.stopPropagation(e);
+      }
+      if (currentActiveHotspotId === h.id) {
+        // Clicking active marker toggles it closed
+        closeActiveTooltip();
+      } else {
+        focusHotspot(h.id);
+      }
     });
 
     hotspotMarkersMap[h.id] = marker;
@@ -1516,15 +1536,18 @@ function initMap() {
     leafletMap.fitBounds([[7.5, 68.0], [35.8, 97.5]], { padding: [22, 22] });
   } catch (e) {}
 
-  // Dismiss tooltip on zoom or drag start to avoid jitter & float misalignment
-  leafletMap.on('zoomstart', () => {
-    closeActiveTooltip(true);
-  });
-
-  leafletMap.on('movestart', () => {
-    if (!isPointerInsideCard) {
-      closeActiveTooltip(true);
+  // Dismiss card ONLY when clicking on the empty map canvas outside any card, marker, or popup
+  leafletMap.on('click', (e) => {
+    if (e && e.originalEvent && e.originalEvent.target) {
+      const target = e.originalEvent.target;
+      if (target.closest('.hotspot-marker-wrapper') || 
+          target.closest('.hotspot-pin') || 
+          target.closest('.map-hover-card') ||
+          target.closest('.leaflet-popup')) {
+        return;
+      }
     }
+    closeActiveTooltip();
   });
 
   leafletMap.on('zoomend', () => {
@@ -1575,6 +1598,7 @@ function initMap() {
   window.resetMapView = resetMapView;
   window.focusHotspot = focusHotspot;
   window.planHotspot = planHotspot;
+  window.closeActiveTooltip = closeActiveTooltip;
   window.filterMapHotspots = filterMapHotspots;
   window.statePanel = statePanel;
 

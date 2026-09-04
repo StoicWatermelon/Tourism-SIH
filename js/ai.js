@@ -13,301 +13,461 @@
   const toast = (...args) => (window.toast ? window.toast(...args) : console.log(...args));
   const updateResponsibleScore = (...args) => (window.updateResponsibleScore ? window.updateResponsibleScore(...args) : null);
 
-// ═══════════════════════════════════════════════════════
-//  MARKDOWN RENDERER FOR AI CHAT
-// ═══════════════════════════════════════════════════════
+  // Active conversational state tracking
+  let activeDestination = null;
+  const chatHistory = [];
 
-// ═══════════════════════════════════════════════════════
-//  MARKDOWN RENDERER FOR AI CHAT
-// ═══════════════════════════════════════════════════════
+  // Destination keywords
+  const KOLKATA_KW = ["kolkata", "calcutta", "howrah", "bengal", "victoria memorial", "dakshineswar", "hooghly", "park street", "college street", "কলকাতা", "হাওড়া", "বাংলা", "ভিক্টোরিয়া", "দক্ষিণেশ্বর", "कोलकाता", "कलकत्ता"];
+  const JAIPUR_KW = ["jaipur", "rajasthan", "pink city", "amber fort", "hawa mahal", "jantar mantar", "chokhi dhani", "जयपुर", "राजस्थान", "জয়পুর", "রাজস্থান"];
+  const KERALA_KW = ["kerala", "alleppey", "alappuzha", "munnar", "kochi", "cochin", "backwater", "wayanad", "केरल", "কেরল", "আলেপ্পি", "মুন্নার"];
+  const LADAKH_KW = ["ladakh", "leh", "pangong", "nubra", "khardung", "chang la", "zoji la", "turtuk", "hanle", "tso moriri", "लद्दाख", "लेह", "पैंगोंग", "লাদাখ", "লেহ", "প্যাংগং"];
+  const GOA_KW = ["goa", "panaji", "calangute", "dudhsagar", "fontainhas", "गोवा", "গোয়া"];
+  const VARANASI_KW = ["varanasi", "kashi", "banaras", "ghat", "ganga aarti", "वाराणसी", "काशी", "বারাণসী", "কাশী"];
 
-/**
- * Enhanced markdown renderer for AI responses
- * Supports headings (###, ##), bold, italics, bullets, numbered lists, and paragraphs
- */
-function renderMarkdown(text) {
-  if (!text) return "";
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // Headings
-  html = html.replace(/^###\s+(.+)$/gm, '<h4 class="ai-heading">$1</h4>');
-  html = html.replace(/^##\s+(.+)$/gm, '<h3 class="ai-heading">$1</h3>');
-
-  // Bold & Italic
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*([^*\n]+?)\*/g, '<em>$1</em>');
-
-  // Bullet list items (•, -, *)
-  html = html.replace(/^[•\-\*]\s+(.+)$/gm, '<div class="ai-list-item"><span class="ai-bullet">•</span> $1</div>');
-
-  // Numbered list items (1., 2., etc.)
-  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<div class="ai-list-item"><span class="ai-num">$1.</span> $2</div>');
-
-  // Paragraph breaks & newlines
-  html = html.replace(/\n\n+/g, '</p><p class="ai-para">');
-  html = html.replace(/\n/g, '<br>');
-
-  return '<p class="ai-para">' + html + '</p>';
-}
-
-// ═══════════════════════════════════════════════════════
-//  RULE-BASED AI FALLBACK ENGINE (OFFLINE RESILIENCE)
-// ═══════════════════════════════════════════════════════
-
-const aiReply = q => {
-  const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
-  const s = (q || "").toLowerCase();
-
-  if (lang === "hi") {
-    if (s.includes("भीड़") || s.includes("decongest") || s.includes("ऑफबीट") || s.includes("तुरतुक") || s.includes("हानले") || s.includes("लाभ")) {
-      return "**स्मार्ट भीड़-नियंत्रण रणनीति:**\n\nतुरतुक, हानले और शाम घाटी जैसे माध्यमिक गलियारों का दौरा करने से पैंगोंग झील और लेह जैसे अत्यधिक भीड़भाड़ वाले हॉटस्पॉट्स पर दबाव काफी कम होता है। इससे वाहन प्रदूषण घटता है, हिमनदों के जल स्रोतों की रक्षा होती है और 80%+ पर्यटन आय सीधे दूरदराज के लद्दाखी परिवारों तक पहुंचती है।";
-    }
-    if (s.includes("सामान") || s.includes("पैक") || s.includes("pack") || s.includes("gear")) {
-      return "**उच्च हिमालयी दर्रों के लिए आवश्यक पैकिंग सूची:**\n\n• **थर्मल बेस लेयर्स:** मेरिनो वूल के कम से कम 2 सेट।\n• **विंडप्रूफ जैकेट:** 600-फिल डाउन जैकेट और वाटरप्रूफ विंडचीटर।\n• **धूप का चश्मा:** UV-400 पोलराइज्ड ग्लेशियर ग्लासेस (17,000 फीट पर तीव्र पराबैंगनी किरणों से बचाव हेतु आवश्यक)।\n• **पुनः प्रयोज्य फ्लास्क:** इंसुलेटेड गर्म पानी की बोतल (एकल-उपयोग प्लास्टिक लद्दाख में पूर्णतः प्रतिबंधित है)।\n• **सनस्क्रीन:** SPF 50+ सनस्क्रीन और लिप बाम।\n• **दवाइयां:** डायमॉक्स (AMS रोकथाम हेतु चिकित्सक से परामर्श लें), ORS इलेक्ट्रोलाइट्स और पल्स ऑक्सीमीटर।";
-    }
-    if (s.includes("अनुकूलन") || s.includes("acclimat") || s.includes("ams") || s.includes("ऊंचाई") || s.includes("नियम")) {
-      return "**अनिवार्य ऊंचाई सुरक्षा (48-घंटे AMS अनुकूलन नियम):**\n\nलेह 11,500 फीट की ऊंचाई पर स्थित है। खारदुंग ला (17,582 फीट) या पैंगोंग त्सो जाने से पहले लेह में पहले 48 घंटे पूर्ण शारीरिक विश्राम अनिवार्य है। प्रतिदिन 4-5 लीटर पानी पिएं, शराब व नींद की गोलियों से बचें और नियमित रूप से SpO2 ऑक्सीजन स्तर जांचें। यदि सिरदर्द या चक्कर बढ़े, तो तुरंत कम ऊंचाई पर जाएं।";
-    }
-    if (s.includes("दर्र") || s.includes("pass") || s.includes("खारदुंग") || s.includes("चांग") || s.includes("सड़क")) {
-      return "**पर्वतीय दर्रा लाइव सुरक्षा परामर्श:**\n\nखारदुंग ला और चांग ला पर लगातार निगरानी रखी जा रही है। दर्रों को पार करने की अनुमति सुबह 06:00 से शाम 16:00 बजे के बीच ही है। सुबह प्रस्थान करने से पहले उत्तरी ढलानों पर ब्लैक आइस (काली बर्फ) की जांच करें। 4x4 स्नो चेन वाहन अनिवार्य हैं।";
-    }
-    if (s.includes("परमिट") || s.includes("permit") || s.includes("ilp")) {
-      return "**इनर लाइन परमिट (ILP) आवश्यक दिशानिर्देश:**\n\n• **अनिवार्यता:** नुब्रा घाटी, पैंगोंग त्सो, त्सो मोरीरी, तुरतुक और हानले जाने वाले सभी भारतीय पर्यटकों के लिए ILP अनिवार्य है।\n• **आवेदन:** ऑनलाइन lahdc.nic.in पर या लेह में उपायुक्त (DC) कार्यालय से प्राप्त करें।\n• **हार्डकॉपी:** साउथ पुल्लू, नॉर्थ पुल्लू और खारदुंग ला चेकपोस्ट के लिए 4 भौतिक प्रतियां साथ रखें।";
-    }
-    if (s.includes("बजट") || s.includes("budget") || s.includes("खर्च") || s.includes("लागत")) {
-      return "**लद्दाख यात्रा बजट दिशानिर्देश (प्रति व्यक्ति):**\n\n• **5-दिवसीय बजट (बैकपैकर):** ₹18,000–25,000 (साझा टैक्सी और होमस्टे)।\n• **7-दिवसीय मध्यम:** ₹30,000–45,000 (प्रमाणित इको-होमस्टे और 4x4 वाहन)।\n• **पर्यावरण टिप:** प्रमाणित ग्रामीण होमस्टे में ठहरने से 80%+ आय सीधे स्थानीय लद्दाखी परिवारों तक पहुंचती है।";
-    }
-    return "जुले और नमस्ते! 🙏 मैं भारत एआई (Bharat AI) हूँ, लद्दाख और उच्च हिमालयी यात्रा के लिए आपका बुद्धिमान मार्गदर्शक। मैं AMS ऊंचाई सुरक्षा, दर्रा परामर्श, पर्यावरण-अनुकूल होमस्टे और जिम्मेदार यात्रा में आपकी सहायता कर सकता हूँ। मुझसे कुछ भी पूछें!";
+  function detectDestination(text) {
+    const t = (text || "").toLowerCase();
+    if (KOLKATA_KW.some(k => t.includes(k))) return "kolkata";
+    if (JAIPUR_KW.some(k => t.includes(k))) return "jaipur";
+    if (KERALA_KW.some(k => t.includes(k))) return "kerala";
+    if (LADAKH_KW.some(k => t.includes(k))) return "ladakh";
+    if (GOA_KW.some(k => t.includes(k))) return "goa";
+    if (VARANASI_KW.some(k => t.includes(k))) return "varanasi";
+    return null;
   }
 
-  if (lang === "bn") {
-    if (s.includes("ভিড়") || s.includes("decongest") || s.includes("অফবিট") || s.includes("তুরতুক") || s.includes("হানলে") || s.includes("সুবিধা")) {
-      return "**স্মার্ট ভিড়-নিয়ন্ত্রণ কৌশল:**\n\nতুরতুক, হানলে এবং শাম উপত্যকার মতো বিকল্প করিডোর পরিদর্শনে প্যাংগং লেক ও লেহ শহরের ভিড় কমে। এর ফলে দূষণ হ্রাস পায়, ভূগর্ভস্থ জলস্তর সংরক্ষিত থাকে এবং পর্যটন ব্যয়ের ৮০%+ অর্থ সরাসরি স্থানীয় গ্রামীণ পরিবারের কাছে পৌঁছায়।";
-    }
-    if (s.includes("প্যাক") || s.includes("জিনিস") || s.includes("pack") || s.includes("gear")) {
-      return "**উচ্চ হিমালয় গিরিপথের প্রয়োজনীয় প্যাকিং তালিকা:**\n\n• **থার্মাল বেস লেয়ার:** মেরিনো উলের অন্তত ২ সেট।\n• **উইন্ডপ্রুফ জ্যাকেট:** ডাউন ফেদার জ্যাকেট ও উইন্ডচিটার।\n• **রোদচশমা:** UV-400 পোলারাইজড গ্লেসিয়ার চশমা (উচ্চতায় প্রখর অতিবেগুনি রশ্মি থেকে বাঁচার জন্য)।\n• **থার্মো ফ্লাস্ক:** পুনরায় ব্যবহারযোগ্য ইনসুলেটেড জলের বোতল (একক ব্যবহার্য প্লাস্টিক লাদাখে নিষিদ্ধ)।\n• **সানস্ক্রিন:** SPF 50+ সানস্ক্রিন এবং ময়েশ্চারাইজার।\n• **ওষুধ:** ডায়ামক্স (AMS সুরক্ষার জন্য চিকিৎসকের পরামর্শ নিন), ওআরএস ও পালস অক্সিমিটার।";
-    }
-    if (s.includes("অভিযোজন") || s.includes("acclimat") || s.includes("ams") || s.includes("উচ্চতা") || s.includes("নিয়ম")) {
-      return "**বাধ্যতামূলক উচ্চতা সুরক্ষা ও অভিযোজন নির্দেশিকা:**\n\nলেহ শহর ১১,৫০০ ফুট উচ্চতায় অবস্থিত। খারদুং লা (১৭,৫৮২ ফুট) বা প্যাংগং লেকে যাওয়ার আগে লেহ শহরে প্রথম ৪৮ ঘণ্টার সম্পূর্ণ বিশ্রাম বাধ্যতামূলক। প্রতিদিন ৪-৫ লিটার জল পান করুন, অতিরিক্ত শারীরিক পরিশ্রম এড়িয়ে চলুন এবং রক্তে অক্সিজেনের মাত্রা (SpO2) পরীক্ষা করুন। লক্ষণ বাড়লে অবিলম্বে নিচে নেমে আসুন।";
-    }
-    if (s.includes("গিরিপথ") || s.includes("pass") || s.includes("খারদুং") || s.includes("চাং") || s.includes("রাস্তা")) {
-      return "**পাহাড়ি গিরিপথ লাইভ সতর্কতা:**\n\nখারদুং লা এবং চাং লা গিরিপথে সার্বক্ষণিক নজরদারি চলছে। সকাল ০৬:০০ থেকে বিকাল ১৬:০০ এর মধ্যে গিরিপথ অতিক্রমের অনুমতি দেওয়া হয়। সকালে রওনা হওয়ার আগে রাস্তায় পিচ্ছিল বরফ (ব্ল্যাক আইস) আছে কিনা তা দেখে নিন। 4x4 স্নো চেইন গাড়ি ব্যবহার বাধ্যতামূলক।";
-    }
-    if (s.includes("পারমিট") || s.includes("permit") || s.includes("ilp")) {
-      return "**ইনার লাইন পারমিট (ILP) নির্দেশিকা:**\n\n• **প্রয়োজনীয়তা:** নুব্রা ভ্যালি, প্যাংগং ত্সো, তুরতুক এবং হানলে ভ্রমণের জন্য সমস্ত ভারতীয় নাগরিকের ILP বাধ্যতামূলক।\n• **আবেদন:** অনলাইনে lahdc.nic.in অথবা লেহ ডিসি অফিসে সরাসরি আবেদন করা যায়।\n• **হার্ডকপি:** সাউথ পুল্লু, নর্থ পুল্লু ও খারদুং লা চেকপোস্টের জন্য ৪টি প্রিন্ট কপি সাথে রাখুন।";
-    }
-    if (s.includes("বাজেট") || s.includes("budget") || s.includes("খরচ")) {
-      return "**লাদাখ ভ্রমণ বাজেট গাইড (জনপ্রতি):**\n\n• **৫ দিনের বাজেট (ব্যাকপ্যাকার):** ১৮,০০০–২৫,০০০ টাকা (শেয়ার্ড ট্যাক্সি ও হোমস্টে)।\n• **৭ দিনের মিড-রেঞ্জ:** ৩০,০০০–৪৫,০০০ টাকা (সার্টিফাইড ইকো-হোমস্টে ও প্রাইভেট ৪x৪)।\n• **ইকো পরামর্শ:** কমিউনিটি হোমস্টেতে থাকলে খরচে ৪০% সাশ্রয় হয় এবং উপার্জনের ৮০%+ অর্থ সরাসরি স্থানীয় গ্রামবাসীর হাতে থাকে।";
-    }
-    return "জুলে ও নমস্কার! 🙏 আমি ভারত এআই (Bharat AI), লাদাখ ও উচ্চ হিমালয় ভ্রমণের জন্য আপনার বুদ্ধিমান সহায়ক। উচ্চতাজনিত সুরক্ষা (AMS), গিরিপথ সতর্কতা, পরিবেশবান্ধব হোমস্টে ও দায়িত্বশীল পর্যটন সম্পর্কে যেকোনো প্রশ্ন করুন!";
+  function detectSubtopic(text) {
+    const t = (text || "").toLowerCase();
+    if (["food", "eat", "cuisine", "dish", "restaurant", "sweet", "biryani", "snack", "breakfast", "dinner", "lunch", "भोजन", "खाना", "खाएं", "खाएँ", "खाओ", "स्वाद", "मिठाई", "व्यंजन", "খাবার", "খাব", "মিষ্টি"].some(w => t.includes(w))) return "food";
+    if (["pack", "gear", "carry", "bag", "cloth", "wear", "shoes", "पैक", "सामान", "कपड़े", "প্যাক", "পোশাক", "জিনিস"].some(w => t.includes(w))) return "pack";
+    if (["budget", "cost", "price", "money", "expensive", "cheap", "afford", "spend", "rate", "बजट", "खर्च", "বাজেট", "খরচ"].some(w => t.includes(w))) return "budget";
+    if (["safe", "safety", "emergency", "hospital", "police", "danger", "crime", "सुरक्षा", "आपातकालीन", "নিরাপত্তা", "জরুরি"].some(w => t.includes(w))) return "safety";
+    if (["pass", "khardung", "chang la", "zoji", "baralacha", "tanglang", "दर्र", "গিরিপথ"].some(w => t.includes(w))) return "pass";
+    if (["acclimat", "altitude", "ams", "oxygen", "breathe", "अनुकूलन", "ऊंचाई", "অভিযোজন", "উচ্চতা"].some(w => t.includes(w))) return "acclimat";
+    if (["permit", "ilp", "pap", "permiss", "restricted", "परमिट", "পারমিট"].some(w => t.includes(w))) return "permit";
+    if (["decongest", "offbeat", "crowd", "भीड़", "ऑफबीट", "ভিড়", "অফবিট"].some(w => t.includes(w))) return "decongest";
+    return "overview";
   }
 
-  // English fallback
-  if (s.includes("decongest") || s.includes("offbeat") || s.includes("turtuk") || s.includes("hanle")) {
-    return "Smart Decongestion Strategy: Visiting secondary corridors like Turtuk, Hanle, and Sham Valley diverts tourist footprint away from saturated hotspots like Pangong Lake. This reduces vehicle emissions, relieves alpine water tables, and redistributes 80%+ of tourism revenue directly to remote village families.";
+  // ═══════════════════════════════════════════════════════
+  //  MARKDOWN RENDERER FOR AI CHAT
+  // ═══════════════════════════════════════════════════════
+
+  /**
+   * Enhanced markdown renderer for AI responses
+   * Supports headings (###, ##), bold, italics, bullets, and paragraphs
+   */
+  function renderMarkdown(text) {
+    if (!text) return "";
+    let html = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Headings
+    html = html.replace(/^###\s+(.+)$/gm, '<h4 class="ai-heading">$1</h4>');
+    html = html.replace(/^##\s+(.+)$/gm, '<h3 class="ai-heading">$1</h3>');
+
+    // Bold & Italic
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*([^\*\n]+?)\*/g, '<em>$1</em>');
+
+    // Bullet list items (•, -, *)
+    html = html.replace(/^[•\-\*]\s+(.+)$/gm, '<div class="ai-list-item"><span class="ai-bullet">•</span> $1</div>');
+
+    // Paragraph breaks
+    html = html.replace(/\n\n+/g, '<div class="ai-spacer"></div>');
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
   }
-  if (s.includes("pack") || s.includes("gear")) {
-    return "High-Pass Himalayan Packing: 1) Thermal base layers (merino wool), 2) Down jacket & windproof shell, 3) Polarized UV-400 sunglasses, 4) Reusable insulated hydration flask (no single-use plastic), 5) High-SPF sunscreen & lip balm, 6) Diamox (consult physician for AMS).";
-  }
-  if (s.includes("acclimat") || s.includes("ams") || s.includes("altitude")) {
-    return "Mandatory Altitude Safety: Leh is situated at 11,500 ft. You MUST allocate 48 hours in Leh for complete rest before ascending Khardung La (17,582 ft) or Pangong Tso. Hydrate with 4+ liters of water daily, avoid alcohol, and carry a pulse oximeter.";
-  }
-  if (s.includes("pass") || s.includes("khardung") || s.includes("road")) {
-    return "Mountain Pass Advisory: Khardung La and Chang La are currently under active monitoring. Pass crossings are permitted between 06:00 and 16:00. Check for black ice on northern descents before early morning departures.";
-  }
-  return "Julley & Namaste! 🙏 I am Bharat AI, your intelligent companion for high-altitude Himalayan and Indian travel. I can help you with real-time pass telemetry, altitude acclimatization pacing, offbeat decongestion corridors, and certified Ladakh village homestays. Ask me anything!";
-};
 
-// ═══════════════════════════════════════════════════════
-//  STREAMING AI CHAT ENGINE WITH ADAPTIVE TOKEN DISPATCHER
-// ═══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
+  //  STRUCTURED DESTINATION-AWARE HEURISTIC FALLBACKS
+  // ═══════════════════════════════════════════════════════
 
-let isGenerating = false;
-
-async function askAI(q) {
-  if (!q || !q.trim() || isGenerating) return;
-  const box = $("#messages");
-  const orb = $("#aiOrb");
-  const statusText = $("#aiStatusText");
-  const chatForm = $("#chatForm");
-  const submitBtn = chatForm ? chatForm.querySelector("button[type='submit']") : null;
-  const chatInput = $("#chatInput");
-
-  const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
-  const connectingText = lang === "hi" ? "हिमालयी बुद्धिमत्ता • कनेक्ट हो रहा है..." : lang === "bn" ? "হিমালয় বুদ্ধিমত্তা • সংযুক্ত হচ্ছে..." : "Himalayan Intelligence • Connecting...";
-  const streamingText = lang === "hi" ? "हिमालयी बुद्धिमत्ता • उत्तर आ रहा है..." : lang === "bn" ? "হিমালয় বুদ্ধিমত্তা • উত্তর লেখা হচ্ছে..." : "Himalayan Intelligence • Streaming...";
-  const activeText = lang === "hi" ? "हिमालयी बुद्धिमत्ता • सक्रिय" : lang === "bn" ? "হিমালয় বুদ্ধিমত্তা • सक्रिय" : "Himalayan Intelligence • Active";
-  const placeholderText = lang === "hi" ? "हिमालयी बुद्धिमत्ता से संपर्क किया जा रहा है..." : lang === "bn" ? "হিমালয় বুদ্ধিমত্তার সাথে যোগাযোগ করা হচ্ছে..." : "Connecting to Himalayan Intelligence...";
-
-  isGenerating = true;
-
-  // Safeguard: Disable submit button to prevent parallel conflicting requests
-  if (submitBtn) submitBtn.disabled = true;
-
-  // 1. Instantly append user message synchronously (<10ms)
-  const userMsg = document.createElement("div");
-  userMsg.className = "msg user";
-  userMsg.textContent = q;
-  box.appendChild(userMsg);
-  box.scrollTop = box.scrollHeight;
-
-  // 2. Instantly update orb & status indicator
-  if (orb) orb.className = "ai-orb thinking";
-  if (statusText) statusText.textContent = connectingText;
-
-  // 3. Mount bot message container synchronously with immediate typing placeholder & blinking cursor
-  const botMsg = document.createElement("div");
-  botMsg.className = "msg bot";
-
-  const textSpan = document.createElement("span");
-  textSpan.className = "bot-text";
-  textSpan.textContent = placeholderText;
-  textSpan.style.opacity = "0.7";
-
-  const cursor = document.createElement("span");
-  cursor.textContent = "▍";
-  cursor.className = "typing-cursor";
-
-  botMsg.appendChild(textSpan);
-  botMsg.appendChild(cursor);
-  box.appendChild(botMsg);
-  box.scrollTop = box.scrollHeight;
-
-  // 4. Token Queue & Typewriter Dispatcher State
-  const tokenQueue = [];
-  let displayedText = "";
-  let isStreamFinished = false;
-  let isDispatcherRunning = false;
-  let isFirstToken = true;
-
-  // Dynamic Activity Watchdog (resets on incoming chunks)
-  const controller = new AbortController();
-  let watchdogTimer = null;
-  const resetWatchdog = (ms = 30000) => {
-    if (watchdogTimer) clearTimeout(watchdogTimer);
-    watchdogTimer = setTimeout(() => {
-      console.warn("[Bharat AI] Activity watchdog timeout (30s inactivity). Aborting connection.");
-      controller.abort();
-    }, ms);
+  const DESTINATION_FALLBACKS = {
+    kolkata: {
+      en: {
+        overview: "**Kolkata & West Bengal — The Cultural Capital of India:**\n\n• **Historic & Cultural Landmarks:** Victoria Memorial (grand Italian Renaissance marble palace), Howrah Bridge (1943 cantilever engineering marvel across the Hooghly), Dakshineswar Kali Temple, Belur Math (global Ramakrishna Mission headquarters), Indian Museum (Asia's oldest), and sunset strolls along Princep Ghat.\n• **Intellectual & Artisan Quarters:** College Street ('Boi Para') — the world's largest second-hand book market with the legendary Indian Coffee House; Kumartuli — the 300-year-old traditional clay sculptors' quarter handcrafting monumental deities.\n• **Iconic Zero-Mile Flavors:** Warm spongy Rosogolla, caramelized Mishti Doi, Sandesh; aromatic Kolkata Biryani (with succulent spiced potato and egg); original Nizam's Kathi Rolls; and crispy street Phuchka.\n• **Sustainable Transit:** Ride India's only operating historic electric tramway network, take scenic green river ferries across the Hooghly, or use the underwater East-West Metro line beneath the riverbed.\n• **Best Season:** October through March — pleasant winter weather and the UNESCO-inscribed Durga Puja celebration.",
+        food: "**Kolkata's World-Renowned Culinary Heritage:**\n\n• **Legendary Street Food:** Original mutton and paneer Kathi Rolls from Nizam's (New Market); crisp, hollow Phuchkas filled with spiced potato and tangy tamarind water; and Dacre Lane street eats (Chowmein, fish cutlets, Mughlai Paratha).\n• **Kolkata Biryani:** Aromatic Awadhi-style long-grain rice infused with saffron, cooked with tender meat, succulent boiled egg, and the iconic golden slow-cooked spiced potato.\n• **Bengali Sweets (Mishti):** Warm spongy Rosogolla (Nobin Chandra Das heritage), creamy caramelized Mishti Doi, and winter-special Nolen Gur Sandesh.\n• **Traditional Mahabhoj:** Steaming Gobindobhog rice with Jhuri Aloo Bhaja, Machher Jhol (fresh freshwater fish curry), and Kosha Mangsho (rich slow-cooked mutton) with fluffy Luchi.\n• **Iconic Hangouts:** Indian Coffee House on College Street for hot infused coffee and intellectual discussions, and Flurys on Park Street for British-era heritage breakfast and pastries.",
+        pack: "**Essential Packing Guide for Kolkata & West Bengal:**\n\n• **Clothing:** Lightweight, breathable cotton clothes are best throughout the year. Kolkata has a warm tropical climate; in winter (Dec–Feb), carry a light jacket or shawl for evenings.\n• **Footwear:** Comfortable walking shoes or cushioned sneakers — essential for exploring College Street book alleys, heritage walking trails, and expansive museum grounds.\n• **Weather Protection:** Compact umbrella or light raincoat (monsoon showers from June to September) and a reusable tote bag for books and handcrafted souvenirs.\n• **Electronics:** High-capacity power bank for long days of photography around colonial architecture, river ghats, and bustling street bazaars.\n• **Eco Tip:** Carry a reusable stainless steel water bottle. Kolkata has numerous clean filtered water dispensing stations.",
+        budget: "**Kolkata Travel Budget Guide (Per Person):**\n\n• **Backpacker / Budget (₹1,200–2,000/day):** Heritage guest houses or dorms, authentic street meals & local cabin dining (₹100–200/meal), and public transit via Kolkata Metro (₹10–25) and historic electric trams (₹7).\n• **Mid-Range (₹3,000–5,500/day):** Character boutique hotels in Central/South Kolkata, curated dining at Oh! Calcutta or Peter Cat, ride-hailing cabs, and museum entry tickets.\n• **Luxury (₹8,000–18,000+/day):** Grand heritage hotels (The Oberoi Grand, ITC Sonar), private chauffeur, private Hooghly river heritage cruises, and fine dining.\n• **Value Note:** Kolkata is widely recognized as one of India's most culturally rich yet budget-friendly metropolitan cities!",
+        safety: "**Kolkata Safety, Navigation & Local Etiquette:**\n\n• **Metropolitan Safety:** Kolkata is consistently ranked among the safest major metropolitan cities in India with high public safety, active street life, and helpful locals.\n• **Tourist Assistance:** Kolkata Police Tourist Assistance booths are available at Howrah Station, Sealdah, and Victoria Memorial. Emergency Police Helpline: 100 / 112.\n• **Public Transit Tips:** Use the convenient Kolkata Metro (Blue and Green underwater lines) to bypass traffic; classic yellow ambassador taxis should run by meter or prepaid counters at stations; app cabs (Uber/Ola) are ubiquitous.\n• **Temple Etiquette:** Dress respectfully (cover shoulders and knees) when visiting temples like Dakshineswar and Kalighat. Deposit shoes at designated shoe stands."
+      },
+      hi: {
+        overview: "**कोलकाता एवं पश्चिम बंगाल — भारत की सांस्कृतिक राजधानी:**\n\n• **प्रमुख ऐतिहासिक स्थल:** विक्टोरिया मेमोरियल (भव्य संगमरमर महल), हावड़ा ब्रिज (हुगली नदी पर ऐतिहासिक कैंटिलीवर पुल), दक्षिणेश्वर काली मंदिर, बेलूर मठ और प्रिंसप घाट।\n• **सांस्कृतिक और बौद्धिक केंद्र:** कॉलेज स्ट्रीट 'बोई पाड़ा' और ऐतिहासिक इंडियन कॉफी हाउस; कुम्हारटोली में पारंपरिक मूर्तिकारों की कला।\n• **प्रामाणिक स्थानीय स्वाद:** गर्म रसगुल्ला, मिष्टी दोई, नलेन गुड़ संदेश; आलू और अंडे वाली कोलकाता बिरयानी; निज़ाम का काठी रोल; और चटपटे पुचके।\n• **पर्यावरण-अनुकूल परिवहन:** भारत की एकमात्र ऐतिहासिक ट्राम, हुगली नदी पर इलेक्ट्रिक नौका या गंगा के नीचे से पहली अंडरवाटर मेट्रो।\n• **यात्रा का सर्वोत्तम समय:** अक्टूबर से मार्च — सुखद मौसम और विश्व प्रसिद्ध दुर्गा पूजा का उत्सव।",
+        food: "**कोलकाता के विश्व प्रसिद्ध व्यंजन एवं खान-पान:**\n\n• **प्रसिद्ध स्ट्रीट फूड:** निज़ाम (न्यू मार्केट) का मूल मटन व पनीर काठी रोल; मसालेदार आलू और इमली के तीखे पानी वाले कुरकुरे पुचके; और डैकर्स लेन के स्ट्रीट स्नैक्स।\n• **कोलकाता बिरयानी:** केसर और खुशबूदार मसालों से युक्त अवधी शैली की बिरयानी, जिसमें नरम गोश्त/अंडे के साथ धीमी आंच पर पका स्वादिष्ट सुनहरा आलू होता है।\n• **पारंपरिक बंगाली मिठाइयां:** गर्म स्पंजी रसगुल्ला, नलेन गुड़ का संदेश और पारंपरिक मिष्टी दोई।\n• **पारंपरिक भोजन:** भाप में पके चावल के साथ माछेर झोल (ताजा मछली की करी), और लूची के साथ कोशा मांगशो (धीमी आंच पर पका मटन)।\n• **ऐतिहासिक ठिकाने:** कॉलेज स्ट्रीट पर इंडियन कॉफी हाउस और पार्क स्ट्रीट पर ऐतिहासिक बेकरी 'फ्लूरीज' (Flurys)।",
+        pack: "**कोलकाता एवं पश्चिम बंगाल के लिए पैकिंग सूची:**\n\n• **कपड़े:** हल्के, हवादार सूती (कॉटन) कपड़े सर्वोत्तम हैं। सर्दियों (दिसंबर-फरवरी) में शाम के लिए हल्की शॉल या जैकेट साथ रखें।\n• **जूते:** चलने के लिए आरामदायक स्नीकर्स या जूते — कॉलेज स्ट्रीट की किताबों की गलियों और ऐतिहासिक संग्रहालयों के लिए आवश्यक।\n• **मौसम सुरक्षा:** एक छोटा छाता (जून से सितंबर के दौरान अचानक बारिश हेतु) और एक पुन: प्रयोज्य कपड़े का थैला।\n• **इलेक्ट्रॉनिक्स:** ऐतिहासिक इमारतों और हुगली नदी के घाटों पर फोटोग्राफी के लिए एक पावर बैंक।\n• **पानी:** पुन: प्रयोज्य पानी की बोतल साथ रखें; एकल-उपयोग प्लास्टिक से बचें।",
+        budget: "**कोलकाता यात्रा बजट दिशानिर्देश (प्रति व्यक्ति):**\n\n• **बजट / बैकपैकर (₹1,200–2,000/दिन):** हेरिटेज गेस्ट हाउस या हॉस्टल, स्थानीय कैफे व स्ट्रीट फूड (₹100–200/भोजन), और कोलकाता मेट्रो (₹10–25) व ट्राम (₹7)।\n• **मध्यम श्रेणी (₹3,000–5,500/दिन):** दक्षिण/मध्य कोलकाता में बुटीक होटल, प्रसिद्ध रेस्टोरेंट (ओह! कलकत्ता, पीटर कैट), और कैब यात्रा।\n• **प्रीमियम (₹8,000–18,000+/दिन):** 5-सितारा हेरिटेज होटल (द ओबेरॉय ग्रैंड), निजी क्रूज़ और प्रीमियम डाइनिंग।\n• **विशेष:** कोलकाता भारत के सबसे किफायती और सांस्कृतिक रूप से समृद्ध महानगरों में से एक है!",
+        safety: "**कोलकाता सुरक्षा, परिवहन व स्थानीय मार्गदर्शन:**\n\n• **महानगरीय सुरक्षा:** कोलकाता को भारत के सबसे सुरक्षित महानगरों में गिना जाता है। स्थानीय नागरिक बेहद मददगार और मित्रवत हैं।\n• **पर्यटक सहायता:** हावड़ा स्टेशन, सियालदह और विक्टोरिया मेमोरियल पर कोलकाता पुलिस पर्यटक सहायता बूथ उपलब्ध हैं। आपातकालीन पुलिस हेल्पलाइन: 100 / 112।\n• **आसान परिवहन:** ट्रैफिक से बचने के लिए कोलकाता मेट्रो और अंडरवाटर ईस्ट-वेस्ट मेट्रो का उपयोग करें; टैक्सी या उबर/ओला आसानी से उपलब्ध हैं।\n• **मंदिर मर्यादा:** दक्षिणेश्वर और कालीघाट मंदिर जाते समय शालीन पोशाक पहनें।"
+      },
+      bn: {
+        overview: "**কলকাতা ও পশ্চিমবঙ্গ — ভারতের সাংস্কৃতিক রাজধানী:**\n\n• **প্রধান ঐতিহাসিক ও দর্শনীয় স্থান:** ভিক্টোরিয়া মেমোরিয়াল (ঐতিহাসিক মার্বেল প্রাসাদ), হাওড়া ব্রিজ (হুগলি নদীর উপর শতাব্দীপ্রাচীন ক্যান্টিলিভার সেতু), দক্ষিণেশ্বর কালী মন্দির, বেলুড় মঠ, ভারতীয় জাদুঘর এবং মনোরম প্রিন্সেপ ঘাট।\n• **বুদ্ধিবৃত্তিক ও শিল্পকলা কেন্দ্র:** কলেজ স্ট্রিট বইপাড়া ও বিখ্যাত ইন্ডিয়ান কফি হাউস; কুমোরটুলির ঐতিহ্যবাহী মৃৎশিল্পীদের বিশ্বখ্যাত প্রতিমা নির্মাণ শিল্প।\n• **খাঁটি স্থানীয় স্বাদ:** গরম রসগোল্লা, সুস্বাদু মিষ্টি দই, নলেন গুড়ের সন্দেশ; আলু-ডিম যুক্ত বিখ্যাত কলকাতা বিরিয়ানি; নিজামের আসল কাঠি রোল; এবং তেঁতুল জলের মুচমুচে ফুচকা।\n• **পরিবেশবান্ধব যাতায়াত:** ভারতের একমাত্র ঐতিহ্যবাহী বৈদ্যুতিক ট্রাম, হুগলি নদীর পরিবেশবান্ধব ফেরি সার্ভিস বা গঙ্গার নিচ দিয়ে দেশের প্রথম ইস্ট-ওয়েস্ট মেট্রো ব্যবহার করুন।\n• **ভ্রমণের সেরা সময়:** অক্টোবর থেকে মার্চ — আনন্দময় শীতকাল এবং বিশ্ববিখ্যাত ইউনেস্কো হেরিটেজ দুর্গাপূজার উৎসবমুখর পরিবেশ।",
+        food: "**কলকাতার বিশ্বখ্যাত খাদ্যসংস্কৃতি ও সেরা খাবারের তালিকা:**\n\n• **বিখ্যাত স্ট্রিট ফুড:** নিউ মার্কেটের নিজামের খাঁটি মাটন ও পনির কাঠি রোল; মশলাদার আলু ও তেঁতুল জলের মুচমুচে ফুচকা; এবং ডেকার্স লেনের ঐতিহ্যবাহী কাটলেট ও স্ট্রিট ফুড।\n• **কলকাতা বিরিয়ানি:** সুগন্ধি জাফরানি বাসমতি চাল, নরম মাংস, সিদ্ধ ডিম এবং ঐতিহ্যবাহী সুস্বাদু সোনালী আলুর অনন্য মেলবন্ধন।\n• **ঐতিহ্যবাহী মিষ্টি:** গরম তুলতুলে রসগোল্লা (নবীন চন্দ্র দাসের ঐতিহ্য), ক্ষীরভরা মিষ্টি দই এবং শীতের নলেন গুড়ের সন্দেশ।\n• **খাঁটি বাঙালি ভুরিভোজ:** গরম গোবিন্দভোগ চাল ও ঝুরি আলুভাজা, তাজা মাছের ঝোল এবং ফুলকো লুচির সাথে কষা মাংস।\n• **ঐতিহাসিক আড্ডা:** কলেজ স্ট্রিটের ঐতিহাসিক ইন্ডিয়ান কফি হাউস এবং পার্ক স্ট্রিটের ব্রিটিশ আমলের বিখ্যাত বেকারি ফ্লুরিস (Flurys)।",
+        pack: "**কলকাতা ভ্রমণের জন্য প্রয়োজনীয় প্যাকিং গাইড:**\n\n• **পোশাক:** আরামদায়ক ও হালকা সুতির পোশাক সারা বছরের জন্য সবচেয়ে উপযোগী। শীতকালে (ডিসেম্বর–ফেব্রুয়ারি) সন্ধ্যার জন্য একটি হালকা চাদর বা জ্যাকেট সাথে রাখুন।\n• **জুতো:** হাঁটার জন্য আরামদায়ক স্নিকার্স বা জুতো — কলেজ স্ট্রিটের বইপাড়া ও ঐতিহাসিক স্থাপত্য ঘুরে দেখার জন্য অপরিহার্য।\n• **আবহাওয়া সুরক্ষা:** একটি ছোট ছাতা (হঠাৎ বৃষ্টির জন্য) এবং বই ও হস্তশিল্প কেনার জন্য পুনরায় ব্যবহারযোগ্য কাপড়ের ব্যাগ।\n• **ইলেকট্রনিক্স:** সারাদিনের ছবি তোলা ও ভ্রমণের জন্য একটি ভালো পাওয়ার ব্যাংক সাথে রাখুন।\n• **পরিবেশবান্ধব অভ্যাস:** পুনরায় ব্যবহারযোগ্য জলের বোতল ব্যবহার করুন; প্লাস্টিক বর্জন করুন।",
+        budget: "**কলকাতা ভ্রমণের বাজেট নির্দেশিকা (জনপ্রতি):**\n\n• **বাজেট / ব্যাকপ্যাকার (১,২০০–২,০০০ টাকা/দিন):** ঐতিহ্যবাহী গেস্ট হাউস, স্থানীয় খাবারের কেবিন ও স্ট্রিট ফুড (১০০–২০০ টাকা প্রতি বেলা), এবং মেট্রো (১০–২৫ টাকা) ও ট্রাম (৭ টাকা)।\n• **মিড-রেঞ্জ (৩,০০০–৫,৫০০ টাকা/দিন):** সেন্ট্রাল বা সাউথ কলকাতায় বুটিক হোটেল, পিটার ক্যাট বা ওহ! ক্যালকাটায় খাওয়া এবং অ্যাপ ক্যাব।\n• **প্রিমিয়াম (৮,০০০–১৮,০০০+ টাকা/দিন):** ঐতিহ্যবাহী ওবেরয় গ্র্যান্ড হোটেল, বিলাসবহুল ডাইনিং ও ব্যক্তিগত রিভার ক্রুজ।\n• **বিশেষত্ব:** কলকাতা ভারতের সবচেয়ে সাশ্রয়ী ও সাংস্কৃতিক ঐতিহ্যে ভরপুর মহানগর!",
+        safety: "**কলকাতা নিরাপত্তা, যাতায়াত ও স্থানীয় নির্দেশিকা:**\n\n• **নিরাপত্তা:** কলকাতা ভারতের অন্যতম নিরাপদ মহানগর হিসেবে সুপরিচিত। স্থানীয় মানুষ অত্যন্ত ভদ্র ও সাহায্যকারী।\n• **পর্যটক সহায়তা:** হাওড়া স্টেশন, শিয়ালদহ ও ভিক্টোরিয়া মেমোরিয়ালে কলকাতা পুলিশের পর্যটক সহায়তা বুথ রয়েছে। জরুরি পুলিশ হেল্পলাইন: ১০০ / ১১২।\n• **যাতায়াত সুবিধা:** যানজট এড়াতে কলকাতা মেট্রো এবং গঙ্গার নিচের ঐতিহাসিক ইস্ট-ওয়েস্ট মেট্রো ব্যবহার করুন; হলুদ ট্যাক্সি ও অ্যাপ ক্যাব সর্বত্র সহজলভ্য।\n• **মন্দির সংস্কৃতি:** দক্ষিণেশ্বর ও কালীঘাট পরিদর্শনের সময় মার্জিত পোশাক পরিধান করুন।"
+      }
+    },
+    jaipur: {
+      en: {
+        overview: "**Jaipur & Rajasthan — The Royal Pink City:**\n\n• **Monumental Heritage:** Amber Fort with its shimmering Sheesh Mahal, Hawa Mahal (Palace of Winds), City Palace museum complex, and Jantar Mantar UNESCO astronomical observatory.\n• **Local Crafts:** Traditional blue pottery, handcrafted gemstone jewelry, and Sanganeri wooden block prints.\n• **Authentic Flavors:** Dal Baati Churma, Pyaaz Kachori, Ker Sangri, and sweet Ghewar.\n• **Best Season:** October to March.",
+        food: "**Jaipur's Royal Rajasthani Flavors:**\n\n• **Dal Baati Churma:** Baked wheat dumplings soaked in pure desi ghee, served with five-lentil dal and sweet powdered wheat churma.\n• **Street Savories:** Crisp flaky Pyaaz Kachori from Rawat Mishthan Bhandar, fiery Mirchi Bada, and rich Mawa Kachori.\n• **Sweets:** Honeycombed Ghewar (classic or malai-topped) and thick clay-pot sweet lassi at MI Road.",
+        pack: "**Jaipur & Rajasthan Packing Essentials:**\n\n• **Clothing:** Breathable cotton clothing for daytime; in winter (Nov–Feb), pack layers as desert evenings turn chilly (8–12°C).\n• **Sun Protection:** Wide-brimmed sun hat, polarized sunglasses, and SPF 30+ sunscreen for fort courtyards.\n• **Footwear:** Durable slip-resistant footwear with good grip for ascending steep cobblestone ramps at Amber Fort and Nahargarh.",
+        budget: "**Jaipur Trip Budget (Per Person):**\n\n• **Budget (₹1,500–2,500/day):** Heritage homestays in Bani Park, local dhabas and street kachoris, shared e-rickshaws.\n• **Mid-Range (₹4,000–7,000/day):** Restored heritage Havelis, multi-monument composite tickets, air-conditioned cabs, and folk dining at Chokhi Dhani.",
+        safety: "**Jaipur Travel Safety & Tips:**\n\n• **Guides:** Always hire RTDC (Rajasthan Tourism) approved guides bearing official photo ID badges.\n• **Helpline:** Rajasthan Tourist Police Helpline: 1364 or dial 112."
+      },
+      hi: {
+        overview: "**जयपुर — राजस्थान की गुलाबी नगरी:**\n\n• **ऐतिहासिक धरोहर:** आमेर का भव्य किला, हवा महल, सिटी पैलेस और जंतर मंतर (UNESCO विश्व धरोहर)।\n• **सांस्कृतिक शिल्प:** सांगानेरी ब्लॉक प्रिंटिंग, ब्लू पॉटरी और जोहरी बाजार में पारंपरिक आभूषण।\n• **पारंपरिक राजस्थानी भोजन:** दाल बाटी चूरमा, प्याज़ की कचौड़ी, घेवर और कुल्हड़ लस्सी।",
+        food: "**जयपुर के शाही राजस्थानी व्यंजन:**\n\n• दाल बाटी चूरमा, शुद्ध देसी घी, प्याज कचौरी और पारंपरिक घेवर।",
+        pack: "**जयपुर के लिए पैकिंग सुझाव:**\n\n• सूती कपड़े, सर्दियों में रात के लिए गर्म कपड़े, धूप का चश्मा और मजबूत जूते।",
+        budget: "**जयपुर यात्रा बजट:**\n\n• बजट: ₹1,500–2,500/दिन; मध्यम: ₹4,000–7,000/दिन।",
+        safety: "**जयपुर सुरक्षा:** केवल प्रमाणित गाइड और सरकारी पर्यटन सहायता (1364) का उपयोग करें।"
+      },
+      bn: {
+        overview: "**জয়পুর — রাজস্থানের ঐতিহাসিক গোলাপি শহর:**\n\n• **প্রধান দর্শনীয় স্থান:** রাজকীয় অম্বর কেল্লা, হাওয়া মহল, সিটি প্যালেস এবং যন্তর মন্তর (ইউনেস্কো ওয়ার্ল্ড হেরিটেজ সাইট)।",
+        food: "**জয়পুরের রাজকীয় খাবার:** ডাল বাটি চুরমা, পেঁয়াজের কচুরি এবং সুস্বাদু রাজস্থানি ঘেভর।",
+        pack: "**প্যাকিং টিপস:** আরামদায়ক সুতির পোশাক, রোদচশমা ও হাঁটার জুতো।",
+        budget: "**জয়পুর ভ্রমণ বাজেট:** ১,৫০০–২,৫০০ টাকা/দিন (বাজেট)।",
+        safety: "**নিরাপত্তা:** সরকারি অনুমোদিত গাইড ও পর্যটন হেল্পলাইন (১৩৬৪) ব্যবহার করুন।"
+      }
+    },
+    kerala: {
+      en: {
+        overview: "**Kerala — God's Own Country:**\n\n• **Backwaters & Coastal Serenity:** Alleppey & Kumarakom solar-powered eco-houseboats on Vembanad Lake; Marari village fishing beaches.\n• **Highland Tea Trails:** Munnar's mist-covered Nilgiri tea estates, Anamudi peak, and endangered Nilgiri Tahr wildlife at Eravikulam.\n• **Culture & Food:** Kathakali dance theatre, Kalaripayattu martial arts; authentic Kerala Sadya on banana leaf, Appam with vegetable stew, and Karimeen Pollichathu.\n• **Best Season:** September through March.",
+        food: "**Kerala's Coastal & Spice Flavors:**\n\n• **Traditional Sadya:** Pure vegetarian banquet served on a plantain leaf with 20+ preparations including Avial, Sambar, Thoran, Payasam, and red Matta rice.\n• **Coastal Delicacies:** Karimeen Pollichathu (pearl spot fish wrapped in banana leaf and grilled), and Malabar Fish Curry with Kudampuli kokum.\n• **Breakfast Classics:** Fluffy fermented rice Appam with creamy coconut milk vegetable stew, and steamed Puttu with Kadala curry.",
+        pack: "**Kerala Packing Essentials:**\n\n• **Clothing:** Lightweight linen and breathable cottons. Modest clothing for temple visits.\n• **Monsoon Gear:** Sturdy umbrella or breathable rain poncho (crucial for monsoon showers).\n• **Eco Gear:** Natural citronella insect repellent for backwaters, water-resistant footwear.",
+        budget: "**Kerala Travel Budget (Per Person):**\n\n• **Budget (₹1,800–2,800/day):** Community homestays, state water transport ferries (₹15–40 for scenic cruises!), local vegetarian thalis.\n• **Mid-Range (₹4,500–8,000/day):** Boutique plantations in Munnar, overnight eco-houseboat in Alleppey, Ayurvedic massage.",
+        safety: "**Kerala Travel Safety:** Board only DTPC-registered houseboats with certified lifebuoys; observe beach safety flags."
+      },
+      hi: {
+        overview: "**केरल — ईश्वर का अपना घर (God's Own Country):**\n\n• बैकवाटर्स, सोलर हाउसबोट, मुन्नार के चाय बागान, आयुर्वेद और पारंपरिक कथकली नृत्य।",
+        food: "**केरल के व्यंजन:** केले के पत्ते पर साध्या, अप्पम और नारियल फिश मोइली।",
+        pack: "**केरल पैकिंग:** हल्के सूती कपड़े, छाता और मच्छर रोधी क्रीम।",
+        budget: "**केरल बजट:** ₹1,800–2,800/दिन (बजट); ₹4,500–8,000/दिन (मध्यम)।",
+        safety: "**केरल सुरक्षा:** प्रमाणित हाउसबोट चुनें और लाइफ जैकेट का उपयोग करें।"
+      },
+      bn: {
+        overview: "**কেরল — ঈশ্বরের নিজস্ব দেশ (God's Own Country):**\n\n• ব্যাকওয়াটার্স হাউসবোট, মুন্নারের চা বাগান, আয়ুর্বেদ ও সমুদ্রতট।",
+        food: "**কেরলের খাবার:** কেরল সাধ্য ভোজ, নরম অপ্পম ও নারকেল দুধের ফিশ কারি।",
+        pack: "**প্যাকিং:** সুতির পোশাক, ছাতা ও রোদচশমা।",
+        budget: "**বাজেট:** ১,৮০০–২,৮০০ টাকা/দিন।",
+        safety: "**নিরাপত্তা:** সরকারি রেজিস্টার্ড হাউসবোট ব্যবহার করুন।"
+      }
+    },
+    ladakh: {
+      en: {
+        overview: "**Ladakh — The Land of High Passes:**\n\n• **High-Altitude Wonders:** Pangong Tso (14,270 ft crystal-blue lake), Nubra Valley sand dunes with double-humped Bactrian camels, and Hanle Dark Sky Reserve.\n• **Monastic Heritage:** Hemis Gompa, Thiksey Monastery, and ancient 11th-century murals of Alchi.\n• **Acclimatization:** Mandatory 48 hours of complete rest in Leh (11,500 ft) before crossing high passes.",
+        food: "**Ladakhi High-Altitude Cuisine:**\n\n• **Thukpa:** Hearty noodle soup with garden vegetables and rich broth, providing sustained warmth.\n• **Skyu:** Handmade slow-simmered whole wheat pasta stew — traditional winter sustenance.\n• **Gur Gur Cha:** Churned yak butter tea with Himalayan rock salt — critical for high-altitude hydration.\n• **Tingmo:** Steamed flower-shaped wheat bread served with spicy dal or vegetable stews.",
+        pack: "**High-Altitude Himalayan Packing List (Ladakh):**\n\n• **Base Layers:** Merino wool thermals (2 sets minimum).\n• **Insulation:** 600-fill down jacket or heavy fleece pullover.\n• **Shell:** Waterproof windproof hardshell jacket.\n• **Eyewear & Sun:** Polarized UV-400 glacier sunglasses + SPF 50+ sunscreen.\n• **Medical:** Diamox (under medical advice), pulse oximeter, ORS sachets.\n• **Hydration:** Reusable insulated water bottle (plastic bottles banned in Ladakh!).\n• **Permits:** 4 hardcopies of Inner Line Permit (ILP).",
+        budget: "**Ladakh Travel Budget (Per Person):**\n\n• **Budget (₹18,000–25,000 / 5 days):** Shared taxis, certified eco-homestays, DIY permits.\n• **Mid-Range (₹32,000–48,000 / 7 days):** Private 4x4 vehicle, curated community homestays, all permits.",
+        safety: "**High-Altitude Safety Protocols (AMS):**\n\n• **Leh Acclimatization:** 48 hours minimum complete rest upon landing.\n• **Hydration:** Drink 4–5 liters of water daily with electrolytes. No alcohol or sleeping pills.\n• **Telemetry:** Check Khardung La & Chang La pass clearance before early morning departures. Hospital: SNM Hospital Leh."
+      },
+      hi: {
+        overview: "**लद्दाख — उच्च हिमालयी दर्रों की भूमि:**\n\n• पैंगोंग त्सो (14,270 फीट), नुब्रा घाटी और हानले डार्क स्काई अभयारण्य। लेह में 48 घंटे अनुकूलन अनिवार्य।",
+        food: "**लद्दाखी व्यंजन:** थुकपा, स्क्यू, गुर गुर बटर चाय और तिंगमो।",
+        pack: "**पैकिंग:** मेरिनो वूल थर्मल, डाउन जैकेट, UV-400 चश्मा, डायमॉक्स व पल्स ऑक्सीमीटर।",
+        budget: "**बजट:** ₹18,000–25,000 (5-दिवसीय साझा)।",
+        safety: "**ऊंचाई सुरक्षा:** लेह में 48 घंटे का पूर्ण विश्राम और पर्याप्त पानी।"
+      },
+      bn: {
+        overview: "**লাদাখ — উচ্চ হিমালয় গিরিপথের দেশ:**\n\n• প্যাংগং ত্সো, নুব্রা ভ্যালি ও তুরতুক। লেহতে ৪৮ ঘণ্টা বিশ্রাম বাধ্যতামূলক।",
+        food: "**খাবার:** থুকপা, স্কিউ ও বাটার টি।",
+        pack: "**প্যাকিং:** থার্মাল ইনার, ডাউন জ্যাকেট, গ্লেসিয়ার রোদচশমা ও ডায়ামক্স।",
+        budget: "**বাজেট:** ১৮,০০০–২৫,০০০ টাকা (৫ দিন)।",
+        safety: "**সুরক্ষা:** লেহতে প্রথম ৪৮ ঘণ্টা বিশ্রাম ও পর্যাপ্ত জলপান।"
+      }
+    }
   };
-  resetWatchdog(30000);
 
-  // Finalize UI once stream is done AND all tokens have rendered
-  function finalizeUI() {
-    if (watchdogTimer) clearTimeout(watchdogTimer);
-    if (cursor && cursor.parentNode) cursor.remove();
-    if (orb) orb.className = "ai-orb idle";
-    if (statusText) statusText.textContent = activeText;
-    if (submitBtn) submitBtn.disabled = false;
-    if (chatInput) {
-      chatInput.disabled = false;
-      chatInput.focus();
+  const STANDALONE_HIMALAYAN = {
+    acclimat: {
+      en: "**Mandatory Acclimatization Protocol for Leh (11,500 ft):**\n\n• **Day 1 — Complete Rest:** Land at Leh Airport, go directly to your hotel, and rest for the entire day. Avoid all exertion.\n• **Day 2 — Light Activity:** Gentle short walks (15–20 mins). Monitor for headache, nausea, or breathlessness.\n• **Hydration Rule:** Drink 4–5 liters of water daily with electrolytes. Avoid alcohol, caffeine, and sleeping pills for the first 48 hours.\n• **AMS Warning Signs:** Throbbing headache, nausea, dizziness. If symptoms worsen, descend immediately to lower altitude.",
+      hi: "**लेह (11,500 फीट) के लिए अनिवार्य 48-घंटे अनुकूलन प्रोटोकॉल:**\n\n• पहला दिन होटल में पूर्ण विश्राम करें। प्रतिदिन 4-5 लीटर पानी पिएं। शराब और भारी परिश्रम से बचें। सिरदर्द या चक्कर होने पर तुरंत कम ऊंचाई पर जाएं।",
+      bn: "**বাধ্যতামূলক উচ্চতা সুরক্ষা ও অভিযোজন নির্দেশিকা:**\n\n• লেহ শহরে পৌঁছানোর পর প্রথম ৪৮ ঘণ্টা বিশ্রাম বাধ্যতামূলক। প্রতিদিন ৪-৫ লিটার জল পান করুন এবং রক্তে অক্সিজেনের মাত্রা (SpO2) পরীক্ষা করুন।"
+    },
+    pass: {
+      en: "**Mountain Pass Safety Advisory (Live Telemetry):**\n\n• **Khardung La (17,582 ft) — OPEN:** Light black ice on northern descent. Cross between 06:00–16:00. Maximum stay at summit: 15 minutes. 4x4 with snow chains recommended.\n• **Chang La (17,688 ft) — CAUTION:** High ridge winds (-5°C). Snow drift active near summit. Cross before 14:00.\n• **Zoji La (11,575 ft) — RESTRICTED:** Freight convoy movement from Sonamarg.\n• **Emergency Number:** BRO Rescue 1077.",
+      hi: "**पर्वतीय दर्रा लाइव सुरक्षा परामर्श:**\n\n• खारदुंग ला खुला है (सुबह 06:00 से शाम 16:00)। शिखर पर अधिकतम 15 मिनट रुकें। आपातकालीन नंबर: BRO HIMANK 1077।",
+      bn: "**পাহাড়ি গিরিপথ লাইভ সতর্কতা:**\n\n• খারদুং লা ও চাং লা গিরিপথে নজরদারি চলছে। সকাল ০৬:০০ থেকে বিকাল ১৬:০০ এর মধ্যে অতিক্রম করুন।"
+    },
+    permit: {
+      en: "**Inner Line Permit (ILP) — Complete Guide:**\n\n• Required for Nubra, Pangong, Turtuk, Hanle. Apply online at lahdc.nic.in. Carry 4 hardcopies for checkposts.",
+      hi: "**इनर लाइन परमिट (ILP):** नुब्रा, पैंगोंग और हानले के लिए अनिवार्य। lahdc.nic.in पर ऑनलाइन प्राप्त करें। 4 प्रतियां साथ रखें।",
+      bn: "**ইনার লাইন পারমিট (ILP):** নুব্রা ও প্যাংগং ভ্রমণের জন্য বাধ্যতামূলক। ৪টি প্রিন্ট কপি সাথে রাখুন।"
+    },
+    decongest: {
+      en: "**Smart Decongestion Strategy:** Visiting secondary corridors like Turtuk, Hanle, and Sham Valley diverts tourist footprint away from saturated hotspots like Pangong Lake. This reduces vehicle emissions, relieves alpine water tables, and redistributes 80%+ of tourism revenue directly to remote village families.",
+      hi: "**स्मार्ट भीड़-नियंत्रण रणनीति:** तुरतुक, हानले और शाम घाटी जैसे ऑफबीट स्थानों का दौरा करने से मुख्य केंद्रों पर दबाव घटता है और 80%+ आय सीधे स्थानीय परिवारों तक पहुंचती है।",
+      bn: "**স্মার্ট ভিড়-নিয়ন্ত্রণ কৌশল:** বিকল্প করিডোর পরিদর্শনে মূল পর্যটন কেন্দ্রের ভিড় কমে এবং ৮০%+ অর্থ সরাসরি স্থানীয় গ্রামবাসীর হাতে থাকে।"
     }
+  };
+
+  const PAN_INDIA_FALLBACK = {
+    en: {
+      overview: "**Namaste! 🙏 I am Bharat AI — your verified travel intelligence guide for all of India.**\n\nI provide tailored, sustainable travel insights across all 28 states and union territories of Bharat:\n\n• **Kolkata & West Bengal** — Victoria Memorial, Howrah Bridge, Bengali cuisine, and historic trams\n• **Rajasthan & West India** — Majestic hill forts, palace architecture, and desert culture\n• **Kerala & South India** — Backwater eco-houseboats, spice trails, and tranquil beaches\n• **Himalayas & North** — Mountain valleys, high-altitude acclimatization, and live pass telemetry\n• **Sustainable Travel** — Certified community homestays, public EV transit, and zero single-use plastic\n\nAsk me about any destination, regional food, packing tips, or budget planning — I will stay strictly focused on your chosen topic!",
+      food: "**Pan-India Culinary Explorer — A Journey You Can Taste:**\n\n• **East India (Kolkata & Bengal):** Rosogolla, Mishti Doi, Kolkata Biryani with spiced potato, and Kathi Rolls.\n• **West India (Rajasthan & Gujarat):** Dal Baati Churma, Pyaaz Kachori, and authentic Gujarati Thali.\n• **South India (Kerala & Tamil Nadu):** Traditional Kerala Sadya, Appam with coconut stew, and crispy Dosa with Sambar.\n• **North India (Himalayas & Plains):** Kashmiri Rogan Josh, Ladakhi Thukpa, and Punjabi Dal Makhani with Kulcha.\n\nTell me which region or city you're exploring, and I'll detail the best authentic local eateries and dishes!",
+      pack: "**General Travel Packing Essentials for India:**\n\n• **Plains & Coastal Regions (Kolkata, Kerala, Goa):** Lightweight breathable cottons, comfortable walking shoes, umbrella, and sunglasses.\n• **Desert Regions (Rajasthan):** Cotton wear for warm days, warm layers for cool desert nights, and sun protection.\n• **Mountain Destinations (Himalayas):** Thermal base layers, fleece, down jacket, and sturdy trekking shoes.\n• **General Essentials:** Universal power bank, reusable water bottle, digital ID copies, and UPI payment app on your smartphone.",
+      budget: "**Pan-India Travel Budget Guide (Per Person/Day):**\n\n• **Budget Backpacker (₹1,200–2,200/day):** Clean hostels/homestays, authentic street dhabas, state buses & metro.\n• **Mid-Range Traveler (₹3,500–6,500/day):** 3-star boutique hotels, heritage dining, ride-hailing cabs, and guided tours.\n• **Luxury Traveler (₹10,000–25,000+/day):** 5-star palace hotels, private chauffeur-driven vehicles, and curated experiences.\n\nLet me know your target destination for an exact city-specific budget breakdown!",
+      safety: "**Pan-India Travel Safety & Etiquette Advice:**\n\n• **Emergency Numbers:** All-India Emergency Helpline: 112 (Police, Ambulance, Fire). Tourist Helpline: 1363.\n• **Digital Payments:** UPI (Google Pay, PhonePe, Paytm) is accepted nationwide from street stalls to luxury stores.\n• **Cultural Respect:** Remove shoes before entering temples and prayer halls; dress modestly at religious monuments.\n• **Transportation:** Use official prepaid taxi booths at airports/railway stations, or ride-hailing apps (Uber, Ola) with active GPS tracking."
+    },
+    hi: {
+      overview: "**नमस्ते! 🙏 मैं भारत एआई (Bharat AI) हूँ — संपूर्ण भारत यात्रा के लिए आपका बुद्धिमान मार्गदर्शक।**\n\nमैं भारत के सभी राज्यों एवं प्रमुख शहरों के लिए सटीक और स्थायी यात्रा जानकारी प्रदान करता हूँ:\n\n• **कोलकाता एवं पश्चिम बंगाल** — विक्टोरिया मेमोरियल, हावड़ा ब्रिज, प्रसिद्ध मिष्टी दोई व ट्राम संस्कृति\n• **राजस्थान व पश्चिमी भारत** — जयपुर का आमेर किला, हवेलियां और रेगिस्तानी संस्कृति\n• **केरल व दक्षिण भारत** — बैकवाटर हाउसबोट, मुन्नार चाय बागान और समुद्री तट\n• **हिमालयी गंतव्य** — लद्दाख, हिमाचल और उत्तराखंड के लिए ऊंचाई सुरक्षा व दर्रा सलाह\n\nआप जिस भी शहर या यात्रा विषय के बारे में पूछेंगे, मैं बिना भटके केवल उसी विषय पर मार्गदर्शन दूंगा!",
+      food: "**अखिल भारतीय खानपान गाइड:** पूर्व भारत में कोलकाता की बिरयानी व रसगुल्ला, पश्चिम में दाल बाटी चूरमा, दक्षिण में केरल साध्या और उत्तर में पहाड़ी व्यंजन।",
+      pack: "**भारत यात्रा पैकिंग:** मैदानी व तटीय क्षेत्रों (कोलकाता/केरल) के लिए हल्के सूती कपड़े व छाता; हिमालय के लिए गर्म कपड़े।",
+      budget: "**भारत यात्रा बजट:** ₹1,200–2,200/दिन (बजट); ₹3,500–6,500/दिन (मध्यम)।",
+      safety: "**सुरक्षा सुझाव:** राष्ट्रीय आपातकालीन नंबर: 112। पर्यटक हेल्पलाइन: 1363।"
+    },
+    bn: {
+      overview: "**নমস্কার! 🙏 আমি ভারত এআই (Bharat AI) — সমগ্র ভারত ভ্রমণের জন্য আপনার বুদ্ধিমান সহায়ক।**\n\nআমি ভারতের সমস্ত রাজ্য ও প্রধান শহরের জন্য নির্ভরযোগ্য ভ্রমণ পরামর্শ প্রদান করি:\n\n• **কলকাতা ও পশ্চিমবঙ্গ** — ভিক্টোরিয়া মেমোরিয়াল, হাওড়া ব্রিজ, ঐতিহ্যবাহী বাঙালি মিষ্টি ও ট্রাম\n• **রাজস্থান ও পশ্চিম ভারত** — প্রাচীন দুর্গ, রাজপুত স্থাপত্য ও রাজকীয় সংস্কৃতি\n• **কেরল ও দক্ষিণ ভারত** — ব্যাকওয়াটার্স হাউসবোট, চা বাগান ও সমুদ্রতট\n• **হিমালয় অঞ্চল** — লাদাখ ও হিমাচলের উচ্চতা সুরক্ষা ও গিরিপথ সতর্কতা\n\nআপনি যে শহর বা গন্তব্য সম্পর্কে জানতে চান আমাকে প্রশ্ন করুন — আমি সম্পূর্ণ সেই বিষয়ের উপর তথ্য জানাব!",
+      food: "**ভারতের খাদ্যসংস্কৃতি:** কলকাতায় বিরিয়ানি ও রসগোল্লা, রাজস্থানে ডাল বাটি চুরমা, কেরলে সাধ্য ভোজ।",
+      pack: "**প্যাকিং গাইড:** সমতল অঞ্চলের জন্য হালকা সুতির পোশাক ও ছাতা; পাহাড়ি অঞ্চলের জন্য উলের জ্যাকেট।",
+      budget: "**ভ্রমণ বাজেট:** ১,২০০–২,২০০ টাকা/দিন (বাজেট); ৩,৫০০–৬,৫০০ টাকা/দিন (মিড-রেঞ্জ)।",
+      safety: "**নিরাপত্তা নির্দেশিকা:** জরুরি হেল্পলাইন: ১১২। ক্যাশলেস UPI পেমেন্ট অত্যন্ত নির্ভরযোগ্য।"
+    }
+  };
+
+  /**
+   * Client-side offline heuristic fallback engine
+   * Strictly stays on topic for the active or queried destination
+   */
+  function aiReply(q, overrideDest = null) {
+    const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+    const targetLang = (lang === "hi" || lang === "bn") ? lang : "en";
+
+    const dest = detectDestination(q) || overrideDest || activeDestination;
+    const subtopic = detectSubtopic(q);
+
+    // 1. If explicit Himalayan telemetry/acclimatization requested
+    if (subtopic in STANDALONE_HIMALAYAN) {
+      const hDict = STANDALONE_HIMALAYAN[subtopic];
+      return hDict[targetLang] || hDict.en;
+    }
+
+    // 2. If destination is recognized
+    if (dest && DESTINATION_FALLBACKS[dest]) {
+      const destBundle = DESTINATION_FALLBACKS[dest][targetLang] || DESTINATION_FALLBACKS[dest].en;
+      if (destBundle[subtopic]) return destBundle[subtopic];
+      return destBundle.overview || destBundle.food || "";
+    }
+
+    // 3. Pan-India general fallback
+    const panBundle = PAN_INDIA_FALLBACK[targetLang] || PAN_INDIA_FALLBACK.en;
+    if (panBundle[subtopic]) return panBundle[subtopic];
+    return panBundle.overview;
+  }
+
+  // ═══════════════════════════════════════════════════════
+  //  STREAMING AI CHAT ENGINE WITH ADAPTIVE TOKEN DISPATCHER
+  // ═══════════════════════════════════════════════════════
+
+  let isGenerating = false;
+
+  async function askAI(q) {
+    if (!q || !q.trim() || isGenerating) return;
+    const box = $("#messages");
+    const orb = $("#aiOrb");
+    const statusText = $("#aiStatusText");
+    const chatForm = $("#chatForm");
+    const submitBtn = chatForm ? chatForm.querySelector("button[type='submit']") : null;
+    const chatInput = $("#chatInput");
+
+    // Detect and anchor destination if present in current query
+    const detected = detectDestination(q);
+    if (detected) {
+      activeDestination = detected;
+    }
+
+    const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+    const connectingText = lang === "hi" ? "भारत एआई • कनेक्ट हो रहा है..." : lang === "bn" ? "ভারত এআই • সংযুক্ত হচ্ছে..." : "Bharat AI • Connecting...";
+    const streamingText = lang === "hi" ? "भारत एआई • उत्तर आ रहा है..." : lang === "bn" ? "ভারত এআই • উত্তর লেখা হচ্ছে..." : "Bharat AI • Streaming...";
+    const activeText = lang === "hi" ? "भारत एआई • सक्रिय" : lang === "bn" ? "ভারত এআই • সক্রিয়" : "Bharat AI • Active";
+    const placeholderText = lang === "hi" ? "भारत एआई से संपर्क किया जा रहा है..." : lang === "bn" ? "ভারত এআই-এর সাথে যোগাযোগ করা হচ্ছে..." : "Connecting to Bharat AI...";
+
+    isGenerating = true;
+
+    // Safeguard: Disable submit button to prevent parallel conflicting requests
+    if (submitBtn) submitBtn.disabled = true;
+
+    // 1. Instantly append user message synchronously (<10ms)
+    const userMsg = document.createElement("div");
+    userMsg.className = "msg user";
+    userMsg.textContent = q;
+    box.appendChild(userMsg);
     box.scrollTop = box.scrollHeight;
-    isGenerating = false;
-  }
 
-  // Token Typewriter Dispatcher loop
-  function processTokenQueue() {
-    if (tokenQueue.length > 0) {
-      if (isFirstToken) {
-        textSpan.textContent = "";
-        textSpan.style.opacity = "1";
-        isFirstToken = false;
+    // 2. Instantly update orb & status indicator
+    if (orb) orb.className = "ai-orb thinking";
+    if (statusText) statusText.textContent = connectingText;
+
+    // 3. Mount bot message container synchronously with immediate typing placeholder & blinking cursor
+    const botMsg = document.createElement("div");
+    botMsg.className = "msg bot";
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "bot-text";
+    textSpan.textContent = placeholderText;
+    textSpan.style.opacity = "0.7";
+
+    const cursor = document.createElement("span");
+    cursor.textContent = "▍";
+    cursor.className = "typing-cursor";
+
+    botMsg.appendChild(textSpan);
+    botMsg.appendChild(cursor);
+    box.appendChild(botMsg);
+    box.scrollTop = box.scrollHeight;
+
+    // 4. Token Queue & Typewriter Dispatcher State
+    const tokenQueue = [];
+    let displayedText = "";
+    let isStreamFinished = false;
+    let isDispatcherRunning = false;
+    let isFirstToken = true;
+
+    // Dynamic Activity Watchdog (resets on incoming chunks)
+    const controller = new AbortController();
+    let watchdogTimer = null;
+    const resetWatchdog = (ms = 30000) => {
+      if (watchdogTimer) clearTimeout(watchdogTimer);
+      watchdogTimer = setTimeout(() => {
+        console.warn("[Bharat AI] Activity watchdog timeout (30s inactivity). Aborting connection.");
+        controller.abort();
+      }, ms);
+    };
+    resetWatchdog(30000);
+
+    // Finalize UI once stream is done AND all tokens have rendered
+    function finalizeUI() {
+      if (watchdogTimer) clearTimeout(watchdogTimer);
+      if (cursor && cursor.parentNode) cursor.remove();
+      if (orb) orb.className = "ai-orb idle";
+      if (statusText) statusText.textContent = activeText;
+      if (submitBtn) submitBtn.disabled = false;
+      if (chatInput) {
+        chatInput.disabled = false;
+        chatInput.focus();
       }
-
-      // Adaptive cadence: if queue builds up from network burst, drain faster
-      let tokensToDrain = 1;
-      let delayMs = 18; // Default natural LLM cadence
-
-      if (tokenQueue.length > 35) {
-        tokensToDrain = 3;
-        delayMs = 6;
-      } else if (tokenQueue.length > 18) {
-        tokensToDrain = 2;
-        delayMs = 10;
-      } else if (tokenQueue.length > 8) {
-        tokensToDrain = 1;
-        delayMs = 14;
-      }
-
-      for (let i = 0; i < tokensToDrain && tokenQueue.length > 0; i++) {
-        displayedText += tokenQueue.shift();
-      }
-
-      textSpan.innerHTML = renderMarkdown(displayedText.trimStart());
       box.scrollTop = box.scrollHeight;
+      isGenerating = false;
 
-      setTimeout(processTokenQueue, delayMs);
-    } else if (!isStreamFinished) {
-      // Stream still active over network, waiting for next packet
-      setTimeout(processTokenQueue, 25);
-    } else {
-      // Both stream finished and token queue completely drained!
-      isDispatcherRunning = false;
-      textSpan.innerHTML = renderMarkdown(displayedText.trimStart());
-      finalizeUI();
-    }
-  }
-
-  try {
-    const res = await fetch("http://127.0.0.1:8000/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: q, lang: lang }),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw new Error("Status " + res.status);
-
-    if (orb) orb.className = "ai-orb streaming";
-    if (statusText) statusText.textContent = streamingText;
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      resetWatchdog(30000);
-
-      const chunk = decoder.decode(value, { stream: true });
-      if (!chunk) continue;
-
-      // Tokenize chunk into words and whitespace
-      const tokens = chunk.match(/\S+|\s+/g);
-      if (tokens && tokens.length > 0) {
-        tokenQueue.push(...tokens);
-        if (!isDispatcherRunning) {
-          isDispatcherRunning = true;
-          processTokenQueue();
+      // Persist in conversation history for multi-turn awareness
+      if (displayedText.trim()) {
+        chatHistory.push({ role: "user", text: q });
+        chatHistory.push({ role: "model", text: displayedText.trim() });
+        if (chatHistory.length > 12) {
+          chatHistory.splice(0, chatHistory.length - 12);
         }
       }
     }
 
-    isStreamFinished = true;
-  } catch (err) {
-    console.warn("[Bharat AI Stream Catch]:", err);
-    isStreamFinished = true;
-  } finally {
-    // If no tokens were ever enqueued (offline or instant error), load fallback reply
-    if (displayedText.trim().length === 0 && tokenQueue.length === 0) {
-      const fallback = aiReply(q);
-      const tokens = fallback.match(/\S+|\s+/g) || [fallback];
-      tokenQueue.push(...tokens);
+    // Token Typewriter Dispatcher loop
+    function processTokenQueue() {
+      if (tokenQueue.length > 0) {
+        if (isFirstToken) {
+          textSpan.textContent = "";
+          textSpan.style.opacity = "1";
+          isFirstToken = false;
+        }
+
+        // Adaptive cadence: if queue builds up from network burst, drain faster
+        let tokensToDrain = 1;
+        let delayMs = 18; // Default natural LLM cadence
+
+        if (tokenQueue.length > 35) {
+          tokensToDrain = 3;
+          delayMs = 6;
+        } else if (tokenQueue.length > 18) {
+          tokensToDrain = 2;
+          delayMs = 10;
+        } else if (tokenQueue.length > 8) {
+          tokensToDrain = 1;
+          delayMs = 14;
+        }
+
+        for (let i = 0; i < tokensToDrain && tokenQueue.length > 0; i++) {
+          displayedText += tokenQueue.shift();
+        }
+
+        textSpan.innerHTML = renderMarkdown(displayedText.trimStart());
+        box.scrollTop = box.scrollHeight;
+
+        setTimeout(processTokenQueue, delayMs);
+      } else if (!isStreamFinished) {
+        // Stream still active over network, waiting for next packet
+        setTimeout(processTokenQueue, 25);
+      } else {
+        // Both stream finished and token queue completely drained!
+        isDispatcherRunning = false;
+        textSpan.innerHTML = renderMarkdown(displayedText.trimStart());
+        finalizeUI();
+      }
     }
 
-    // Ensure dispatcher is kicked off to drain tokens
-    if (!isDispatcherRunning) {
-      isDispatcherRunning = true;
-      processTokenQueue();
+    try {
+      const payload = {
+        message: q,
+        lang: lang,
+        history: chatHistory.slice(-6),
+        active_destination: activeDestination
+      };
+
+      const res = await fetch("http://127.0.0.1:8000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server returned HTTP status ${res.status}`);
+      }
+
+      if (statusText) statusText.textContent = streamingText;
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        resetWatchdog(30000);
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        // Tokenize chunk into words and whitespace
+        const tokens = chunk.match(/\S+|\s+/g);
+        if (tokens && tokens.length > 0) {
+          tokenQueue.push(...tokens);
+          if (!isDispatcherRunning) {
+            isDispatcherRunning = true;
+            processTokenQueue();
+          }
+        }
+      }
+
+      isStreamFinished = true;
+    } catch (err) {
+      console.warn("[Bharat AI Stream Catch]:", err);
+      isStreamFinished = true;
+    } finally {
+      // If no tokens were ever enqueued (offline or instant error), load fallback reply
+      if (displayedText.trim().length === 0 && tokenQueue.length === 0) {
+        const fallback = aiReply(q, activeDestination);
+        const tokens = fallback.match(/\S+|\s+/g) || [fallback];
+        tokenQueue.push(...tokens);
+      }
+
+      // Ensure dispatcher is kicked off to drain tokens
+      if (!isDispatcherRunning) {
+        isDispatcherRunning = true;
+        processTokenQueue();
+      }
     }
   }
-}
 
 // ═══════════════════════════════════════════════════════
 //  SMART SAFETY-AUDITED ITINERARY PLANNER
