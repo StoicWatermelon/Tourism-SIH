@@ -1330,12 +1330,73 @@ function initMap() {
     maxZoom: 14
   }).setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
 
-  // CartoDB Voyager Tile Layer: vivid colors, crisp country and state borders
-  const voyagerTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  // Dynamic CARTO Basemap API Configuration
+  const getCartoApiKey = () => {
+    const raw = (
+      (typeof window !== "undefined" && window.CARTO_API_KEY) ||
+      (typeof window !== "undefined" && window.ENV && window.ENV.CARTO_API_KEY) ||
+      (typeof process !== "undefined" && process.env && process.env.CARTO_API_KEY) ||
+      ""
+    ).trim();
+    return (raw && raw !== "YOUR_CARTO_API_KEY_HERE") ? raw : "";
+  };
+
+  let cartoApiKey = getCartoApiKey();
+
+  const buildCartoTileUrl = (key) => {
+    const baseUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    const cleanKey = (key || '').trim();
+    if (cleanKey && cleanKey !== "YOUR_CARTO_API_KEY_HERE") {
+      // CARTO Basemaps requires the 'key' query parameter to remove the watermark (also accepts 'api_key')
+      return `${baseUrl}?key=${encodeURIComponent(cleanKey)}&api_key=${encodeURIComponent(cleanKey)}`;
+    }
+    return baseUrl;
+  };
+
+  // CartoDB Voyager Tile Layer: vivid colors, crisp country and state borders with dynamic API key parameters
+  const voyagerTileLayer = L.tileLayer(buildCartoTileUrl(cartoApiKey), {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(leafletMap);
+
+  const applyResolvedCartoKey = (resolvedKey) => {
+    const clean = (resolvedKey || '').trim();
+    if (clean && clean !== "YOUR_CARTO_API_KEY_HERE") {
+      cartoApiKey = clean;
+      if (typeof window !== "undefined") window.CARTO_API_KEY = clean;
+      const targetUrl = buildCartoTileUrl(clean);
+      voyagerTileLayer.setUrl(targetUrl);
+      if (typeof voyagerTileLayer.redraw === "function") {
+        voyagerTileLayer.redraw();
+      }
+    }
+  };
+
+  // Always attempt to sync latest CARTO_API_KEY from backend server or local .env
+  if (typeof fetch === "function") {
+    fetch('/api/config')
+      .then(res => res.ok ? res.json() : null)
+      .then(config => {
+        if (config && config.CARTO_API_KEY) {
+          applyResolvedCartoKey(config.CARTO_API_KEY);
+        }
+      })
+      .catch(() => {
+        // Fallback for static servers: read .env directly
+        fetch('.env')
+          .then(res => res.ok ? res.text() : null)
+          .then(txt => {
+            if (txt) {
+              const m = txt.match(/CARTO_API_KEY\s*=\s*([^\r\n#]+)/);
+              if (m && m[1]) {
+                applyResolvedCartoKey(m[1].trim());
+              }
+            }
+          })
+          .catch(() => {});
+      });
+  }
 
   voyagerTileLayer.on('tileerror', function () {
     console.warn("[Map] Retrying tile fetch...");

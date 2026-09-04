@@ -1026,40 +1026,7 @@ function updateResponsibleScore(delta, message) {
 }
 
 function checkRewardUnlock() {
-  const badge = $("#scoreBadge");
-  const levelBadge = $("#levelBadge");
-  const redeemBtn = $("#redeemRewardsBtn");
-  const tier95Header = $("#tier95Header");
-  const rewardsGrid95 = $("#rewardsGrid95");
-
-  // Update SVG ring initial state on load
-  const ringFill = $("#scoreRingFill");
-  if (ringFill) {
-    const CIRCUMFERENCE = 408;
-    ringFill.style.strokeDashoffset = CIRCUMFERENCE - (currentScore / 100) * CIRCUMFERENCE;
-  }
-
-  const t = (k, fb) => (window.i18n && typeof window.i18n.t === "function") ? window.i18n.t(k) : fb;
-
-  if (currentScore >= 95) {
-    if (badge) badge.textContent = t("resp_perk_guardian_unlocked", "✦ HIMALAYAN GUARDIAN TIER UNLOCKED");
-    if (levelBadge) { levelBadge.className = "level-badge guardian"; levelBadge.textContent = t("resp_level_guardian", "🏔 Himalayan Guardian"); }
-    if (redeemBtn) redeemBtn.style.boxShadow = "0 0 20px rgba(255, 183, 3, 0.6)";
-    if (tier95Header) tier95Header.style.display = "block";
-    if (rewardsGrid95) rewardsGrid95.style.display = "grid";
-  } else if (currentScore >= 80) {
-    if (badge) badge.textContent = t("resp_perk_unlocked", "✦ ECO-CHAMPION TIER UNLOCKED (Vouchers Active)");
-    if (levelBadge) { levelBadge.className = "level-badge silver"; levelBadge.textContent = t("resp_level_silver", "🥈 Silver Eco-Traveler"); }
-    if (redeemBtn) redeemBtn.style.boxShadow = "0 0 16px rgba(255, 183, 3, 0.5)";
-    if (tier95Header) tier95Header.style.display = "none";
-    if (rewardsGrid95) rewardsGrid95.style.display = "none";
-  } else {
-    if (badge) badge.textContent = `${t("resp_perk_locked", "✦ REACH 80+ TO UNLOCK DIGITAL VOUCHERS")} (${currentScore}/80)`;
-    if (levelBadge) { levelBadge.className = "level-badge silver"; levelBadge.textContent = t("resp_level_silver", "🥈 Silver Eco-Traveler"); }
-    if (redeemBtn) redeemBtn.style.boxShadow = "none";
-    if (tier95Header) tier95Header.style.display = "none";
-    if (rewardsGrid95) rewardsGrid95.style.display = "none";
-  }
+  // Legacy token coupon vouchers replaced by The Great Himalayan Eco-Expedition game
 }
 
 function triggerEcoAction(type) {
@@ -1303,17 +1270,6 @@ async function init() {
     };
   }
 
-  // Redeem Rewards button
-  const redeemBtn = $("#redeemRewardsBtn");
-  if (redeemBtn) {
-    redeemBtn.onclick = () => {
-      if (currentScore >= 80) {
-        $("#rewardsModal").classList.add("open");
-      } else {
-        toast(`Your Responsible Score is ${currentScore}. Reach 80+ to unlock cooperative vouchers!`);
-      }
-    };
-  }
 
   // Plan from journey drawer button
   const planFromJourneyBtn = $("#planFromJourneyBtn");
@@ -1354,11 +1310,6 @@ async function init() {
     });
   });
 
-  // Responsible score button
-  const scoreBtn = $("#scoreBtn");
-  if (scoreBtn) {
-    scoreBtn.onclick = () => updateResponsibleScore(5, "Eco-friendly decision recorded!");
-  }
 
   // Emotion pills
   $$(".emotion-row button").forEach(b => {

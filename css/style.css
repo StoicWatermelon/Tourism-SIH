@@ -1397,17 +1397,24 @@ button {
 
 /* Responsible Tourism & Score Card */
 .responsible {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr;
-  gap: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
   background: #eef1ea;
+}
+
+.responsible-header {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 36px;
+  align-items: center;
 }
 
 .responsible-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 26px;
+  margin-top: 0;
 }
 
 .resp-pill {
@@ -1632,25 +1639,6 @@ button {
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
 }
 
-/* Milestone reward tier badges in rewards modal */
-.reward-tier-header {
-  background: linear-gradient(135deg, rgba(42, 157, 143, 0.1) 0%, rgba(0, 180, 216, 0.08) 100%);
-  border: 1px solid rgba(42, 157, 143, 0.3);
-  border-radius: var(--radius-sm);
-  padding: 10px 16px;
-  margin: 16px 0 8px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--emerald-pop);
-}
-
-.reward-tier-header.tier-95 {
-  background: linear-gradient(135deg, rgba(255, 183, 3, 0.12) 0%, rgba(255, 107, 53, 0.08) 100%);
-  border-color: rgba(255, 183, 3, 0.35);
-  color: var(--gold-pop);
-}
-
 /* Trans-Himalayan Journey Route */
 .journey {
   background: #0d171c;
@@ -1764,53 +1752,462 @@ button {
   color: var(--accent);
 }
 
-/* Rewards Coupons */
-.rewards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
+/* ═══════════════════════════════════════════════════════
+   BHARAT ECO-EXPEDITION: HIMALAYAN TRAIL QUEST GAME
+   ═══════════════════════════════════════════════════════ */
+
+.game-hub-container {
+  background: #0f172a;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
 }
 
-.reward-coupon {
-  background: #f9fbfb;
-  border-radius: var(--radius-sm);
-  padding: 22px;
-  border: 1.5px dashed rgba(42, 157, 143, 0.4);
+.game-hub-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.coupon-tag {
-  display: inline-block;
-  background: var(--emerald-pop);
-  color: #fff;
+.game-hub-badge {
   font-size: 11px;
   font-weight: 800;
-  padding: 3px 9px;
+  letter-spacing: 0.12em;
+  color: var(--gold-pop);
+  text-transform: uppercase;
+}
+
+.btn.ghost-mini {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.ghost-mini:hover {
+  border-color: #fff;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Game HUD Gauges */
+.game-hud {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(30, 41, 59, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hud-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.hud-stat-header strong {
+  font-size: 13px;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+.hud-stat-header strong.gold {
+  color: var(--gold-pop);
+}
+
+.hud-bar-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 99px;
+  overflow: hidden;
+}
+
+.hud-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+}
+
+.hud-bar-fill.good {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.hud-bar-fill.warn {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.hud-bar-fill.danger {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.hud-bar-fill.gold {
+  background: linear-gradient(90deg, #ffb703, #fb8500);
+  box-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+}
+
+/* Stage Card & Compact Landscape 2-Column Grid */
+.game-stage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 22px;
+  padding: 16px 20px;
+  align-items: stretch;
+  background: #0f172a;
+}
+
+.game-stage-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-stage-banner-compact {
+  background-size: cover;
+  background-position: center;
+  padding: 16px 18px;
+  position: relative;
+  min-height: 125px;
+  max-height: 135px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.game-stage-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.game-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #e2e8f0;
+}
+
+.game-pill.checkpoint {
+  background: rgba(42, 157, 143, 0.9);
+  color: #fff;
+  border-color: rgba(42, 157, 143, 0.9);
+}
+
+.game-stage-title-compact {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.25;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.game-scenario-text-compact {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0;
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  flex: 1;
+}
+
+.game-stage-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.game-choices-header {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  text-transform: uppercase;
   margin-bottom: 10px;
 }
 
-.reward-coupon h3 {
-  margin: 0 0 6px;
-  font-size: 16.5px;
+.game-choices-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
 
-.reward-coupon p {
-  color: var(--muted);
+.game-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
   font-size: 13px;
-  margin-bottom: 12px;
+  line-height: 1.4;
+  font-family: inherit;
+  width: 100%;
 }
 
-.coupon-code {
-  background: #edf2f4;
-  padding: 7px 11px;
-  border-radius: 8px;
-  font-size: 12px;
+.choice-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+/* Neutral Hover State - NO hint colors (no green/red/amber) */
+.game-choice-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(51, 65, 85, 0.95);
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.game-choice-btn:hover .choice-badge {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  color: #0f172a;
+}
+
+/* Consequence Feedback Modal */
+.game-consequence-card {
+  max-width: 540px;
+  text-align: left;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.consequence-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.consequence-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+
+.consequence-title.best { color: #34d399; }
+.consequence-title.danger { color: #f87171; }
+.consequence-title.neutral { color: #fbbf24; }
+
+.consequence-deltas {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.stat-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+
+.stat-pill.pos {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.stat-pill.neg {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.stat-pill.neutral {
+  background: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.consequence-feedback {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  margin: 0 0 16px;
+}
+
+.consequence-lesson {
+  background: rgba(30, 41, 59, 0.8);
+  border-left: 3px solid var(--accent);
+  padding: 12px 14px;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+.consequence-lesson strong {
+  color: #f1f5f9;
+}
+
+/* Victory Screen / Digital Eco-Passport */
+.game-victory-card {
+  padding: 30px 24px;
+  text-align: center;
+  background: #0f172a;
+}
+
+.victory-header {
+  margin-bottom: 22px;
+}
+
+.victory-stamp {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 16px rgba(255, 183, 3, 0.5));
+}
+
+.victory-header h2 {
+  font-size: 24px;
+  color: #ffffff;
+  margin: 6px 0 12px;
+}
+
+.victory-score-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  padding: 6px 16px;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.victory-score-pill strong {
+  font-size: 16px;
+  color: var(--gold-pop);
+}
+
+.victory-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.impact-box {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.impact-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.impact-lbl {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.victory-certificate {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px dashed rgba(255, 183, 3, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  text-align: left;
+  margin: 20px 0;
+}
+
+.cert-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.cert-row code {
+  color: var(--gold-pop);
   font-weight: 700;
 }
 
-.coupon-code code {
-  color: var(--accent);
+.cert-desc {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.victory-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .game-hud {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .victory-impact-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Offline Emergency & Eco Travel Pass / Field Kit */
@@ -2053,7 +2450,10 @@ button {
   .planner {
     grid-template-columns: 1fr;
   }
-  .responsible {
+  .responsible-header {
+    grid-template-columns: 1fr;
+  }
+  .game-stage-grid {
     grid-template-columns: 1fr;
   }
   .field-kit-grid {

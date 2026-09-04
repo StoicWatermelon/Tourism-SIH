@@ -19,6 +19,8 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/map.css">
   <link rel="stylesheet" href="css/ai.css">
+  <!-- CARTO Basemap API Configuration Initialization -->
+  <script>window.CARTO_API_KEY = window.CARTO_API_KEY || "";</script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -351,13 +353,21 @@
       </div>
     </section>
 
-    <!-- Responsible Tourism & Gamified Score -->
+    <!-- Responsible Tourism & Interactive Eco-Expedition Game -->
     <section class="section responsible" id="responsible">
-      <div class="responsible-copy">
-        <p class="eyebrow" data-i18n="resp_eyebrow">LEAVE NO TRACE • TRAVEL ETHICALLY</p>
-        <h2 data-i18n="resp_title">Travel beautifully. Leave it better.</h2>
-        <p data-i18n="resp_sub">Himalayan ecology is extremely fragile. Bharat Explore gamifies your commitment to sustainable choices, converting eco-habits into tangible perks.</p>
-        
+      <div class="responsible-header">
+        <div class="responsible-copy">
+          <p class="eyebrow" data-i18n="resp_eyebrow">LEAVE NO TRACE • TRAVEL ETHICALLY</p>
+          <h2 data-i18n="resp_title">Travel beautifully. Leave it better.</h2>
+          <p data-i18n="resp_sub">Himalayan ecology is extremely fragile. Lead your expedition through 5 high-altitude challenges to earn your official digital Eco-Passport.</p>
+          <div class="eco-toggle-row">
+            <button class="eco-toggle-btn" id="plasticPledgeBtn" onclick="togglePlasticFree(this)" data-i18n="resp_btn_plastic">
+              <span class="toggle-dot"></span>
+              🫙 Pledge Plastic-Free / Reusable Flask
+            </button>
+          </div>
+        </div>
+
         <div class="responsible-grid">
           <div class="resp-pill active-pill" onclick="triggerEcoAction('plastic')"><span data-i18n="resp_pill_plastic">♻️ Zero single-use plastic pledge</span> <b>+5 pts</b></div>
           <div class="resp-pill active-pill" onclick="triggerEcoAction('homestay')"><span data-i18n="resp_pill_homestay">🏘 Certified village homestay stay</span> <b>+10 pts</b></div>
@@ -366,41 +376,16 @@
           <div class="resp-pill active-pill" onclick="triggerEcoAction('wildlife')"><span data-i18n="resp_pill_wildlife">🐾 Snow leopard habitat respect</span> <b>+5 pts</b></div>
           <div class="resp-pill active-pill" onclick="triggerEcoAction('local')"><span data-i18n="resp_pill_local">🧑‍🌾 Direct artisan commerce pledge</span> <b>+10 pts</b></div>
         </div>
-        <div class="eco-toggle-row">
-          <button class="eco-toggle-btn" id="plasticPledgeBtn" onclick="togglePlasticFree(this)" data-i18n="resp_btn_plastic">
-            <span class="toggle-dot"></span>
-            🫙 Pledge Plastic-Free / Reusable Flask
-          </button>
-        </div>
       </div>
 
-      <div class="score-card">
-        <p class="score-title" data-i18n="resp_score_title">RESPONSIBLE TRAVELLER SCORE</p>
-        <div id="levelBadge" class="level-badge silver" data-i18n="resp_level_silver">🥈 Silver Eco-Traveler</div>
-        <div class="score-ring-wrapper">
-          <svg class="score-ring-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-              <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#ff6b35"/>
-                <stop offset="100%" stop-color="#ffb703"/>
-              </linearGradient>
-            </defs>
-            <circle class="score-ring-track" cx="80" cy="80" r="65"/>
-            <circle class="score-ring-fill" id="scoreRingFill" cx="80" cy="80" r="65"/>
-          </svg>
-          <div class="score-ring-text">
-            <strong id="score">85</strong>
-            <small>/100</small>
-          </div>
+      <!-- Interactive Himalayan Eco-Expedition Game Container -->
+      <div class="game-hub-container">
+        <div class="game-hub-topbar">
+          <div class="game-hub-badge" data-i18n="game_badge">🎮 INTERACTIVE ADVENTURE QUEST</div>
+          <button class="btn ghost-mini" onclick="window.restartEcoGame()" data-i18n="game_btn_restart">↺ Restart Quest</button>
         </div>
-        <!-- Legacy progress bar (hidden, kept for JS compatibility) -->
-        <div class="progress" style="display:none;"><i id="scoreBar" style="width: 85%;"></i></div>
-        <div class="score-perk-badge" id="scoreBadge" data-i18n="resp_perk_unlocked">
-          ✦ ECO-CHAMPION TIER UNLOCKED
-        </div>
-        <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
-          <button id="scoreBtn" class="btn light" data-i18n="resp_btn_simulate">Simulate Eco-Action (+5)</button>
-          <button id="redeemRewardsBtn" class="btn primary" data-i18n="resp_btn_redeem">Redeem Perks 🎁</button>
+        <div id="ecoExpeditionGame">
+          <!-- Populated dynamically by js/game.js -->
         </div>
       </div>
     </section>
@@ -474,53 +459,16 @@
     </div>
   </div>
 
-  <!-- Eco-Rewards Digital Coupon Modal (Unlocks at Score >= 80) -->
-  <div class="modal" id="rewardsModal" aria-hidden="true">
-    <div class="modal-card">
-      <button class="close" data-close>×</button>
-      <p class="eyebrow" data-i18n="rewards_eyebrow">ECO-CHAMPION PRIVILEGES</p>
-      <h2 data-i18n="rewards_title">Local Cooperative Digital Vouchers</h2>
-      <p data-i18n="rewards_sub">Thank you for traveling responsibly! Present these digital vouchers to our verified grassroots partners in Ladakh and the Himalayas:</p>
-      
-      <div class="reward-tier-header" data-i18n="reward_tier80_header">🥈 SILVER ECO-TRAVELER — Score 80+</div>
-      <div class="rewards-grid" id="rewardsGrid80">
-        <div class="reward-coupon">
-          <div class="coupon-tag" data-i18n="c1_tag">15% DISCOUNT</div>
-          <h3 data-i18n="c1_title">Leh Women's Handloom Cooperative</h3>
-          <p data-i18n="c1_desc">15% off authentic hand-woven Ladakhi pashmina shawls, felt bags, and natural-dye textiles sourced directly from Changthang artisans.</p>
-          <div class="coupon-code">CODE: <code>BHARAT-HANDLOOM-15</code></div>
-        </div>
-
-        <div class="reward-coupon">
-          <div class="coupon-tag" data-i18n="c2_tag">COMPLIMENTARY</div>
-          <h3 data-i18n="c2_title">Tingmo Community Homestay, Nubra</h3>
-          <p data-i18n="c2_desc">Complimentary traditional salted butter tea (Gur Gur) & authentic Tingmo steamed bread at this community-run eco-homestay.</p>
-          <div class="coupon-code">CODE: <code>TINGMO-WELCOME</code></div>
-        </div>
-
-        <div class="reward-coupon">
-          <div class="coupon-tag" data-i18n="c3_tag">₹500 OFF</div>
-          <h3 data-i18n="c3_title">Himalayan Homestay Cooperative</h3>
-          <p data-i18n="c3_desc">₹500 direct voucher toward your booking at any affiliated village homestay in Rumbak, Hemis Shukpachan, or Turtuk.</p>
-          <div class="coupon-code">CODE: <code>HOMESTAY-LADAKH</code></div>
-        </div>
-      </div>
-
-      <div class="reward-tier-header tier-95" id="tier95Header" style="display:none;" data-i18n="reward_tier95_header">🏔 HIMALAYAN GUARDIAN — Score 95+</div>
-      <div class="rewards-grid" id="rewardsGrid95" style="display:none;">
-        <div class="reward-coupon" style="border-color: rgba(255,183,3,0.4);">
-          <div class="coupon-tag" style="background: var(--gold-pop);" data-i18n="c4_tag">PRIORITY ACCESS</div>
-          <h3 data-i18n="c4_title">Hanle Dark Sky Stargazing Session</h3>
-          <p data-i18n="c4_desc">Priority access pass for an exclusive guided Milky Way stargazing session at India's first Dark Sky Sanctuary — hosted by Hanle village astronomers.</p>
-          <div class="coupon-code">CODE: <code>HANLE-GUARDIAN-PASS</code></div>
-        </div>
-
-        <div class="reward-coupon" style="border-color: rgba(255,183,3,0.4);">
-          <div class="coupon-tag" style="background: var(--gold-pop);" data-i18n="c5_tag">10% DISCOUNT</div>
-          <h3 data-i18n="c5_title">Leh Tibetan Artisan Bakery</h3>
-          <p data-i18n="c5_desc">Complimentary artisanal butter tea and 10% off organic buckwheat cookies & apricot pies baked on traditional clay hearths.</p>
-          <div class="coupon-code">CODE: <code>APRICOT-HEAVEN</code></div>
-        </div>
+  <!-- Interactive Decision Consequence Modal -->
+  <div class="modal" id="gameConsequenceModal" aria-hidden="true">
+    <div class="modal-card game-consequence-card">
+      <div class="consequence-icon">🌟</div>
+      <h3 class="consequence-title">Decision Consequence</h3>
+      <div class="consequence-deltas"></div>
+      <p class="consequence-feedback"></p>
+      <div class="consequence-lesson"></div>
+      <div style="margin-top:20px; text-align:right;">
+        <button id="consequenceNextBtn" class="btn primary">Proceed to Next Checkpoint →</button>
       </div>
     </div>
   </div>
@@ -644,5 +592,6 @@
   <script src="js/app.js"></script>
   <script src="js/ai.js"></script>
   <script src="js/map.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>

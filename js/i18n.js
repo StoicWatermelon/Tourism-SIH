@@ -190,6 +190,8 @@
       rewards_eyebrow: "ECO-CHAMPION PRIVILEGES",
       rewards_title: "Local Cooperative Digital Vouchers",
       rewards_sub: "Thank you for traveling responsibly! Present these digital vouchers to our verified grassroots partners in Ladakh and the Himalayas:",
+      game_badge: "🎮 INTERACTIVE ADVENTURE QUEST",
+      game_btn_restart: "↺ Restart Quest",
       drawer_eyebrow: "MY CURATED EXPEDITION",
       drawer_title: "Saved Destinations",
       drawer_plan: "Plan Custom Itinerary →",
@@ -371,7 +373,7 @@
       sug_passes: "दर्रों की लाइव स्थिति",
       ai_bot_title: "भारत AI",
       ai_bot_status: "हिमालयी बुद्धिमत्ता • सक्रिय",
-      ai_welcome: "Julley & Namaste! 🙏 I am Bharat AI, your intelligent guide for high-altitude Himalayan and Indian travel. Ask me about AMS safety, pass advisories, eco-homestays, offbeat corridors, or custom itineraries!",
+      ai_welcome: "जुले और नमस्ते! 🙏 मैं भारत एआई (Bharat AI) हूँ, लद्दाख और उच्च हिमालयी यात्रा के लिए आपका बुद्धिमान मार्गदर्शक। मुझसे AMS ऊंचाई सुरक्षा, दर्रा परामर्श, पर्यावरण-अनुकूल होमस्टे, ऑफबीट गलियारों या यात्रा योजना के बारे में कुछ भी पूछें!",
       ai_input_placeholder: "भारत AI से मार्ग, ऊंचाई सुरक्षा, परमिट के बारे में पूछें...",
       ai_send: "भेजें →",
 
@@ -463,6 +465,8 @@
       rewards_eyebrow: "पर्यावरण-संरक्षक विशेषाधिकार",
       rewards_title: "स्थानीय सहकारी डिजिटल वाउचर",
       rewards_sub: "जिम्मेदारी से यात्रा करने के लिए धन्यवाद! लद्दाख और हिमालय में हमारे सत्यापित साझेदारों को ये डिजिटल वाउचर दिखाएं:",
+      game_badge: "🎮 इंटरैक्टिव साहसिक अभियान",
+      game_btn_restart: "↺ अभियान पुनः प्रारंभ करें",
       drawer_eyebrow: "मेरी चुनिंदा यात्रा",
       drawer_title: "सुरक्षित गंतव्य",
       drawer_plan: "कस्टम यात्रा योजना बनाएं →",
@@ -644,7 +648,7 @@
       sug_passes: "গিরিপথের লাইভ অবস্থা",
       ai_bot_title: "ভারত AI",
       ai_bot_status: "হিমালয় বুদ্ধিমত্তা • সক্রিয়",
-      ai_welcome: "Julley & Namaste! 🙏 I am Bharat AI, your intelligent guide for high-altitude Himalayan and Indian travel. Ask me about AMS safety, pass advisories, eco-homestays, offbeat corridors, or custom itineraries!",
+      ai_welcome: "জুলে ও নমস্কার! 🙏 আমি ভারত এআই (Bharat AI), লাদাখ ও উচ্চ হিমালয় ভ্রমণের জন্য আপনার বুদ্ধিমান সহায়ক। উচ্চতাজনিত সুরক্ষা (AMS), গিরিপথ সতর্কতা, পরিবেশবান্ধব হোমস্টে, অফবিট পর্যটন করিডোর বা ভ্রমণ পরিকল্পনা সম্পর্কে যেকোনো প্রশ্ন করুন!",
       ai_input_placeholder: "ভারত AI কে রুট, উচ্চতা সুরক্ষা, পারমিট সম্পর্কে জিজ্ঞাসা করুন...",
       ai_send: "পাঠান →",
 
@@ -736,6 +740,8 @@
       rewards_eyebrow: "ইকো-চ্যাম্পিয়ন বিশেষ সুবিধাসমূহ",
       rewards_title: "স্থানীয় সমবায় ডিজিটাল ভাউচার",
       rewards_sub: "দায়িত্বশীলভাবে ভ্রমণের জন্য ধন্যবাদ! লাদাখ এবং হিমালয়ে আমাদের অংশীদারদের কাছে এই ভাউচারগুলি উপস্থাপন করুন:",
+      game_badge: "🎮 ইন্টারেক্টিভ রোমাঞ্চকর অভিযান",
+      game_btn_restart: "↺ অভিযান পুনরায় শুরু করুন",
       drawer_eyebrow: "আমার নির্বাচিত ভ্রমণসূচি",
       drawer_title: "সংরক্ষিত গন্তব্যসমূহ",
       drawer_plan: "কাস্টম ভ্রমণ পরিকল্পনা তৈরি করুন →",
@@ -1052,12 +1058,12 @@
       if (questions[idx]) btn.dataset.question = questions[idx];
     });
 
-    // Keep AI's default welcome reply in English language
+    // Update AI's default welcome reply to match active language if user has not started chat yet
     const messages = $("#messages");
     if (messages) {
       const botMsgs = messages.querySelectorAll(".msg.bot");
       if (botMsgs.length === 1 && !messages.querySelector(".msg.user")) {
-        botMsgs[0].innerHTML = t("ai_welcome", "en");
+        botMsgs[0].innerHTML = t("ai_welcome", lang);
       }
     }
 
