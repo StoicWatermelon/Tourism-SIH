@@ -51,7 +51,7 @@ if not exist "!PY_SERVER!" (
     )
 )
 
-:: 6. Launch FastAPI + SQLite backend in independent console
+:: 6. Launch FastAPI + Supabase Cloud backend in independent console
 echo [*] Launching Bharat Explore AI ^& Tourism Backend...
 start "Bharat Explore Backend Server" "!PYTHON_EXE!" "!PY_SERVER!"
 

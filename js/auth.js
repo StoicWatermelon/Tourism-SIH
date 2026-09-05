@@ -320,7 +320,7 @@
       if (!AuthService.guardPage("guest-only")) return;
 
       let currentStep = 1;
-      const totalSteps = 3;
+      const totalSteps = 2;
       const form = document.getElementById("stepperRegisterForm");
       const alertEl = document.getElementById("registerAlert");
       const trackProgress = document.getElementById("stepperTrackProgress");

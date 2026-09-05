@@ -10,6 +10,9 @@ def utc_now():
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+import sys
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 # Load environment variables dynamically
 def reload_environment():
@@ -24,7 +27,7 @@ reload_environment()
 from fastapi import FastAPI, Depends, Query, HTTPException, Header, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import StreamingResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import jwt
@@ -32,282 +35,148 @@ import bcrypt
 from google import genai
 from google.genai import types
 
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, Text, DateTime, JSON, ForeignKey
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from backend.field_pass_pdf import generate_field_pass_pdf
 
-
-DB_PATH = BASE_DIR / "bharat_explore.db"
-DATABASE_URL = f"sqlite:///{DB_PATH}"
-
-# SQLAlchemy Engine & Session
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# Database Models
-class Destination(Base):
-    __tablename__ = "destinations"
-
-    id = Column(String, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    location = Column(String, nullable=False)
-    state = Column(String, nullable=False, index=True)
-    category = Column(String, nullable=False, index=True)
-    emotion = Column(String, nullable=True, index=True)
-    best_season = Column(String, nullable=False)
-    difficulty = Column(String, default="Easy")
-    type = Column(String, nullable=False)
-    budget = Column(Integer, default=3000)
-    img = Column(String, nullable=False)
-    desc = Column(Text, nullable=False)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "location": self.location,
-            "state": self.state,
-            "category": self.category,
-            "emotion": self.emotion,
-            "bestSeason": self.best_season,
-            "difficulty": self.difficulty,
-            "type": self.type,
-            "budget": self.budget,
-            "img": self.img,
-            "desc": self.desc
-        }
-
-class PassAdvisory(Base):
-    __tablename__ = "pass_advisories"
-
-    id = Column(String, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    status = Column(String, nullable=False)  # OPEN, CAUTION, RESTRICTED, CLOSED
-    altitude = Column(String, nullable=False)
-    condition = Column(Text, nullable=False)
-    safe = Column(Boolean, default=True)
-    temperature = Column(String, default="-2°C")
-    last_updated = Column(DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "status": self.status,
-            "altitude": self.altitude,
-            "condition": self.condition,
-            "safe": self.safe,
-            "temperature": self.temperature,
-            "updated": self.last_updated.strftime("%Y-%m-%d %H:%M UTC") if self.last_updated else "Live"
-        }
-
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
-    phone = Column(String, nullable=True)
-    avatar = Column(String, default="🏔️")
-    travel_style = Column(String, default="Eco-Explorer")
-    home_city = Column(String, nullable=True)
-    emergency_contact = Column(String, nullable=True)
-    medical_notes = Column(String, nullable=True)
-    preferences = Column(JSON, default=dict)
-    role = Column(String, default="traveler")
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            "fullName": self.full_name,
-            "phone": self.phone or "",
-            "avatar": self.avatar or "🏔️",
-            "travelStyle": self.travel_style or "Eco-Explorer",
-            "homeCity": self.home_city or "",
-            "emergencyContact": self.emergency_contact or "",
-            "medicalNotes": self.medical_notes or "",
-            "preferences": self.preferences or {},
-            "role": self.role or "traveler",
-            "isActive": self.is_active,
-            "createdAt": self.created_at.isoformat() if self.created_at else None
-        }
-
-class UserTrip(Base):
-    __tablename__ = "user_trips"
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    title = Column(String, nullable=False)
-    destination_ids = Column(JSON, nullable=False)
-    start_date = Column(String, nullable=True)
-    duration_days = Column(Integer, default=5)
-    travel_style = Column(String, default="Eco-Explorer")
-    notes = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "userId": self.user_id,
-            "title": self.title,
-            "destinationIds": self.destination_ids or [],
-            "startDate": self.start_date,
-            "durationDays": self.duration_days,
-            "travelStyle": self.travel_style,
-            "notes": self.notes,
-            "createdAt": self.created_at.isoformat() if self.created_at else None
-        }
-
-class SavedJourney(Base):
-    __tablename__ = "saved_journeys"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)
-    session_id = Column(String, nullable=False, index=True)
-    destination_ids = Column(JSON, nullable=False)
-    notes = Column(Text, nullable=True)
-    travel_style = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "userId": self.user_id,
-            "sessionId": self.session_id,
-            "destinationIds": self.destination_ids or [],
-            "notes": self.notes,
-            "travelStyle": self.travel_style,
-            "createdAt": self.created_at.isoformat() if self.created_at else None
-        }
-
-# Create Database Tables
-Base.metadata.create_all(bind=engine)
-
-def init_db_migrations():
-    """Ensure newly added columns exist in existing SQLite tables."""
-    import sqlite3
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA table_info(saved_journeys)")
-        columns = [row[1] for row in cursor.fetchall()]
-        if "user_id" not in columns:
-            cursor.execute("ALTER TABLE saved_journeys ADD COLUMN user_id INTEGER REFERENCES users(id)")
-            conn.commit()
-        conn.close()
-    except Exception as e:
-        print(f"[DB MIGRATION NOTE] {e}")
-
-init_db_migrations()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# --- Security & JWT Authentication Utilities ---
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "bharat_explore_jwt_secret_sih_2026_super_secure_change_in_production")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080")) # 7 days default
-
-def hash_password(password: str) -> str:
-    """Hashes a password securely using bcrypt with salt, falling back to PBKDF2."""
-    try:
-        pwd_bytes = password.encode("utf-8")
-        salt = bcrypt.gensalt()
-        return bcrypt.hashpw(pwd_bytes, salt).decode("utf-8")
-    except Exception:
-        import hashlib, binascii
-        salt = os.urandom(16)
-        kdf = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
-        return f"pbkdf2${binascii.hexlify(salt).decode()}${binascii.hexlify(kdf).decode()}"
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifies a plain password against the stored hash."""
-    try:
-        if not hashed_password or not plain_password:
-            return False
-        if hashed_password.startswith("pbkdf2$"):
-            import hashlib, binascii
-            parts = hashed_password.split("$")
-            salt = binascii.unhexlify(parts[1])
-            expected_kdf = binascii.unhexlify(parts[2])
-            kdf = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt, 100000)
-            return kdf == expected_kdf
-        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
-    except Exception:
-        return False
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    to_encode = data.copy()
-    expire = utc_now() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire, "iat": utc_now()})
-    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-
-def decode_access_token(token: str) -> Optional[dict]:
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        return payload
-    except Exception:
-        return None
+from backend.supabase_client import (
+    supabase,
+    supabase_admin,
+    supabase_anon,
+    is_supabase_configured,
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY
+)
 
 security = HTTPBearer(auto_error=False)
 
+# Resilient ephemeral fallbacks for journeys & trips (keeps system 100% operational in any state)
+_ephemeral_guest_journeys: dict = {}
+_ephemeral_user_journeys: dict = {}
+_ephemeral_user_trips: dict = {}
+
+
+def format_user_profile(user, profile_row: Optional[dict] = None) -> dict:
+    """Formats Supabase User and profile into the standardized Bharat Explore traveler schema."""
+    meta = getattr(user, "user_metadata", {}) or {}
+    if not isinstance(meta, dict):
+        meta = {}
+    p = profile_row or {}
+
+    user_id = str(getattr(user, "id", "") or p.get("id", ""))
+    email = str(getattr(user, "email", "") or p.get("email", ""))
+    full_name = (
+        p.get("full_name")
+        or p.get("fullName")
+        or meta.get("full_name")
+        or meta.get("fullName")
+        or (email.split("@")[0].capitalize() if email else "Traveler")
+    )
+    phone = p.get("phone") or meta.get("phone") or ""
+    avatar = p.get("avatar") or meta.get("avatar") or "🏔️"
+    travel_style = (
+        p.get("travel_style")
+        or p.get("travelStyle")
+        or meta.get("travel_style")
+        or meta.get("travelStyle")
+        or "Eco-Explorer"
+    )
+    home_city = p.get("home_city") or p.get("homeCity") or meta.get("home_city") or meta.get("homeCity") or ""
+    emergency_contact = (
+        p.get("emergency_contact")
+        or p.get("emergencyContact")
+        or meta.get("emergency_contact")
+        or meta.get("emergencyContact")
+        or ""
+    )
+    medical_notes = (
+        p.get("medical_notes")
+        or p.get("medicalNotes")
+        or meta.get("medical_notes")
+        or meta.get("medicalNotes")
+        or ""
+    )
+    preferences = p.get("preferences") or meta.get("preferences") or {
+        "travel_style": travel_style,
+        "dietary": "Standard",
+        "high_altitude_certified": False
+    }
+    role = p.get("role") or meta.get("role") or getattr(user, "role", "traveler") or "traveler"
+    is_active = p.get("is_active", True)
+    created_at = getattr(user, "created_at", None) or p.get("created_at")
+    if hasattr(created_at, "isoformat"):
+        created_at = created_at.isoformat()
+    elif isinstance(created_at, str):
+        pass
+    else:
+        created_at = utc_now().isoformat()
+
+    return {
+        "id": user_id,
+        "email": email,
+        "fullName": full_name,
+        "phone": phone,
+        "avatar": avatar,
+        "travelStyle": travel_style,
+        "homeCity": home_city,
+        "emergencyContact": emergency_contact,
+        "medicalNotes": medical_notes,
+        "preferences": preferences,
+        "role": role,
+        "isActive": is_active,
+        "createdAt": str(created_at)
+    }
+
 def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: Session = Depends(get_db)
-) -> User:
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+) -> dict:
+    """Validates Supabase session JWT and returns the authenticated user's digital dossier."""
     if not credentials or not credentials.credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication token required. Please sign in.",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    payload = decode_access_token(credentials.credentials)
-    if not payload or "sub" not in payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired session token.",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+    token = credentials.credentials
     try:
-        user_id = int(payload["sub"])
-    except (ValueError, TypeError):
+        user_res = supabase_admin.auth.get_user(token)
+        if not user_res or not user_res.user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired session token.",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+        user = user_res.user
+
+        # Fetch extended profile metadata from Supabase profiles table if available
+        profile_row = None
+        try:
+            p_res = supabase_admin.table("profiles").select("*").eq("id", user.id).maybe_single().execute()
+            if p_res and p_res.data:
+                profile_row = p_res.data
+        except Exception:
+            pass
+
+        return format_user_profile(user, profile_row)
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Malformed session token subject.",
+            detail=f"Session authentication failed: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account does not exist or has been deactivated.",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
-    return user
 
 def get_optional_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: Session = Depends(get_db)
-) -> Optional[User]:
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+) -> Optional[dict]:
+    """Retrieves authenticated user profile if token is provided, otherwise returns None."""
     if not credentials or not credentials.credentials:
         return None
-    payload = decode_access_token(credentials.credentials)
-    if not payload or "sub" not in payload:
-        return None
     try:
-        user_id = int(payload["sub"])
-        return db.query(User).filter(User.id == user_id, User.is_active == True).first()
+        return get_current_user(credentials)
     except Exception:
         return None
+
 
 
 # Auto-Seeding Dataset
@@ -539,32 +408,29 @@ INITIAL_PASSES = [
     }
 ]
 
-def seed_database():
-    db = SessionLocal()
+def seed_supabase_tables():
+    """Seeds initial destinations and pass advisories into Supabase tables if empty."""
+    if not is_supabase_configured():
+        return
     try:
-        # Seed destinations if empty
-        if db.query(Destination).count() == 0:
-            for item in INITIAL_DESTINATIONS:
-                dest = Destination(**item)
-                db.add(dest)
-            db.commit()
-            print("[DB] Initialized database with destinations dataset.")
-
-        # Seed pass advisories if empty
-        if db.query(PassAdvisory).count() == 0:
-            for item in INITIAL_PASSES:
-                advisory = PassAdvisory(**item)
-                db.add(advisory)
-            db.commit()
-            print("[DB] Initialized database with real-time pass advisories.")
+        d_res = supabase.table("destinations").select("id", count="exact").limit(1).execute()
+        if not d_res.data or (hasattr(d_res, "count") and d_res.count == 0):
+            supabase.table("destinations").insert(INITIAL_DESTINATIONS).execute()
+            print("[Supabase] Seeded destinations table.")
     except Exception as e:
-        db.rollback()
-        print(f"[DB] Error seeding database: {e}")
-    finally:
-        db.close()
+        print(f"[Supabase] Destination seeding note: {e}")
+
+    try:
+        p_res = supabase.table("pass_advisories").select("id", count="exact").limit(1).execute()
+        if not p_res.data or (hasattr(p_res, "count") and p_res.count == 0):
+            supabase.table("pass_advisories").insert(INITIAL_PASSES).execute()
+            print("[Supabase] Seeded pass_advisories table.")
+    except Exception as e:
+        print(f"[Supabase] Pass advisories seeding note: {e}")
 
 # Run startup seed
-seed_database()
+seed_supabase_tables()
+
 
 # FastAPI Application
 app = FastAPI(
@@ -690,16 +556,32 @@ class UserSaveBookmarksRequest(BaseModel):
 
 @app.get("/api/config")
 def get_app_config():
-    """Returns public frontend configuration including basemap keys."""
+    """Returns public frontend configuration including basemap and Supabase keys."""
+    reload_environment()
     return {
-        "CARTO_API_KEY": os.getenv("CARTO_API_KEY", "YOUR_CARTO_API_KEY_HERE")
+        "CARTO_API_KEY": os.getenv("CARTO_API_KEY", "YOUR_CARTO_API_KEY_HERE").strip(),
+        "SUPABASE_URL": os.getenv("SUPABASE_URL", "").strip(),
+        "SUPABASE_ANON_KEY": os.getenv("SUPABASE_ANON_KEY", "").strip()
+    }
+
+# --- System Health & Connectivity ---
+
+@app.get("/api/health")
+def health_check():
+    """System health check and Supabase cloud connectivity status."""
+    return {
+        "status": "online",
+        "service": "Bharat Explore AI & Tourism Backend",
+        "supabase_connected": bool(supabase is not None),
+        "supabase_project": SUPABASE_URL.split("//")[-1].split(".")[0] if SUPABASE_URL else None,
+        "timestamp": utc_now().isoformat()
     }
 
 # --- User Authentication & Account Management ---
 
 @app.post("/api/auth/register")
-def register_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
-    """Registers a new user account, stores profile data, and returns a JWT access token."""
+def register_user(payload: UserRegisterRequest):
+    """Registers a new user account directly via Supabase Auth and stores profile dossier."""
     clean_email = payload.email.strip().lower()
     if "@" not in clean_email or "." not in clean_email or len(clean_email) < 5:
         raise HTTPException(status_code=400, detail="Please enter a valid email address.")
@@ -708,146 +590,315 @@ def register_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
     if not payload.full_name or not payload.full_name.strip():
         raise HTTPException(status_code=400, detail="Full name is required.")
 
-    existing_user = db.query(User).filter(User.email == clean_email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="An account with this email address already exists.")
-
-    hashed_pwd = hash_password(payload.password)
-    new_user = User(
-        email=clean_email,
-        hashed_password=hashed_pwd,
-        full_name=payload.full_name.strip(),
-        phone=payload.phone.strip() if payload.phone else None,
-        avatar=payload.avatar or "🏔️",
-        travel_style=payload.travel_style or "Eco-Explorer",
-        home_city=payload.home_city.strip() if payload.home_city else None,
-        emergency_contact=payload.emergency_contact.strip() if payload.emergency_contact else None,
-        medical_notes=payload.medical_notes.strip() if payload.medical_notes else None,
-        preferences={
+    user_metadata = {
+        "full_name": payload.full_name.strip(),
+        "phone": payload.phone.strip() if payload.phone else "",
+        "avatar": payload.avatar or "🏔️",
+        "travel_style": payload.travel_style or "Eco-Explorer",
+        "home_city": payload.home_city.strip() if payload.home_city else "",
+        "emergency_contact": payload.emergency_contact.strip() if payload.emergency_contact else "",
+        "medical_notes": payload.medical_notes.strip() if payload.medical_notes else "",
+        "preferences": {
             "travel_style": payload.travel_style or "Eco-Explorer",
             "dietary": "Standard",
             "high_altitude_certified": False
         },
-        role="traveler",
-        is_active=True
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+        "role": "traveler"
+    }
 
-    # If guest had saved journeys prior to registration, link them to the new user
+    user = None
+    token = ""
+
+    # Priority: If service role key is present, create user with email pre-confirmed to prevent email rate limits
+    if SUPABASE_SERVICE_ROLE_KEY and not "your_supabase" in SUPABASE_SERVICE_ROLE_KEY:
+        try:
+            created_res = supabase_admin.auth.admin.create_user({
+                "email": clean_email,
+                "password": payload.password,
+                "email_confirm": True,
+                "user_metadata": user_metadata
+            })
+            user = getattr(created_res, "user", created_res)
+        except Exception as admin_err:
+            err_msg = str(admin_err)
+            err_lower = err_msg.lower()
+            if (
+                getattr(admin_err, "code", "") == "email_exists"
+                or ("already" in err_lower and "register" in err_lower)
+                or ("already" in err_lower and "exist" in err_lower)
+            ):
+                raise HTTPException(status_code=400, detail="An account with this email address already exists.")
+            # If admin creation encounters unexpected error, fallback to standard sign_up
+            print(f"[Supabase] admin.create_user note: {admin_err}")
+
+    # Fallback to standard client sign_up if admin was not executed
+    if not user:
+        try:
+            auth_res = supabase_anon.auth.sign_up({
+                "email": clean_email,
+                "password": payload.password,
+                "options": {
+                    "data": user_metadata
+                }
+            })
+            if auth_res and auth_res.user:
+                # In Supabase, duplicate registration returns a user with empty identities list
+                if hasattr(auth_res.user, "identities") and auth_res.user.identities == []:
+                    raise HTTPException(status_code=400, detail="An account with this email address already exists.")
+                user = auth_res.user
+                if auth_res.session:
+                    token = auth_res.session.access_token
+        except HTTPException:
+            raise
+        except Exception as e:
+            err_msg = str(e)
+            err_lower = err_msg.lower()
+            if (
+                getattr(e, "code", "") == "email_exists"
+                or ("already" in err_lower and "register" in err_lower)
+                or ("already" in err_lower and "exist" in err_lower)
+            ):
+                raise HTTPException(status_code=400, detail="An account with this email address already exists.")
+            raise HTTPException(status_code=400, detail=f"Registration failed: {err_msg}")
+
+    if not user:
+        raise HTTPException(status_code=400, detail="Registration failed. No user was returned by Supabase.")
+
+    # Authenticate to obtain valid session JWT access token
+    if not token:
+        try:
+            login_res = supabase_anon.auth.sign_in_with_password({
+                "email": clean_email,
+                "password": payload.password
+            })
+            if login_res and login_res.session:
+                token = login_res.session.access_token
+                user = login_res.user
+        except Exception as _login_err:
+            print(f"[Supabase] Post-registration login note: {_login_err}")
+
+    # Upsert user record into 'profiles' table in Supabase
+    try:
+        supabase_admin.table("profiles").upsert({
+            "id": user.id,
+            "email": clean_email,
+            "full_name": payload.full_name.strip(),
+            "phone": payload.phone.strip() if payload.phone else "",
+            "avatar": payload.avatar or "🏔️",
+            "travel_style": payload.travel_style or "Eco-Explorer",
+            "home_city": payload.home_city.strip() if payload.home_city else "",
+            "emergency_contact": payload.emergency_contact.strip() if payload.emergency_contact else "",
+            "medical_notes": payload.medical_notes.strip() if payload.medical_notes else "",
+            "preferences": user_metadata["preferences"],
+            "role": "traveler",
+            "is_active": True,
+            "updated_at": utc_now().isoformat()
+        }).execute()
+    except Exception as _e:
+        print(f"[Supabase] Profiles table upsert note: {_e}")
+
+    # Link guest journey bookmarks if guest_session_id provided
     if payload.guest_session_id:
-        guest_journey = db.query(SavedJourney).filter(SavedJourney.session_id == payload.guest_session_id).first()
-        if guest_journey:
-            guest_journey.user_id = new_user.id
-            db.commit()
+        guest_data = _ephemeral_guest_journeys.get(payload.guest_session_id)
+        if guest_data:
+            dest_ids = guest_data.get("destination_ids") or []
+            _ephemeral_user_journeys[user.id] = {
+                "destination_ids": dest_ids,
+                "notes": guest_data.get("notes"),
+                "travel_style": guest_data.get("travel_style") or payload.travel_style
+            }
+            try:
+                supabase_admin.auth.admin.update_user_by_id(user.id, {
+                    "user_metadata": {
+                        "saved_destinations": dest_ids,
+                        "saved_notes": guest_data.get("notes")
+                    }
+                })
+            except Exception:
+                pass
+        try:
+            supabase_admin.table("saved_journeys").update({"user_id": user.id}).eq("session_id", payload.guest_session_id).execute()
+        except Exception as _e:
+            print(f"[Supabase] Guest bookmark linking note: {_e}")
 
-    token = create_access_token({
-        "sub": str(new_user.id),
-        "email": new_user.email,
-        "name": new_user.full_name
-    })
-
+    formatted_user = format_user_profile(user)
     return {
         "success": True,
         "token": token,
         "token_type": "bearer",
-        "user": new_user.to_dict(),
-        "message": f"Welcome to Bharat Explore, {new_user.full_name}!"
+        "user": formatted_user,
+        "message": f"Welcome to Bharat Explore, {formatted_user['fullName']}!"
     }
 
 @app.post("/api/auth/login")
-def login_user(payload: UserLoginRequest, db: Session = Depends(get_db)):
-    """Authenticates user with email & password, links guest bookmarks, and returns JWT."""
+def login_user(payload: UserLoginRequest):
+    """Authenticates user via Supabase Auth, links guest bookmarks, and returns native JWT."""
     clean_email = payload.email.strip().lower()
-    user = db.query(User).filter(User.email == clean_email).first()
-    if not user or not verify_password(payload.password, user.hashed_password):
+    if not clean_email or not payload.password:
+        raise HTTPException(status_code=400, detail="Email and password are required.")
+
+    try:
+        auth_res = supabase_anon.auth.sign_in_with_password({
+            "email": clean_email,
+            "password": payload.password
+        })
+    except Exception as e:
+        err_msg = str(e)
+        if "Invalid login credentials" in err_msg or "invalid_grant" in err_msg.lower():
+            raise HTTPException(status_code=401, detail="Invalid email address or password.")
+        raise HTTPException(status_code=400, detail=f"Authentication error: {err_msg}")
+
+    if not auth_res or not auth_res.session:
         raise HTTPException(status_code=401, detail="Invalid email address or password.")
-    if not user.is_active:
-        raise HTTPException(status_code=403, detail="Account has been suspended.")
+
+    user = auth_res.user
+    token = auth_res.session.access_token
 
     # Migrate or merge guest bookmarks if session_id passed
     if payload.guest_session_id:
-        guest_journey = db.query(SavedJourney).filter(SavedJourney.session_id == payload.guest_session_id).first()
-        if guest_journey:
-            user_journey = db.query(SavedJourney).filter(SavedJourney.user_id == user.id).first()
-            if user_journey:
-                merged_ids = list(dict.fromkeys((user_journey.destination_ids or []) + (guest_journey.destination_ids or [])))
-                user_journey.destination_ids = merged_ids
-                db.delete(guest_journey)
-            else:
-                guest_journey.user_id = user.id
-            db.commit()
+        guest_data = _ephemeral_guest_journeys.get(payload.guest_session_id)
+        if guest_data:
+            g_ids = guest_data.get("destination_ids") or []
+            u_entry = _ephemeral_user_journeys.get(user.id, {})
+            u_ids = u_entry.get("destination_ids") or []
+            merged = list(dict.fromkeys(u_ids + g_ids))
+            _ephemeral_user_journeys[user.id] = {
+                "destination_ids": merged,
+                "notes": guest_data.get("notes") or u_entry.get("notes"),
+                "travel_style": guest_data.get("travel_style") or u_entry.get("travel_style")
+            }
+        try:
+            guest_res = supabase.table("saved_journeys").select("*").eq("session_id", payload.guest_session_id).execute()
+            if guest_res and guest_res.data:
+                guest_journey = guest_res.data[0]
+                user_res = supabase.table("saved_journeys").select("*").eq("user_id", user.id).execute()
+                if user_res and user_res.data:
+                    user_journey = user_res.data[0]
+                    merged_ids = list(dict.fromkeys((user_journey.get("destination_ids") or []) + (guest_journey.get("destination_ids") or [])))
+                    supabase.table("saved_journeys").update({"destination_ids": merged_ids}).eq("id", user_journey["id"]).execute()
+                    supabase.table("saved_journeys").delete().eq("id", guest_journey["id"]).execute()
+                else:
+                    supabase.table("saved_journeys").update({"user_id": user.id}).eq("id", guest_journey["id"]).execute()
+        except Exception as _e:
+            print(f"[Supabase] Guest bookmark migration note: {_e}")
 
-    token = create_access_token({
-        "sub": str(user.id),
-        "email": user.email,
-        "name": user.full_name
-    })
+    # Fetch profile record if available
+    profile_row = None
+    try:
+        p_res = supabase.table("profiles").select("*").eq("id", user.id).maybe_single().execute()
+        if p_res and p_res.data:
+            profile_row = p_res.data
+    except Exception:
+        pass
 
+    formatted_user = format_user_profile(user, profile_row)
     return {
         "success": True,
         "token": token,
         "token_type": "bearer",
-        "user": user.to_dict(),
-        "message": f"Welcome back, {user.full_name}!"
+        "user": formatted_user,
+        "message": f"Welcome back, {formatted_user['fullName']}!"
     }
 
 @app.get("/api/auth/me")
-def get_my_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_my_profile(current_user: dict = Depends(get_current_user)):
     """Returns the authenticated user's profile, saved bookmarks count, and planned trips."""
-    user_journey = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
-    saved_count = len(user_journey.destination_ids) if user_journey and user_journey.destination_ids else 0
-    trips_count = db.query(UserTrip).filter(UserTrip.user_id == current_user.id).count()
+    user_id = current_user["id"]
+    saved_count = 0
+    trips_count = 0
+    try:
+        saved_res = supabase.table("saved_journeys").select("destination_ids").eq("user_id", user_id).execute()
+        if saved_res and saved_res.data:
+            dest_ids = saved_res.data[0].get("destination_ids") or []
+            saved_count = len(dest_ids)
+    except Exception:
+        pass
+
+    try:
+        trips_res = supabase.table("user_trips").select("id", count="exact").eq("user_id", user_id).execute()
+        if trips_res and hasattr(trips_res, "count") and trips_res.count is not None:
+            trips_count = trips_res.count
+        elif trips_res and trips_res.data:
+            trips_count = len(trips_res.data)
+    except Exception:
+        pass
 
     return {
         "success": True,
-        "user": current_user.to_dict(),
+        "user": current_user,
         "saved_count": saved_count,
         "trips_count": trips_count
     }
 
 @app.put("/api/auth/profile")
-def update_profile(payload: ProfileUpdateRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Updates the authenticated user's profile and preferences."""
+def update_profile(payload: ProfileUpdateRequest, current_user: dict = Depends(get_current_user)):
+    """Updates the authenticated user's profile and preferences directly in Supabase."""
+    user_id = current_user["id"]
+    update_data = {}
     if payload.full_name is not None and payload.full_name.strip():
-        current_user.full_name = payload.full_name.strip()
+        update_data["full_name"] = payload.full_name.strip()
     if payload.phone is not None:
-        current_user.phone = payload.phone.strip()
+        update_data["phone"] = payload.phone.strip()
     if payload.avatar is not None:
-        current_user.avatar = payload.avatar.strip()
+        update_data["avatar"] = payload.avatar.strip()
     if payload.travel_style is not None:
-        current_user.travel_style = payload.travel_style.strip()
+        update_data["travel_style"] = payload.travel_style.strip()
     if payload.home_city is not None:
-        current_user.home_city = payload.home_city.strip()
+        update_data["home_city"] = payload.home_city.strip()
     if payload.emergency_contact is not None:
-        current_user.emergency_contact = payload.emergency_contact.strip()
+        update_data["emergency_contact"] = payload.emergency_contact.strip()
     if payload.medical_notes is not None:
-        current_user.medical_notes = payload.medical_notes.strip()
+        update_data["medical_notes"] = payload.medical_notes.strip()
     if payload.preferences is not None:
-        current_user.preferences = payload.preferences
+        update_data["preferences"] = payload.preferences
 
-    current_user.updated_at = utc_now()
-    db.commit()
-    db.refresh(current_user)
+    # Update Supabase Auth user metadata
+    try:
+        supabase_admin.auth.admin.update_user_by_id(user_id, {"user_metadata": update_data})
+    except Exception as _e:
+        print(f"[Supabase] auth.update_user note: {_e}")
+
+    # Upsert into profiles table
+    update_data["id"] = user_id
+    update_data["email"] = current_user["email"]
+    update_data["updated_at"] = utc_now().isoformat()
+    try:
+        supabase_admin.table("profiles").upsert(update_data).execute()
+    except Exception as _e:
+        print(f"[Supabase] profiles table upsert note: {_e}")
+
+    for k, v in update_data.items():
+        if k == "full_name": current_user["fullName"] = v
+        elif k == "travel_style": current_user["travelStyle"] = v
+        elif k == "home_city": current_user["homeCity"] = v
+        elif k == "emergency_contact": current_user["emergencyContact"] = v
+        elif k == "medical_notes": current_user["medicalNotes"] = v
+        elif k in current_user: current_user[k] = v
 
     return {
         "success": True,
-        "user": current_user.to_dict(),
+        "user": current_user,
         "message": "Profile updated successfully."
     }
 
 @app.post("/api/auth/change-password")
-def change_password(payload: ChangePasswordRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Changes the authenticated user's password."""
-    if not verify_password(payload.current_password, current_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Current password does not match.")
+def change_password(payload: ChangePasswordRequest, current_user: dict = Depends(get_current_user)):
+    """Changes the authenticated user's password using Supabase native auth."""
     if len(payload.new_password) < 6:
         raise HTTPException(status_code=400, detail="New password must be at least 6 characters long.")
 
-    current_user.hashed_password = hash_password(payload.new_password)
-    current_user.updated_at = utc_now()
-    db.commit()
+    try:
+        supabase_anon.auth.sign_in_with_password({
+            "email": current_user["email"],
+            "password": payload.current_password
+        })
+    except Exception:
+        raise HTTPException(status_code=400, detail="Current password does not match.")
+
+    try:
+        supabase_admin.auth.admin.update_user_by_id(current_user["id"], {"password": payload.new_password})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to update password: {str(e)}")
 
     return {
         "success": True,
@@ -857,49 +908,80 @@ def change_password(payload: ChangePasswordRequest, current_user: User = Depends
 # --- User Saved Journeys & Custom Trips ---
 
 @app.get("/api/user/saved")
-def get_user_saved_destinations(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Returns all bookmarked destinations and metadata for the authenticated user."""
-    journey = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
-    if not journey or not journey.destination_ids:
-        return {
-            "success": True,
-            "destination_ids": [],
-            "destinations": [],
-            "notes": None,
-            "travel_style": current_user.travel_style
-        }
+def get_user_saved_destinations(current_user: dict = Depends(get_current_user)):
+    """Returns all bookmarked destinations and metadata for the authenticated user from Supabase."""
+    user_id = current_user["id"]
+    dest_ids = []
+    notes = None
+    travel_style = current_user.get("travelStyle")
 
-    dest_ids = journey.destination_ids or []
-    destinations = db.query(Destination).filter(Destination.id.in_(dest_ids)).all()
+    try:
+        res = supabase.table("saved_journeys").select("*").eq("user_id", user_id).execute()
+        if res and res.data:
+            journey = res.data[0]
+            dest_ids = journey.get("destination_ids") or []
+            notes = journey.get("notes")
+            travel_style = journey.get("travel_style") or travel_style
+    except Exception:
+        pass
+
+    if not dest_ids and user_id in _ephemeral_user_journeys:
+        e_data = _ephemeral_user_journeys[user_id]
+        dest_ids = e_data.get("destination_ids") or []
+        notes = e_data.get("notes") or notes
+        travel_style = e_data.get("travel_style") or travel_style
+
+    destinations = []
+    if dest_ids:
+        try:
+            dest_res = supabase.table("destinations").select("*").in_("id", dest_ids).execute()
+            if dest_res and dest_res.data:
+                destinations = dest_res.data
+        except Exception:
+            pass
+        if not destinations:
+            destinations = [d for d in INITIAL_DESTINATIONS if d["id"] in dest_ids]
+
     return {
         "success": True,
         "destination_ids": dest_ids,
-        "destinations": [d.to_dict() for d in destinations],
-        "notes": journey.notes,
-        "travel_style": journey.travel_style or current_user.travel_style
+        "destinations": destinations,
+        "notes": notes,
+        "travel_style": travel_style
     }
 
 @app.post("/api/user/save")
-def save_user_destinations(payload: UserSaveBookmarksRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Saves or updates the user's bookmarked destinations."""
-    journey = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
-    if journey:
-        journey.destination_ids = payload.destination_ids
-        if payload.notes is not None:
-            journey.notes = payload.notes
-        if payload.travel_style is not None:
-            journey.travel_style = payload.travel_style
-        db.commit()
-    else:
-        new_journey = SavedJourney(
-            user_id=current_user.id,
-            session_id=f"user_{current_user.id}_{int(utc_now().timestamp())}",
-            destination_ids=payload.destination_ids,
-            notes=payload.notes,
-            travel_style=payload.travel_style or current_user.travel_style
-        )
-        db.add(new_journey)
-        db.commit()
+def save_user_destinations(payload: UserSaveBookmarksRequest, current_user: dict = Depends(get_current_user)):
+    """Saves or updates the user's bookmarked destinations in Supabase."""
+    user_id = current_user["id"]
+    session_id = f"user_{user_id}_{int(utc_now().timestamp())}"
+    data = {
+        "user_id": user_id,
+        "session_id": session_id,
+        "destination_ids": payload.destination_ids,
+        "notes": payload.notes,
+        "travel_style": payload.travel_style or current_user.get("travelStyle")
+    }
+    _ephemeral_user_journeys[user_id] = data
+
+    try:
+        supabase_admin.auth.admin.update_user_by_id(user_id, {
+            "user_metadata": {
+                "saved_destinations": payload.destination_ids,
+                "saved_notes": payload.notes
+            }
+        })
+    except Exception:
+        pass
+
+    try:
+        existing = supabase.table("saved_journeys").select("id").eq("user_id", user_id).execute()
+        if existing and existing.data:
+            supabase.table("saved_journeys").update(data).eq("id", existing.data[0]["id"]).execute()
+        else:
+            supabase.table("saved_journeys").insert(data).execute()
+    except Exception as e:
+        print(f"[Supabase] save_user_destinations error: {e}")
 
     return {
         "success": True,
@@ -908,133 +990,311 @@ def save_user_destinations(payload: UserSaveBookmarksRequest, current_user: User
     }
 
 @app.get("/api/user/trips")
-def get_user_trips(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Returns custom planned itineraries created by the authenticated user."""
-    trips = db.query(UserTrip).filter(UserTrip.user_id == current_user.id).order_by(UserTrip.created_at.desc()).all()
+def get_user_trips(current_user: dict = Depends(get_current_user)):
+    """Returns custom planned itineraries created by the authenticated user from Supabase."""
+    user_id = current_user["id"]
+    trips = []
+    try:
+        res = supabase.table("user_trips").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+        if res and res.data:
+            for item in res.data:
+                trips.append({
+                    "id": item.get("id"),
+                    "userId": item.get("user_id"),
+                    "title": item.get("title"),
+                    "destinationIds": item.get("destination_ids") or [],
+                    "startDate": item.get("start_date"),
+                    "durationDays": item.get("duration_days", 5),
+                    "travelStyle": item.get("travel_style"),
+                    "notes": item.get("notes"),
+                    "createdAt": item.get("created_at")
+                })
+    except Exception as e:
+        print(f"[Supabase] get_user_trips error: {e}")
+
+    if not trips and user_id in _ephemeral_user_trips:
+        trips = list(_ephemeral_user_trips[user_id].values())
+
     return {
         "success": True,
-        "trips": [t.to_dict() for t in trips]
+        "trips": trips
     }
 
 @app.post("/api/user/trips")
-def create_user_trip(payload: UserTripCreateRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Creates a custom itinerary or expedition plan for the user."""
+def create_user_trip(payload: UserTripCreateRequest, current_user: dict = Depends(get_current_user)):
+    """Creates a custom itinerary or expedition plan in Supabase."""
     if not payload.title or not payload.title.strip():
         raise HTTPException(status_code=400, detail="Trip title is required.")
 
-    trip = UserTrip(
-        user_id=current_user.id,
-        title=payload.title.strip(),
-        destination_ids=payload.destination_ids or [],
-        start_date=payload.start_date,
-        duration_days=payload.duration_days or 5,
-        travel_style=payload.travel_style or current_user.travel_style,
-        notes=payload.notes
-    )
-    db.add(trip)
-    db.commit()
-    db.refresh(trip)
+    import uuid
+    user_id = current_user["id"]
+    trip_id = f"trip_{uuid.uuid4().hex[:8]}"
+    new_trip = {
+        "id": trip_id,
+        "user_id": user_id,
+        "title": payload.title.strip(),
+        "destination_ids": payload.destination_ids or [],
+        "start_date": payload.start_date,
+        "duration_days": payload.duration_days or 5,
+        "travel_style": payload.travel_style or current_user.get("travelStyle"),
+        "notes": payload.notes,
+        "created_at": utc_now().isoformat()
+    }
+
+    if user_id not in _ephemeral_user_trips:
+        _ephemeral_user_trips[user_id] = {}
+    _ephemeral_user_trips[user_id][trip_id] = {
+        "id": trip_id,
+        "userId": user_id,
+        "title": new_trip["title"],
+        "destinationIds": new_trip["destination_ids"],
+        "startDate": new_trip["start_date"],
+        "durationDays": new_trip["duration_days"],
+        "travelStyle": new_trip["travel_style"],
+        "notes": new_trip["notes"],
+        "createdAt": new_trip["created_at"]
+    }
+    inserted_trip = _ephemeral_user_trips[user_id][trip_id]
+
+    try:
+        db_payload = {k: v for k, v in new_trip.items() if k != "id"}
+        res = supabase.table("user_trips").insert(db_payload).execute()
+        if res and res.data:
+            item = res.data[0]
+            inserted_trip = {
+                "id": str(item.get("id")),
+                "userId": item.get("user_id"),
+                "title": item.get("title"),
+                "destinationIds": item.get("destination_ids") or [],
+                "startDate": item.get("start_date"),
+                "durationDays": item.get("duration_days", 5),
+                "travelStyle": item.get("travel_style"),
+                "notes": item.get("notes"),
+                "createdAt": item.get("created_at")
+            }
+            _ephemeral_user_trips[user_id][str(item.get("id"))] = inserted_trip
+    except Exception as e:
+        print(f"[Supabase] create_user_trip error: {e}")
 
     return {
         "success": True,
-        "trip": trip.to_dict(),
-        "message": f"Trip '{trip.title}' saved to your profile!"
+        "trip": inserted_trip,
+        "message": f"Trip '{payload.title.strip()}' saved to your profile!"
     }
 
 @app.delete("/api/user/trips/{trip_id}")
-def delete_user_trip(trip_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Deletes a custom trip plan belonging to the authenticated user."""
-    trip = db.query(UserTrip).filter(UserTrip.id == trip_id, UserTrip.user_id == current_user.id).first()
-    if not trip:
-        raise HTTPException(status_code=404, detail="Trip not found or unauthorized.")
-    db.delete(trip)
-    db.commit()
+def delete_user_trip(trip_id: str, current_user: dict = Depends(get_current_user)):
+    """Deletes a custom trip plan in Supabase."""
+    user_id = current_user["id"]
+    if user_id in _ephemeral_user_trips and trip_id in _ephemeral_user_trips[user_id]:
+        del _ephemeral_user_trips[user_id][trip_id]
+
+    try:
+        supabase.table("user_trips").delete().eq("id", trip_id).eq("user_id", user_id).execute()
+    except Exception as e:
+        print(f"[Supabase] delete_user_trip error: {e}")
 
     return {
         "success": True,
         "message": "Trip successfully deleted."
     }
 
+# --- Resource Modules: Destinations, Mountain Passes & Journey Bookmarks ---
+
 @app.get("/api/destinations")
 def get_destinations(
     category: Optional[str] = Query(None, description="Filter by category e.g. mountains, culture, adventure"),
     state: Optional[str] = Query(None, description="Filter by state e.g. Ladakh, Rajasthan"),
     emotion: Optional[str] = Query(None, description="Filter by emotion e.g. peace, adventure, culture"),
-    search: Optional[str] = Query(None, description="Search term across name, location, and description"),
-    db: Session = Depends(get_db)
+    search: Optional[str] = Query(None, description="Search term across name, location, and description")
 ):
-    query = db.query(Destination)
+    """Returns curated destinations directly from Supabase table with high-speed query filtering."""
+    try:
+        query = supabase.table("destinations").select("*")
+        if category:
+            query = query.ilike("category", f"%{category}%")
+        if state:
+            query = query.ilike("state", f"%{state}%")
+        if emotion:
+            query = query.ilike("emotion", f"%{emotion}%")
 
+        res = query.execute()
+        if res and res.data and len(res.data) > 0:
+            results = res.data
+            if search:
+                s = search.lower()
+                results = [
+                    d for d in results
+                    if s in d.get("name", "").lower()
+                    or s in d.get("location", "").lower()
+                    or s in d.get("desc", "").lower()
+                ]
+            return results
+    except Exception as e:
+        print(f"[Supabase] destinations query note: {e}")
+
+    # Fallback to rich built-in dataset to maintain instant visual interface
+    filtered = INITIAL_DESTINATIONS
     if category:
-        query = query.filter(Destination.category.ilike(f"%{category}%"))
+        filtered = [d for d in filtered if category.lower() in d.get("category", "").lower()]
     if state:
-        query = query.filter(Destination.state.ilike(f"%{state}%"))
+        filtered = [d for d in filtered if state.lower() in d.get("state", "").lower()]
     if emotion:
-        query = query.filter(Destination.emotion.ilike(f"%{emotion}%"))
+        filtered = [d for d in filtered if emotion.lower() in d.get("emotion", "").lower()]
     if search:
-        s = f"%{search}%"
-        query = query.filter(
-            (Destination.name.ilike(s)) |
-            (Destination.location.ilike(s)) |
-            (Destination.desc.ilike(s))
-        )
-
-    results = query.all()
-    return [d.to_dict() for d in results]
+        s = search.lower()
+        filtered = [
+            d for d in filtered
+            if s in d.get("name", "").lower()
+            or s in d.get("location", "").lower()
+            or s in d.get("desc", "").lower()
+        ]
+    return filtered
 
 @app.get("/api/destinations/{dest_id}")
-def get_destination_detail(dest_id: str, db: Session = Depends(get_db)):
-    dest = db.query(Destination).filter(Destination.id == dest_id).first()
-    if not dest:
-        raise HTTPException(status_code=404, detail="Destination not found")
-    return dest.to_dict()
+def get_destination_detail(dest_id: str):
+    """Retrieves destination detail from Supabase table."""
+    try:
+        res = supabase.table("destinations").select("*").eq("id", dest_id).single().execute()
+        if res and res.data:
+            return res.data
+    except Exception:
+        pass
+
+    for d in INITIAL_DESTINATIONS:
+        if d["id"] == dest_id:
+            return d
+    raise HTTPException(status_code=404, detail="Destination not found")
 
 @app.get("/api/passes")
-def get_all_passes(db: Session = Depends(get_db)):
-    """Returns live mountain pass telemetry keyed by pass name for direct frontend integration."""
-    passes = db.query(PassAdvisory).all()
+def get_all_passes():
+    """Returns live mountain pass telemetry keyed by pass name directly from Supabase."""
     result = {}
-    for p in passes:
-        result[p.name] = {
-            "status": p.status,
-            "altitude": p.altitude,
-            "condition": p.condition,
-            "safe": p.safe,
-            "temperature": p.temperature,
-            "updated": p.last_updated.strftime("%H:%M IST") if p.last_updated else "Live"
+    try:
+        res = supabase.table("pass_advisories").select("*").execute()
+        if res and res.data and len(res.data) > 0:
+            for p in res.data:
+                result[p.get("name")] = {
+                    "status": p.get("status"),
+                    "altitude": p.get("altitude"),
+                    "condition": p.get("condition"),
+                    "safe": p.get("safe", True),
+                    "temperature": p.get("temperature", "-2°C"),
+                    "updated": p.get("updated") or "Live"
+                }
+            return result
+    except Exception as e:
+        print(f"[Supabase] pass_advisories query note: {e}")
+
+    for p in INITIAL_PASSES:
+        result[p["name"]] = {
+            "status": p["status"],
+            "altitude": p["altitude"],
+            "condition": p["condition"],
+            "safe": p["safe"],
+            "temperature": p["temperature"],
+            "updated": "Live"
         }
     return result
+
+@app.get("/api/passes/download-safety-guidelines-pdf")
+@app.get("/api/passes/download-field-pass-pdf")
+@app.get("/api/pass/download-pdf")
+def download_field_pass_pdf(
+    full_name: Optional[str] = Query(None),
+    email: Optional[str] = Query(None),
+    home_city: Optional[str] = Query(None),
+    emergency_contact: Optional[str] = Query(None),
+    medical_notes: Optional[str] = Query(None),
+    travel_style: Optional[str] = Query(None),
+    current_user: Optional[dict] = Depends(get_optional_user)
+):
+    """Generates and downloads the official high-altitude Himalayan Safety & Danger Guidelines PDF."""
+    traveler_data = {}
+    if current_user:
+        traveler_data["full_name"] = current_user.get("fullName") or current_user.get("full_name")
+        traveler_data["email"] = current_user.get("email")
+        traveler_data["home_city"] = current_user.get("homeCity") or current_user.get("home_city")
+        traveler_data["emergency_contact"] = current_user.get("emergencyContact") or current_user.get("emergency_contact")
+        traveler_data["medical_notes"] = current_user.get("medicalNotes") or current_user.get("medical_notes")
+        traveler_data["travel_style"] = current_user.get("travelStyle") or current_user.get("travel_style")
+        traveler_data["pass_id"] = f"BE-HIM-2026-{str(current_user.get('id', ''))[:6].upper() or 'IND99'}"
+
+    # Allow query parameter overrides
+    if full_name and full_name.strip():
+        traveler_data["full_name"] = full_name.strip()
+    if email and email.strip():
+        traveler_data["email"] = email.strip()
+    if home_city and home_city.strip():
+        traveler_data["home_city"] = home_city.strip()
+    if emergency_contact and emergency_contact.strip():
+        traveler_data["emergency_contact"] = emergency_contact.strip()
+    if medical_notes and medical_notes.strip():
+        traveler_data["medical_notes"] = medical_notes.strip()
+    if travel_style and travel_style.strip():
+        traveler_data["travel_style"] = travel_style.strip()
+
+    try:
+        pdf_bytes = generate_field_pass_pdf(traveler_data)
+    except Exception as e:
+        print(f"[FieldPassPDF] Generation error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate safety guidelines PDF: {str(e)}")
+
+    filename = "Bharat_Explore_Himalayan_Safety_Guidelines.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache"
+        }
+    )
 
 @app.post("/api/journey/save")
 def save_user_journey(
     payload: JourneySaveRequest,
-    db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_user)
+    current_user: Optional[dict] = Depends(get_optional_user)
 ):
-    """Persists user trip bookmarks for guests or authenticated users."""
-    existing = None
-    if current_user:
-        existing = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
-    if not existing:
-        existing = db.query(SavedJourney).filter(SavedJourney.session_id == payload.session_id).first()
+    """Persists user trip bookmarks for guests or authenticated users directly into Supabase."""
+    user_id = current_user["id"] if current_user else None
+    data = {
+        "session_id": payload.session_id,
+        "destination_ids": payload.destination_ids,
+        "notes": payload.notes,
+        "travel_style": payload.travel_style,
+        "user_id": user_id
+    }
+    _ephemeral_guest_journeys[payload.session_id] = data
+    if user_id:
+        _ephemeral_user_journeys[user_id] = data
+        try:
+            supabase_admin.auth.admin.update_user_by_id(user_id, {
+                "user_metadata": {
+                    "saved_destinations": payload.destination_ids,
+                    "saved_notes": payload.notes,
+                    "travel_style": payload.travel_style
+                }
+            })
+        except Exception:
+            pass
 
-    if existing:
-        existing.destination_ids = payload.destination_ids
-        existing.notes = payload.notes
-        existing.travel_style = payload.travel_style
-        if current_user and not existing.user_id:
-            existing.user_id = current_user.id
-        db.commit()
-    else:
-        new_journey = SavedJourney(
-            user_id=current_user.id if current_user else None,
-            session_id=payload.session_id,
-            destination_ids=payload.destination_ids,
-            notes=payload.notes,
-            travel_style=payload.travel_style
-        )
-        db.add(new_journey)
-        db.commit()
+    try:
+        existing = None
+        if user_id:
+            res = supabase.table("saved_journeys").select("id").eq("user_id", user_id).execute()
+            if res and res.data:
+                existing = res.data[0]
+        if not existing:
+            res = supabase.table("saved_journeys").select("id").eq("session_id", payload.session_id).execute()
+            if res and res.data:
+                existing = res.data[0]
+
+        if existing:
+            supabase.table("saved_journeys").update(data).eq("id", existing["id"]).execute()
+        else:
+            supabase.table("saved_journeys").insert(data).execute()
+    except Exception as e:
+        print(f"[Supabase] save_user_journey note: {e}")
 
     return {
         "success": True,
@@ -1046,28 +1306,45 @@ def save_user_journey(
 @app.get("/api/journey/{session_id}")
 def get_user_journey(
     session_id: str,
-    db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_user)
+    current_user: Optional[dict] = Depends(get_optional_user)
 ):
-    """Retrieves saved destinations for a given session or authenticated user."""
-    saved = None
-    if current_user:
-        saved = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
-    if not saved:
-        saved = db.query(SavedJourney).filter(SavedJourney.session_id == session_id).first()
+    """Retrieves saved destinations directly from Supabase."""
+    dest_ids = []
+    notes = None
+    travel_style = "Adventure"
+    try:
+        saved = None
+        if current_user:
+            res = supabase.table("saved_journeys").select("*").eq("user_id", current_user["id"]).execute()
+            if res and res.data:
+                saved = res.data[0]
+        if not saved:
+            res = supabase.table("saved_journeys").select("*").eq("session_id", session_id).execute()
+            if res and res.data:
+                saved = res.data[0]
 
-    if not saved:
-        return {"session_id": session_id, "destination_ids": [], "destinations": []}
+        if saved:
+            dest_ids = saved.get("destination_ids") or []
+            notes = saved.get("notes")
+            travel_style = saved.get("travel_style") or travel_style
+    except Exception as e:
+        print(f"[Supabase] get_user_journey note: {e}")
 
-    dest_ids = saved.destination_ids or []
-    destinations = db.query(Destination).filter(Destination.id.in_(dest_ids)).all()
+    if not dest_ids and session_id in _ephemeral_guest_journeys:
+        e_data = _ephemeral_guest_journeys[session_id]
+        dest_ids = e_data.get("destination_ids") or []
+        notes = e_data.get("notes")
+        travel_style = e_data.get("travel_style") or travel_style
+
+    destinations = [d for d in INITIAL_DESTINATIONS if d["id"] in dest_ids]
     return {
         "session_id": session_id,
         "destination_ids": dest_ids,
-        "destinations": [d.to_dict() for d in destinations],
-        "travel_style": saved.travel_style,
-        "notes": saved.notes
+        "destinations": destinations,
+        "travel_style": travel_style,
+        "notes": notes
     }
+
 
 # Comprehensive Destination-Aware AI Intelligence & Heuristic Knowledge Base
 # Designed for Smart India Hackathon (SIH 2026) Bharat Explore Platform
@@ -1899,12 +2176,6 @@ if (BASE_DIR / "js").exists():
     app.mount("/js", StaticFiles(directory=str(BASE_DIR / "js")), name="js")
 if (BASE_DIR / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(BASE_DIR / "assets")), name="assets")
-@app.get("/api/config")
-def get_config():
-    reload_environment()
-    return {
-        "CARTO_API_KEY": os.getenv("CARTO_API_KEY", "YOUR_CARTO_API_KEY_HERE").strip()
-    }
 
 @app.get("/")
 def serve_index():
@@ -1963,4 +2234,5 @@ def serve_favicon():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
+    app_target = "backend.server:app" if (Path.cwd() / "backend").exists() else "server:app"
+    uvicorn.run(app_target, host="127.0.0.1", port=8000, reload=True)

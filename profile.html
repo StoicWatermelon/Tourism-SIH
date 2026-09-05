@@ -50,7 +50,14 @@
             <span class="profile-chip" id="dashUserCity">India</span>
             <span class="profile-chip">🛡️ SIH AMS Safety Active</span>
           </div>
+          <div style="margin-top: 12px;">
+            <button type="button" class="auth-btn-primary download-pass-btn" id="heroDownloadPassBtn" onclick="downloadOfflineFieldPassPDF(null, this)" style="width: auto; padding: 7px 16px; font-size: 13px; display: inline-flex;">
+              📥 Safety & Danger Guide (PDF)
+            </button>
+          </div>
         </div>
+
+
       </div>
     </section>
 
@@ -166,6 +173,23 @@
             <div><strong>AMS Acclimatization Status:</strong> <span style="color: var(--gold); font-weight: 700;">Active • Leh Protocol Mandatory (48h Rest)</span></div>
           </div>
         </div>
+
+        <!-- Official Safety & Danger Guidelines Action Card -->
+        <div class="field-pass-profile-card">
+          <div class="pass-card-left">
+            <div class="pass-seal-badge">LAHDC & TOURISM CLEARED</div>
+            <h4>Official Himalayan Travel Safety & Danger Guidelines</h4>
+            <p>Download the official high-resolution vector PDF safety guide containing critical altitude hypoxia protocols (AMS/HAPE/HACE), mountain pass hazard advisories (Khardung La, Chang La, Rohtang, Zoji La), and the 24/7 hyperbaric oxygen rescue network.</p>
+            <div class="pass-features-tags">
+              <span>✓ 100% Offline Accessible</span>
+              <span>✓ High-Altitude Danger Protocols</span>
+              <span>✓ 24/7 Oxygen & Rescue Directory</span>
+            </div>
+          </div>
+          <button type="button" class="auth-btn-primary download-pass-btn" id="profileDownloadPassBtn" onclick="downloadOfflineFieldPassPDF(null, this)" style="width: auto; padding: 12px 24px;">
+            📥 Download Safety & Danger Guide (PDF)
+          </button>
+        </div>
       </div>
     </section>
 
@@ -239,6 +263,8 @@
     </section>
   </main>
 
+  <script src="js/jspdf.umd.min.js"></script>
+  <script src="js/field_pass.js"></script>
   <script src="js/auth.js"></script>
 </body>
 </html>

@@ -527,7 +527,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 36px;
+  max-width: 440px;
+  margin: 0 auto 36px;
   position: relative;
 }
 

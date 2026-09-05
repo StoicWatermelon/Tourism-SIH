@@ -200,10 +200,11 @@
       drawer_clear: "Clear All",
 
       // Field Kit Modal
-      fieldkit_badge: "OFFLINE EMERGENCY & ECO TRAVEL PASS",
+      fieldkit_badge: "OFFLINE DANGER & TRAVEL SAFETY GUIDELINES",
       fieldkit_header: "Himalayan Travel Safety & Field Kit",
       fieldkit_desc: "Critical offline guidance for traveling through remote sectors (Pangong, Changthang, Nubra, Hanle) where cellular connectivity is intermittent or zero.",
       fieldkit_print: "🖨️ Print / Save Offline Field Kit",
+      fieldkit_download_pdf: "📥 Download Safety & Danger Guide (PDF)",
       fieldkit_pledge: "✦ Sign Eco-Traveler Pledge (+10 Score)",
 
       // Experience Badges
@@ -477,10 +478,11 @@
       drawer_clear: "सभी हटाएं",
 
       // Field Kit Modal
-      fieldkit_badge: "ऑफलाइन आपातकालीन एवं पर्यावरण यात्रा पास",
+      fieldkit_badge: "ऑफलाइन आपातकालीन एवं सुरक्षा दिशानिर्देश",
       fieldkit_header: "हिमालयी यात्रा सुरक्षा और फील्ड किट",
       fieldkit_desc: "दूरदराज के क्षेत्रों (पैंगोंग, चांगथांग, नुब्रा, हानले) में यात्रा के लिए महत्वपूर्ण ऑफलाइन मार्गदर्शन जहां नेटवर्क सीमित या शून्य है।",
       fieldkit_print: "🖨️ प्रिंट / ऑफलाइन फील्ड किट सहेजें",
+      fieldkit_download_pdf: "📥 सुरक्षा एवं खतरा दिशानिर्देश डाउनलोड करें (PDF)",
       fieldkit_pledge: "✦ पर्यावरण प्रतिज्ञा पर हस्ताक्षर करें (+10 स्कोर)",
 
       // Experience Badges
@@ -754,10 +756,11 @@
       drawer_clear: "সব সাফ করুন",
 
       // Field Kit Modal
-      fieldkit_badge: "অফলাইন জরুরি ও পরিবেশ ভ্রমণ পাস",
+      fieldkit_badge: "অফলাইন জরুরি ও সুরক্ষা নির্দেশিকা",
       fieldkit_header: "হিমালয় ভ্রমণ সুরক্ষা ও ফিল্ড কিট",
       fieldkit_desc: "প্যাংগং, চাংথাং, নুব্রা, হানলের মতো প্রত্যন্ত অঞ্চলে ভ্রমণের জন্য গুরুত্বপূর্ণ অফলাইন নির্দেশিকা যেখানে মোবাইল নেটওয়ার্ক থাকে না।",
       fieldkit_print: "🖨️ প্রিন্ট / সংরক্ষণ করুন",
+      fieldkit_download_pdf: "📥 সুরক্ষা ও বিপদ নির্দেশিকা ডাউনলোড করুন (PDF)",
       fieldkit_pledge: "✦ ইকো-ট্রাভেলার প্রতিজ্ঞায় স্বাক্ষর করুন (+১০ স্কোর)",
 
       // Experience Badges

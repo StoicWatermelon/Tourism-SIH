@@ -10,25 +10,48 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi.testclient import TestClient
-from backend.server import app, SessionLocal, User, SavedJourney, UserTrip
+from backend.server import app
+from backend.supabase_client import supabase, supabase_admin, is_supabase_configured
 
 client = TestClient(app)
 
 class TestAuthAndUserData(unittest.TestCase):
     def setUp(self):
-        self.db = SessionLocal()
-        # Clean up any test users from prior runs
-        test_emails = ["explorer.arya@example.com", "hiker.test@example.com", "migration.test@example.com"]
-        for email in test_emails:
-            users = self.db.query(User).filter(User.email == email).all()
-            for u in users:
-                self.db.query(SavedJourney).filter(SavedJourney.user_id == u.id).delete()
-                self.db.query(UserTrip).filter(UserTrip.user_id == u.id).delete()
-                self.db.delete(u)
-        self.db.commit()
+        # If Supabase is configured and reachable, delete any test users from Supabase Auth
+        if is_supabase_configured():
+            test_emails = {"explorer.arya@example.com", "hiker.test@example.com", "migration.test@example.com"}
+            try:
+                users = supabase_admin.auth.admin.list_users()
+                for u in users:
+                    if u.email in test_emails:
+                        try:
+                            supabase_admin.auth.admin.delete_user(u.id)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+            for email in test_emails:
+                try:
+                    supabase_admin.table("saved_journeys").delete().eq("email", email).execute()
+                    supabase_admin.table("profiles").delete().eq("email", email).execute()
+                except Exception:
+                    pass
 
     def tearDown(self):
-        self.db.close()
+        # Clean up test users after test runs
+        if is_supabase_configured():
+            test_emails = {"explorer.arya@example.com", "hiker.test@example.com", "migration.test@example.com"}
+            try:
+                users = supabase_admin.auth.admin.list_users()
+                for u in users:
+                    if u.email in test_emails:
+                        try:
+                            supabase_admin.auth.admin.delete_user(u.id)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
 
     def test_01_register_user_success(self):
         payload = {

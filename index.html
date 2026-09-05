@@ -589,12 +589,17 @@
         <!-- Offline Travel Field Kit Summary in Journey Drawer -->
         <div class="field-kit-promo">
           <div class="field-kit-promo-text">
-            <strong data-i18n="drawer_kit_title">🛡️ Offline Field Kit & Emergency Pass</strong>
+            <strong data-i18n="drawer_kit_title">🛡️ Himalayan Safety & Danger Guidelines</strong>
             <p data-i18n="drawer_kit_sub">Access hospital helplines, ILP checkpoints & AMS protocols.</p>
           </div>
-          <button class="btn light" id="openFieldKitBtn" data-i18n="drawer_kit_btn">
-            Open Field Kit 📄
-          </button>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn light" id="openFieldKitBtn" data-i18n="drawer_kit_btn">
+              Open Field Kit 📄
+            </button>
+            <button class="btn primary download-pass-btn" id="drawerDownloadPassBtn" onclick="downloadOfflineFieldPassPDF(null, this)" title="Download Safety & Danger Guidelines (PDF)">
+              📥 Safety Guide (PDF)
+            </button>
+          </div>
         </div>
 
         <div class="drawer-actions">
@@ -610,9 +615,23 @@
     <div class="modal-card" style="max-width: 900px;">
       <button class="close" data-close>×</button>
       <div class="field-kit-header">
-        <span class="field-kit-badge" data-i18n="fieldkit_badge">OFFLINE EMERGENCY & ECO TRAVEL PASS</span>
+        <span class="field-kit-badge" data-i18n="fieldkit_badge">OFFLINE DANGER & TRAVEL SAFETY GUIDELINES</span>
         <h2 data-i18n="fieldkit_header">Himalayan Travel Safety & Field Kit</h2>
         <p data-i18n="fieldkit_desc">Critical offline guidance for traveling through remote sectors (Pangong, Changthang, Nubra, Hanle) where cellular connectivity is intermittent or zero.</p>
+      </div>
+
+      <!-- Official Field Pass Preview & Direct Download Action -->
+      <div class="field-pass-preview-banner">
+        <div class="pass-preview-info">
+          <div class="pass-preview-icon">🛡️</div>
+          <div>
+            <div class="pass-preview-title">Himalayan Emergency & Danger Guidelines (SIH 2026)</div>
+            <div class="pass-preview-sub">Official vector PDF reference for altitude hypoxia (AMS/HAPE/HACE), mountain pass hazards, SpO2 hyperbaric rescue directory, & LAHDC checkpoint verification.</div>
+          </div>
+        </div>
+        <button class="btn primary download-pass-btn" id="downloadFieldPassBtnModal" onclick="downloadOfflineFieldPassPDF(null, this)" data-i18n="fieldkit_download_pdf">
+          📥 Download Safety & Danger Guide (PDF)
+        </button>
       </div>
 
       <div class="field-kit-grid">
@@ -664,7 +683,10 @@
       </div>
 
       <div class="field-kit-actions">
-        <button class="btn primary" onclick="window.print()" data-i18n="fieldkit_print">
+        <button class="btn primary download-pass-btn" id="downloadFieldPassBtnFooter" onclick="downloadOfflineFieldPassPDF(null, this)" data-i18n="fieldkit_download_pdf">
+          📥 Download Safety & Danger Guide (PDF)
+        </button>
+        <button class="btn light" onclick="window.print()" data-i18n="fieldkit_print">
           🖨️ Print / Save Offline Field Kit
         </button>
         <button class="btn ghost" onclick="pledgeEcoPass()" data-i18n="fieldkit_pledge">
@@ -680,6 +702,8 @@
   <!-- Modular Application Logic -->
   <script src="js/i18n.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/jspdf.umd.min.js"></script>
+  <script src="js/field_pass.js"></script>
   <script src="js/app.js"></script>
   <script src="js/ai.js"></script>
   <script src="js/map.js"></script>
