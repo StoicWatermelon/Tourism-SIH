@@ -549,9 +549,17 @@ function getSessionId() {
 
 async function syncSavedToBackend(savedIds) {
   try {
-    await fetch("http://127.0.0.1:8000/api/journey/save", {
+    const headers = (window.BharatAuth && typeof window.BharatAuth.getAuthHeaders === "function")
+      ? window.BharatAuth.getAuthHeaders()
+      : { "Content-Type": "application/json" };
+
+    const url = (window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost"))
+      ? "/api/journey/save"
+      : "http://127.0.0.1:8000/api/journey/save";
+
+    await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
       body: JSON.stringify({
         session_id: getSessionId(),
         destination_ids: savedIds,
@@ -562,6 +570,23 @@ async function syncSavedToBackend(savedIds) {
     // Silent fallback
   }
 }
+
+window.syncUserSessionState = async function () {
+  try {
+    if (window.BharatAuth && window.BharatAuth.isAuthenticated()) {
+      const savedData = await window.BharatAuth.getSavedDestinations();
+      if (savedData && Array.isArray(savedData.destination_ids)) {
+        let localSaved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
+        const merged = Array.from(new Set([...localSaved, ...savedData.destination_ids]));
+        localStorage.setItem("bharatSaved", JSON.stringify(merged));
+      }
+    }
+    updateSavedCount();
+    renderJourneyDrawer();
+  } catch (e) {
+    console.warn("Error syncing user session state:", e);
+  }
+};
 
 // --- Dynamic Rendering & Decongestion Engine ---
 
@@ -1119,6 +1144,9 @@ async function init() {
   renderFood();
   renderJourney();
   updateSavedCount();
+  if (typeof window.syncUserSessionState === "function") {
+    window.syncUserSessionState();
+  }
 
   // Re-render dynamic grids whenever language switches
   window.addEventListener("bharat-lang-changed", () => {

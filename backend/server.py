@@ -1,9 +1,13 @@
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Optional, List
 from pathlib import Path
 from dotenv import load_dotenv
+
+def utc_now():
+    return datetime.now(timezone.utc)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -17,15 +21,18 @@ def reload_environment():
 
 reload_environment()
 
-from fastapi import FastAPI, Depends, Query, HTTPException
+from fastapi import FastAPI, Depends, Query, HTTPException, Header, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import jwt
+import bcrypt
 from google import genai
 from google.genai import types
 
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, Text, DateTime, JSON
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, Text, DateTime, JSON, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 
@@ -94,18 +101,109 @@ class PassAdvisory(Base):
             "updated": self.last_updated.strftime("%Y-%m-%d %H:%M UTC") if self.last_updated else "Live"
         }
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+    phone = Column(String, nullable=True)
+    avatar = Column(String, default="🏔️")
+    travel_style = Column(String, default="Eco-Explorer")
+    home_city = Column(String, nullable=True)
+    emergency_contact = Column(String, nullable=True)
+    medical_notes = Column(String, nullable=True)
+    preferences = Column(JSON, default=dict)
+    role = Column(String, default="traveler")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "fullName": self.full_name,
+            "phone": self.phone or "",
+            "avatar": self.avatar or "🏔️",
+            "travelStyle": self.travel_style or "Eco-Explorer",
+            "homeCity": self.home_city or "",
+            "emergencyContact": self.emergency_contact or "",
+            "medicalNotes": self.medical_notes or "",
+            "preferences": self.preferences or {},
+            "role": self.role or "traveler",
+            "isActive": self.is_active,
+            "createdAt": self.created_at.isoformat() if self.created_at else None
+        }
+
+class UserTrip(Base):
+    __tablename__ = "user_trips"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String, nullable=False)
+    destination_ids = Column(JSON, nullable=False)
+    start_date = Column(String, nullable=True)
+    duration_days = Column(Integer, default=5)
+    travel_style = Column(String, default="Eco-Explorer")
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "userId": self.user_id,
+            "title": self.title,
+            "destinationIds": self.destination_ids or [],
+            "startDate": self.start_date,
+            "durationDays": self.duration_days,
+            "travelStyle": self.travel_style,
+            "notes": self.notes,
+            "createdAt": self.created_at.isoformat() if self.created_at else None
+        }
+
 class SavedJourney(Base):
     __tablename__ = "saved_journeys"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)
     session_id = Column(String, nullable=False, index=True)
     destination_ids = Column(JSON, nullable=False)
     notes = Column(Text, nullable=True)
     travel_style = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "userId": self.user_id,
+            "sessionId": self.session_id,
+            "destinationIds": self.destination_ids or [],
+            "notes": self.notes,
+            "travelStyle": self.travel_style,
+            "createdAt": self.created_at.isoformat() if self.created_at else None
+        }
+
 # Create Database Tables
 Base.metadata.create_all(bind=engine)
+
+def init_db_migrations():
+    """Ensure newly added columns exist in existing SQLite tables."""
+    import sqlite3
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(saved_journeys)")
+        columns = [row[1] for row in cursor.fetchall()]
+        if "user_id" not in columns:
+            cursor.execute("ALTER TABLE saved_journeys ADD COLUMN user_id INTEGER REFERENCES users(id)")
+            conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[DB MIGRATION NOTE] {e}")
+
+init_db_migrations()
 
 def get_db():
     db = SessionLocal()
@@ -113,6 +211,104 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# --- Security & JWT Authentication Utilities ---
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "bharat_explore_jwt_secret_sih_2026_super_secure_change_in_production")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080")) # 7 days default
+
+def hash_password(password: str) -> str:
+    """Hashes a password securely using bcrypt with salt, falling back to PBKDF2."""
+    try:
+        pwd_bytes = password.encode("utf-8")
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(pwd_bytes, salt).decode("utf-8")
+    except Exception:
+        import hashlib, binascii
+        salt = os.urandom(16)
+        kdf = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+        return f"pbkdf2${binascii.hexlify(salt).decode()}${binascii.hexlify(kdf).decode()}"
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifies a plain password against the stored hash."""
+    try:
+        if not hashed_password or not plain_password:
+            return False
+        if hashed_password.startswith("pbkdf2$"):
+            import hashlib, binascii
+            parts = hashed_password.split("$")
+            salt = binascii.unhexlify(parts[1])
+            expected_kdf = binascii.unhexlify(parts[2])
+            kdf = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt, 100000)
+            return kdf == expected_kdf
+        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+    except Exception:
+        return False
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    expire = utc_now() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire, "iat": utc_now()})
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+def decode_access_token(token: str) -> Optional[dict]:
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        return payload
+    except Exception:
+        return None
+
+security = HTTPBearer(auto_error=False)
+
+def get_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: Session = Depends(get_db)
+) -> User:
+    if not credentials or not credentials.credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token required. Please sign in.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    payload = decode_access_token(credentials.credentials)
+    if not payload or "sub" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session token.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    try:
+        user_id = int(payload["sub"])
+    except (ValueError, TypeError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Malformed session token subject.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account does not exist or has been deactivated.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    return user
+
+def get_optional_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    if not credentials or not credentials.credentials:
+        return None
+    payload = decode_access_token(credentials.credentials)
+    if not payload or "sub" not in payload:
+        return None
+    try:
+        user_id = int(payload["sub"])
+        return db.query(User).filter(User.id == user_id, User.is_active == True).first()
+    except Exception:
+        return None
+
 
 # Auto-Seeding Dataset
 INITIAL_DESTINATIONS = [
@@ -446,6 +642,50 @@ class JourneySaveRequest(BaseModel):
     notes: Optional[str] = None
     travel_style: Optional[str] = "Adventure"
 
+class UserRegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    phone: Optional[str] = None
+    avatar: Optional[str] = None
+    travel_style: Optional[str] = "Eco-Explorer"
+    home_city: Optional[str] = None
+    emergency_contact: Optional[str] = None
+    medical_notes: Optional[str] = None
+    guest_session_id: Optional[str] = None
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+    guest_session_id: Optional[str] = None
+
+class ProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar: Optional[str] = None
+    travel_style: Optional[str] = None
+    home_city: Optional[str] = None
+    emergency_contact: Optional[str] = None
+    medical_notes: Optional[str] = None
+    preferences: Optional[dict] = None
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+class UserTripCreateRequest(BaseModel):
+    title: str
+    destination_ids: List[str]
+    start_date: Optional[str] = None
+    duration_days: Optional[int] = 5
+    travel_style: Optional[str] = "Eco-Explorer"
+    notes: Optional[str] = None
+
+class UserSaveBookmarksRequest(BaseModel):
+    destination_ids: List[str]
+    notes: Optional[str] = None
+    travel_style: Optional[str] = None
+
 # --- REST Endpoints ---
 
 @app.get("/api/config")
@@ -453,6 +693,266 @@ def get_app_config():
     """Returns public frontend configuration including basemap keys."""
     return {
         "CARTO_API_KEY": os.getenv("CARTO_API_KEY", "YOUR_CARTO_API_KEY_HERE")
+    }
+
+# --- User Authentication & Account Management ---
+
+@app.post("/api/auth/register")
+def register_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
+    """Registers a new user account, stores profile data, and returns a JWT access token."""
+    clean_email = payload.email.strip().lower()
+    if "@" not in clean_email or "." not in clean_email or len(clean_email) < 5:
+        raise HTTPException(status_code=400, detail="Please enter a valid email address.")
+    if len(payload.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long.")
+    if not payload.full_name or not payload.full_name.strip():
+        raise HTTPException(status_code=400, detail="Full name is required.")
+
+    existing_user = db.query(User).filter(User.email == clean_email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="An account with this email address already exists.")
+
+    hashed_pwd = hash_password(payload.password)
+    new_user = User(
+        email=clean_email,
+        hashed_password=hashed_pwd,
+        full_name=payload.full_name.strip(),
+        phone=payload.phone.strip() if payload.phone else None,
+        avatar=payload.avatar or "🏔️",
+        travel_style=payload.travel_style or "Eco-Explorer",
+        home_city=payload.home_city.strip() if payload.home_city else None,
+        emergency_contact=payload.emergency_contact.strip() if payload.emergency_contact else None,
+        medical_notes=payload.medical_notes.strip() if payload.medical_notes else None,
+        preferences={
+            "travel_style": payload.travel_style or "Eco-Explorer",
+            "dietary": "Standard",
+            "high_altitude_certified": False
+        },
+        role="traveler",
+        is_active=True
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    # If guest had saved journeys prior to registration, link them to the new user
+    if payload.guest_session_id:
+        guest_journey = db.query(SavedJourney).filter(SavedJourney.session_id == payload.guest_session_id).first()
+        if guest_journey:
+            guest_journey.user_id = new_user.id
+            db.commit()
+
+    token = create_access_token({
+        "sub": str(new_user.id),
+        "email": new_user.email,
+        "name": new_user.full_name
+    })
+
+    return {
+        "success": True,
+        "token": token,
+        "token_type": "bearer",
+        "user": new_user.to_dict(),
+        "message": f"Welcome to Bharat Explore, {new_user.full_name}!"
+    }
+
+@app.post("/api/auth/login")
+def login_user(payload: UserLoginRequest, db: Session = Depends(get_db)):
+    """Authenticates user with email & password, links guest bookmarks, and returns JWT."""
+    clean_email = payload.email.strip().lower()
+    user = db.query(User).filter(User.email == clean_email).first()
+    if not user or not verify_password(payload.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email address or password.")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account has been suspended.")
+
+    # Migrate or merge guest bookmarks if session_id passed
+    if payload.guest_session_id:
+        guest_journey = db.query(SavedJourney).filter(SavedJourney.session_id == payload.guest_session_id).first()
+        if guest_journey:
+            user_journey = db.query(SavedJourney).filter(SavedJourney.user_id == user.id).first()
+            if user_journey:
+                merged_ids = list(dict.fromkeys((user_journey.destination_ids or []) + (guest_journey.destination_ids or [])))
+                user_journey.destination_ids = merged_ids
+                db.delete(guest_journey)
+            else:
+                guest_journey.user_id = user.id
+            db.commit()
+
+    token = create_access_token({
+        "sub": str(user.id),
+        "email": user.email,
+        "name": user.full_name
+    })
+
+    return {
+        "success": True,
+        "token": token,
+        "token_type": "bearer",
+        "user": user.to_dict(),
+        "message": f"Welcome back, {user.full_name}!"
+    }
+
+@app.get("/api/auth/me")
+def get_my_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Returns the authenticated user's profile, saved bookmarks count, and planned trips."""
+    user_journey = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
+    saved_count = len(user_journey.destination_ids) if user_journey and user_journey.destination_ids else 0
+    trips_count = db.query(UserTrip).filter(UserTrip.user_id == current_user.id).count()
+
+    return {
+        "success": True,
+        "user": current_user.to_dict(),
+        "saved_count": saved_count,
+        "trips_count": trips_count
+    }
+
+@app.put("/api/auth/profile")
+def update_profile(payload: ProfileUpdateRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Updates the authenticated user's profile and preferences."""
+    if payload.full_name is not None and payload.full_name.strip():
+        current_user.full_name = payload.full_name.strip()
+    if payload.phone is not None:
+        current_user.phone = payload.phone.strip()
+    if payload.avatar is not None:
+        current_user.avatar = payload.avatar.strip()
+    if payload.travel_style is not None:
+        current_user.travel_style = payload.travel_style.strip()
+    if payload.home_city is not None:
+        current_user.home_city = payload.home_city.strip()
+    if payload.emergency_contact is not None:
+        current_user.emergency_contact = payload.emergency_contact.strip()
+    if payload.medical_notes is not None:
+        current_user.medical_notes = payload.medical_notes.strip()
+    if payload.preferences is not None:
+        current_user.preferences = payload.preferences
+
+    current_user.updated_at = utc_now()
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "success": True,
+        "user": current_user.to_dict(),
+        "message": "Profile updated successfully."
+    }
+
+@app.post("/api/auth/change-password")
+def change_password(payload: ChangePasswordRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Changes the authenticated user's password."""
+    if not verify_password(payload.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password does not match.")
+    if len(payload.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters long.")
+
+    current_user.hashed_password = hash_password(payload.new_password)
+    current_user.updated_at = utc_now()
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Password changed successfully."
+    }
+
+# --- User Saved Journeys & Custom Trips ---
+
+@app.get("/api/user/saved")
+def get_user_saved_destinations(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Returns all bookmarked destinations and metadata for the authenticated user."""
+    journey = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
+    if not journey or not journey.destination_ids:
+        return {
+            "success": True,
+            "destination_ids": [],
+            "destinations": [],
+            "notes": None,
+            "travel_style": current_user.travel_style
+        }
+
+    dest_ids = journey.destination_ids or []
+    destinations = db.query(Destination).filter(Destination.id.in_(dest_ids)).all()
+    return {
+        "success": True,
+        "destination_ids": dest_ids,
+        "destinations": [d.to_dict() for d in destinations],
+        "notes": journey.notes,
+        "travel_style": journey.travel_style or current_user.travel_style
+    }
+
+@app.post("/api/user/save")
+def save_user_destinations(payload: UserSaveBookmarksRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Saves or updates the user's bookmarked destinations."""
+    journey = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
+    if journey:
+        journey.destination_ids = payload.destination_ids
+        if payload.notes is not None:
+            journey.notes = payload.notes
+        if payload.travel_style is not None:
+            journey.travel_style = payload.travel_style
+        db.commit()
+    else:
+        new_journey = SavedJourney(
+            user_id=current_user.id,
+            session_id=f"user_{current_user.id}_{int(utc_now().timestamp())}",
+            destination_ids=payload.destination_ids,
+            notes=payload.notes,
+            travel_style=payload.travel_style or current_user.travel_style
+        )
+        db.add(new_journey)
+        db.commit()
+
+    return {
+        "success": True,
+        "saved_count": len(payload.destination_ids),
+        "message": "Bookmarked destinations saved to user profile."
+    }
+
+@app.get("/api/user/trips")
+def get_user_trips(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Returns custom planned itineraries created by the authenticated user."""
+    trips = db.query(UserTrip).filter(UserTrip.user_id == current_user.id).order_by(UserTrip.created_at.desc()).all()
+    return {
+        "success": True,
+        "trips": [t.to_dict() for t in trips]
+    }
+
+@app.post("/api/user/trips")
+def create_user_trip(payload: UserTripCreateRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Creates a custom itinerary or expedition plan for the user."""
+    if not payload.title or not payload.title.strip():
+        raise HTTPException(status_code=400, detail="Trip title is required.")
+
+    trip = UserTrip(
+        user_id=current_user.id,
+        title=payload.title.strip(),
+        destination_ids=payload.destination_ids or [],
+        start_date=payload.start_date,
+        duration_days=payload.duration_days or 5,
+        travel_style=payload.travel_style or current_user.travel_style,
+        notes=payload.notes
+    )
+    db.add(trip)
+    db.commit()
+    db.refresh(trip)
+
+    return {
+        "success": True,
+        "trip": trip.to_dict(),
+        "message": f"Trip '{trip.title}' saved to your profile!"
+    }
+
+@app.delete("/api/user/trips/{trip_id}")
+def delete_user_trip(trip_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Deletes a custom trip plan belonging to the authenticated user."""
+    trip = db.query(UserTrip).filter(UserTrip.id == trip_id, UserTrip.user_id == current_user.id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found or unauthorized.")
+    db.delete(trip)
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Trip successfully deleted."
     }
 
 @app.get("/api/destinations")
@@ -506,16 +1006,28 @@ def get_all_passes(db: Session = Depends(get_db)):
     return result
 
 @app.post("/api/journey/save")
-def save_user_journey(payload: JourneySaveRequest, db: Session = Depends(get_db)):
-    """Persists user trip bookmarks and custom session configurations."""
-    existing = db.query(SavedJourney).filter(SavedJourney.session_id == payload.session_id).first()
+def save_user_journey(
+    payload: JourneySaveRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Persists user trip bookmarks for guests or authenticated users."""
+    existing = None
+    if current_user:
+        existing = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
+    if not existing:
+        existing = db.query(SavedJourney).filter(SavedJourney.session_id == payload.session_id).first()
+
     if existing:
         existing.destination_ids = payload.destination_ids
         existing.notes = payload.notes
         existing.travel_style = payload.travel_style
+        if current_user and not existing.user_id:
+            existing.user_id = current_user.id
         db.commit()
     else:
         new_journey = SavedJourney(
+            user_id=current_user.id if current_user else None,
             session_id=payload.session_id,
             destination_ids=payload.destination_ids,
             notes=payload.notes,
@@ -532,9 +1044,18 @@ def save_user_journey(payload: JourneySaveRequest, db: Session = Depends(get_db)
     }
 
 @app.get("/api/journey/{session_id}")
-def get_user_journey(session_id: str, db: Session = Depends(get_db)):
-    """Retrieves saved destinations for a given session."""
-    saved = db.query(SavedJourney).filter(SavedJourney.session_id == session_id).first()
+def get_user_journey(
+    session_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Retrieves saved destinations for a given session or authenticated user."""
+    saved = None
+    if current_user:
+        saved = db.query(SavedJourney).filter(SavedJourney.user_id == current_user.id).first()
+    if not saved:
+        saved = db.query(SavedJourney).filter(SavedJourney.session_id == session_id).first()
+
     if not saved:
         return {"session_id": session_id, "destination_ids": [], "destinations": []}
 
@@ -1397,6 +1918,30 @@ def serve_index():
         html = html.replace('</head>', injected, 1)
         return HTMLResponse(content=html, media_type="text/html")
     return {"message": "Bharat Explore API is running. Access endpoints via /api/destinations or /api/passes"}
+
+@app.get("/login")
+@app.get("/login.html")
+def serve_login():
+    login_file = BASE_DIR / "login.html"
+    if login_file.exists():
+        return FileResponse(str(login_file), media_type="text/html")
+    raise HTTPException(status_code=404, detail="Login page not found")
+
+@app.get("/register")
+@app.get("/register.html")
+def serve_register():
+    reg_file = BASE_DIR / "register.html"
+    if reg_file.exists():
+        return FileResponse(str(reg_file), media_type="text/html")
+    raise HTTPException(status_code=404, detail="Registration page not found")
+
+@app.get("/profile")
+@app.get("/profile.html")
+def serve_profile():
+    prof_file = BASE_DIR / "profile.html"
+    if prof_file.exists():
+        return FileResponse(str(prof_file), media_type="text/html")
+    raise HTTPException(status_code=404, detail="Profile page not found")
 
 @app.get("/CodeBreakerz.html")
 @app.get("/CodeBrekerz.html")

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Traveler Profile — Bharat Explore | Smart Himalayan & Pan-India Tourism</title>
+  <meta name="description" content="Create your Bharat Explore traveler profile with tailored travel personas and high-altitude emergency safety protocols.">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body id="page-register">
+  <!-- Ambient Backdrop -->
+  <div class="auth-bg-ambient">
+    <div class="auth-ambient-blur"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <header class="auth-nav">
+    <a href="/" class="auth-brand" aria-label="Bharat Explore Home">
+      <img src="assets/images/favicon.png" alt="Bharat Explore Logo">
+      <span>BHARAT <b>EXPLORE</b></span>
+    </a>
+    <div class="auth-nav-links">
+      <a href="/" class="auth-nav-link">← Back to Explorer Map</a>
+      <a href="/login" class="auth-nav-link">Already registered? Sign In →</a>
+    </div>
+  </header>
+
+  <!-- Stepper Registration Container -->
+  <main class="register-container">
+    <div class="register-card">
+      <!-- Stepper Progress Navigation -->
+      <div class="stepper-container" aria-label="Onboarding Progress">
+        <div class="stepper-track">
+          <div class="stepper-track-progress" id="stepperTrackProgress"></div>
+        </div>
+
+        <div class="step-node active" data-step="1">
+          <div class="step-circle">1</div>
+          <span class="step-label">Credentials</span>
+        </div>
+
+        <div class="step-node" data-step="2">
+          <div class="step-circle">2</div>
+          <span class="step-label">Travel Persona</span>
+        </div>
+
+        <div class="step-node" data-step="3">
+          <div class="step-circle">3</div>
+          <span class="step-label">Safety Card</span>
+        </div>
+      </div>
+
+      <!-- Alert Notification -->
+      <div class="auth-page-alert" id="registerAlert" role="alert"></div>
+
+      <!-- Stepper Form -->
+      <form id="stepperRegisterForm">
+        <!-- Hidden input for selected persona -->
+        <input type="hidden" id="selectedTravelStyle" value="Eco-Explorer">
+
+        <!-- ============================================
+             STEP 1: ACCOUNT CREDENTIALS & IDENTITY
+             ============================================ -->
+        <div class="reg-step-view active" data-step="1">
+          <div class="step-heading">
+            <h2>Step 1: Your Explorer Identity</h2>
+            <p>Set up your core credentials to access personalized routes across Indian states.</p>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="auth-input-group">
+              <label for="regFullName">Full Name *</label>
+              <input type="text" id="regFullName" required placeholder="e.g. Tenzing Norgay" autocomplete="name">
+            </div>
+            <div class="auth-input-group">
+              <label for="regEmail">Email Address *</label>
+              <input type="email" id="regEmail" required placeholder="tenzing@himalaya.org" autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="auth-input-group">
+              <label for="regPassword">Security Password *</label>
+              <input type="password" id="regPassword" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
+            </div>
+            <div class="auth-input-group">
+              <label for="regPhone">Mobile Number (Optional)</label>
+              <input type="tel" id="regPhone" placeholder="+91 98765 43210" autocomplete="tel">
+            </div>
+          </div>
+
+          <div class="step-actions-row">
+            <a href="/login" class="auth-nav-link">Already have an account? Sign In</a>
+            <button type="button" class="auth-btn-primary" data-action="next-step" style="width: auto; padding: 0 28px;">
+              <span>Continue to Travel Persona →</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================
+             STEP 2: TRAVEL PERSONA & STYLE
+             ============================================ -->
+        <div class="reg-step-view" data-step="2">
+          <div class="step-heading">
+            <h2>Step 2: Choose Your Travel Persona</h2>
+            <p>Our Bharat AI engine tailors destination recommendations based on your exploration ethos.</p>
+          </div>
+
+          <div class="persona-cards-grid">
+            <div class="persona-card selected" data-style="Eco-Explorer">
+              <span class="persona-icon">🌿</span>
+              <div class="persona-title">Eco-Explorer</div>
+              <div class="persona-desc">Zero-single-use plastics, solar homestays, and community-benefit travel.</div>
+              <div class="persona-check">✓</div>
+            </div>
+
+            <div class="persona-card" data-style="High-Altitude Trekker">
+              <span class="persona-icon">🏔️</span>
+              <div class="persona-title">High-Altitude Trekker</div>
+              <div class="persona-desc">High mountain passes, alpine lakes, and active AMS acclimatization.</div>
+              <div class="persona-check">✓</div>
+            </div>
+
+            <div class="persona-card" data-style="Cultural Heritage">
+              <span class="persona-icon">🏛️</span>
+              <div class="persona-title">Cultural Pilgrim</div>
+              <div class="persona-desc">Ancient monasteries, sacred corridors, handicraft villages, and monuments.</div>
+              <div class="persona-check">✓</div>
+            </div>
+
+            <div class="persona-card" data-style="Motorbike Adventurer">
+              <span class="persona-icon">🏍️</span>
+              <div class="persona-title">Overland Adventurer</div>
+              <div class="persona-desc">Remote high passes, expedition routes, overlanding, and rugged landscapes.</div>
+              <div class="persona-check">✓</div>
+            </div>
+
+            <div class="persona-card" data-style="Family Leisure">
+              <span class="persona-icon">👨‍👩‍👧</span>
+              <div class="persona-title">Family Leisure</div>
+              <div class="persona-desc">Accessible scenic vistas, gentle pacing, comfortable stays, and heritage gardens.</div>
+              <div class="persona-check">✓</div>
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <label for="regHomeCity">Home City & State</label>
+            <input type="text" id="regHomeCity" placeholder="e.g. New Delhi, Dehradun, Kolkata, Mumbai">
+          </div>
+
+          <div class="step-actions-row">
+            <button type="button" class="auth-btn-secondary" data-action="prev-step">← Back</button>
+            <button type="button" class="auth-btn-primary" data-action="next-step" style="width: auto; padding: 0 28px;">
+              <span>Continue to Safety Dossier →</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================
+             STEP 3: HIMALAYAN SAFETY & AMS PROTOCOL
+             ============================================ -->
+        <div class="reg-step-view" data-step="3">
+          <div class="step-heading">
+            <h2>Step 3: High-Altitude Safety & Emergency Card</h2>
+            <p>Smart India Hackathon Safety Protocol for 11,500+ ft tourism and rescue coordination.</p>
+          </div>
+
+          <div class="safety-dossier-card">
+            <div class="safety-dossier-header">
+              <span class="safety-dossier-icon">🛡️</span>
+              <div>
+                <h3>Official SIH Altitude Tourism Safety Protocol</h3>
+                <p>Recorded to expedite digital pass clearance and emergency oxygen telemetry in high mountain passes.</p>
+              </div>
+            </div>
+
+            <div class="auth-input-group">
+              <label for="regEmergency">Emergency Contact & Relationship *</label>
+              <input type="text" id="regEmergency" required placeholder="e.g. +91 91234 56789 (Father / Base Camp Lead)">
+            </div>
+
+            <div class="auth-input-group">
+              <label for="regMedical">Medical & Altitude Notes (AMS History, Asthma, Allergies)</label>
+              <input type="text" id="regMedical" placeholder="e.g. Carries Diamox, mild asthma, normal resting SpO2: 98%">
+            </div>
+
+            <div class="eco-pledge-box">
+              <input type="checkbox" id="ecoPledge" required checked>
+              <label for="ecoPledge">
+                <strong>Himalayan & Pan-India Eco-Pledge:</strong> I commit to carrying no single-use plastics, leaving zero trace in fragile high-altitude ecosystems, and honoring local Himalayan monastic traditions.
+              </label>
+            </div>
+          </div>
+
+          <div class="step-actions-row">
+            <button type="button" class="auth-btn-secondary" data-action="prev-step">← Back</button>
+            <button type="submit" class="auth-btn-primary" id="btnCompleteRegistration" style="width: auto; padding: 0 32px;">
+              <span>Complete Profile & Launch Dashboard ✦</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>
