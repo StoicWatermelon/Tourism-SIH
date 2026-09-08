@@ -1170,7 +1170,7 @@ body {
     grid-template-columns: 1fr;
   }
   .register-card {
-    padding: 28px 20px;
+    padding: 28px 16px;
   }
   .profile-stats-ribbon {
     grid-template-columns: 1fr;
@@ -1179,6 +1179,18 @@ body {
     grid-template-columns: 1fr;
   }
   .auth-nav {
-    padding: 14px 20px;
+    padding: max(14px, env(safe-area-inset-top)) 16px 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .login-form-panel {
+    padding: 24px 12px;
+  }
+  .register-card {
+    padding: 20px 12px;
+  }
+  .auth-brand span {
+    font-size: 12px;
   }
 }

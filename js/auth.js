@@ -8,7 +8,8 @@
 (function () {
   "use strict";
 
-  const API_BASE = window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost")
+  // Protocol-aware API base: allows mobile devices accessing over LAN (Wi-Fi), ngrok, or production domains to hit the backend directly
+  const API_BASE = window.location.protocol.startsWith("http")
     ? ""
     : "http://127.0.0.1:8000";
 
@@ -16,6 +17,16 @@
   const USER_KEY = "bharat_auth_user";
 
   const AuthService = {
+    // --- Path & Route Resolution ---
+    resolvePath(route) {
+      if (window.location.protocol.startsWith("http")) {
+        return route;
+      }
+      const inHtml = window.location.pathname.includes("/html/") || window.location.pathname.endsWith(".html");
+      const name = route.replace(/^\//, "") || "home";
+      return inHtml ? `${name}.html` : `html/${name}.html`;
+    },
+
     // --- Token & User State Management ---
 
     getToken() {
@@ -68,14 +79,15 @@
       const authenticated = this.isAuthenticated();
       if (pageType === "guest-only" && authenticated) {
         // Already logged in, redirect away from login/register
-        const dest = this.getRedirectUrl("/profile");
+        const dest = this.getRedirectUrl(this.resolvePath("/profile"));
         window.location.href = dest;
         return false;
       }
       if (pageType === "auth-required" && !authenticated) {
         // Not logged in, redirect to login with return path
         const currentPath = window.location.pathname + window.location.search;
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+        const loginUrl = this.resolvePath("/login");
+        window.location.href = `${loginUrl}?redirect=${encodeURIComponent(currentPath)}`;
         return false;
       }
       return true;
@@ -714,7 +726,7 @@
             <span class="user-chip-name">${user.fullName ? user.fullName.split(" ")[0] : "Traveler"}</span>
           `;
           authBtn.setAttribute("title", `Traveler Profile (${user.fullName})`);
-          authBtn.onclick = () => { window.location.href = "/profile"; };
+          authBtn.onclick = () => { window.location.href = AuthService.resolvePath("/profile"); };
         } else {
           authBtn.classList.remove("logged-in");
           authBtn.innerHTML = `
@@ -722,7 +734,7 @@
             <span class="auth-label">Sign In</span>
           `;
           authBtn.setAttribute("title", "Sign In to Bharat Explore");
-          authBtn.onclick = () => { window.location.href = "/login"; };
+          authBtn.onclick = () => { window.location.href = AuthService.resolvePath("/login"); };
         }
       };
 

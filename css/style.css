@@ -2847,9 +2847,10 @@ button {
 
 @media (max-width: 1120px) {
   .nav {
-    top: 10px;
+    top: max(10px, env(safe-area-inset-top));
     width: calc(100% - 24px);
-    height: 56px;
+    min-height: 56px;
+    height: auto;
     padding: 0 12px 0 18px;
     border-radius: 999px;
   }
@@ -2858,27 +2859,37 @@ button {
   }
   .nav-actions {
     margin-left: auto;
-    gap: 6px;
+    gap: 8px;
   }
   .nav-actions button,
   .nav-actions select {
-    height: 34px;
+    min-height: 40px;
+    height: 40px;
   }
   #searchBtn, .nav-toggle {
-    width: 34px;
-    height: 34px;
+    min-width: 40px;
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
   }
   .nav-toggle {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
     margin-left: 4px;
+    touch-action: manipulation;
   }
   .nav.open {
     border-radius: 24px;
     height: auto;
-    padding: 12px 18px 20px;
+    max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 18px max(20px, env(safe-area-inset-bottom));
     flex-wrap: wrap;
     background: rgba(8, 14, 24, 0.98);
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.7);
   }
   .nav.open nav {
     order: 5;
@@ -2889,16 +2900,22 @@ button {
     margin-top: 14px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    gap: 4px;
+    gap: 6px;
   }
   .nav.open nav a {
-    padding: 9px 12px;
-    border-radius: 10px;
-    font-size: 13.5px;
+    padding: 12px 14px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
     color: #e4e9ed;
+    touch-action: manipulation;
   }
-  .nav.open nav a:hover {
-    background: rgba(255, 255, 255, 0.08);
+  .nav.open nav a:hover,
+  .nav.open nav a:active {
+    background: rgba(255, 255, 255, 0.1);
     color: var(--gold-pop);
   }
   .nav.open nav a::after {
@@ -2953,6 +2970,39 @@ button {
   }
   .culture-image {
     height: 280px;
+  }
+}
+
+/* Compact Mobile Resolutions (iPhone SE, Galaxy S compacts, 320px - 375px) */
+@media (max-width: 380px) {
+  .nav {
+    padding: 0 8px 0 12px;
+    width: calc(100% - 16px);
+  }
+  .brand {
+    font-size: 11px;
+    gap: 6px;
+  }
+  .brand-logo {
+    width: 28px;
+    height: 28px;
+  }
+  .nav-actions {
+    gap: 4px;
+  }
+  .nav-actions button,
+  .nav-actions select {
+    min-height: 38px;
+    height: 38px;
+    padding: 0 8px;
+  }
+  #searchBtn, .nav-toggle {
+    min-width: 38px;
+    width: 38px;
+    height: 38px;
+  }
+  .category-grid {
+    grid-template-columns: 1fr;
   }
 }
 

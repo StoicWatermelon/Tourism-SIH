@@ -647,17 +647,27 @@
     grid-template-columns: 1fr;
   }
   .india-map {
-    height: 520px;
-    min-height: 520px;
+    height: clamp(380px, 52vh, 520px);
+    min-height: 380px;
   }
 }
 
 @media (max-width: 600px) {
   .india-map {
-    height: 440px;
-    min-height: 440px;
+    height: clamp(320px, 48vh, 420px);
+    min-height: 320px;
   }
   .state-panel {
-    padding: 20px;
+    padding: 16px 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .india-map {
+    height: 300px;
+    min-height: 300px;
+  }
+  .map-header h1 {
+    font-size: 24px;
   }
 }

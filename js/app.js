@@ -765,12 +765,13 @@ const toast = (text) => {
 };
 
 // --- Backend API Integration ---
+const APP_API_ORIGIN = window.location.protocol.startsWith("http") ? "" : "http://127.0.0.1:8000";
 
 async function fetchDestinationsFromAPI() {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 600);
-    const res = await fetch("http://127.0.0.1:8000/api/destinations", { signal: controller.signal });
+    const timeoutId = setTimeout(() => controller.abort(), 800);
+    const res = await fetch(`${APP_API_ORIGIN}/api/destinations`, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (res.ok) {
       const data = await res.json();
@@ -787,7 +788,7 @@ async function fetchDestinationsFromAPI() {
 
 async function fetchPassesFromAPI() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/passes");
+    const res = await fetch(`${APP_API_ORIGIN}/api/passes`);
     if (res.ok) return await res.json();
   } catch (err) {
     console.warn("[API] Passes API unreachable; using simulated pass telemetry.");
@@ -839,9 +840,7 @@ async function syncSavedToBackend(savedIds) {
       ? window.BharatAuth.getAuthHeaders()
       : { "Content-Type": "application/json" };
 
-    const url = (window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost"))
-      ? "/api/journey/save"
-      : "http://127.0.0.1:8000/api/journey/save";
+    const url = `${APP_API_ORIGIN}/api/journey/save`;
 
     await fetch(url, {
       method: "POST",
@@ -1496,24 +1495,46 @@ async function init() {
     if (nav) nav.classList.toggle("scrolled", window.scrollY > 25);
   }, { passive: true });
 
-  // Mobile menu toggle
+  // Mobile menu toggle with touch outside & keyboard dismiss
   const navToggle = $(".nav-toggle");
   if (navToggle) {
-    navToggle.onclick = () => {
+    const closeMobileNav = () => {
+      const nav = $(".nav");
+      if (nav && nav.classList.contains("open")) {
+        nav.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      }
+    };
+
+    navToggle.onclick = (e) => {
+      e.stopPropagation();
       const nav = $(".nav");
       nav.classList.toggle("open");
       navToggle.setAttribute("aria-expanded", nav.classList.contains("open"));
     };
 
+    // Close on any link click
     $$(".nav nav a").forEach(a => {
-      a.addEventListener("click", () => {
-        const nav = $(".nav");
-        if (nav && nav.classList.contains("open")) {
-          nav.classList.remove("open");
-          navToggle.setAttribute("aria-expanded", "false");
-        }
-      });
+      a.addEventListener("click", closeMobileNav);
     });
+
+    // Close when tapping outside the open nav on mobile/tablets
+    document.addEventListener("click", (e) => {
+      const nav = $(".nav");
+      if (nav && nav.classList.contains("open") && !nav.contains(e.target)) {
+        closeMobileNav();
+      }
+    });
+
+    // Close with Escape key for accessibility
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMobileNav();
+    });
+
+    // Close if orientation changes or screen resizes above mobile breakpoint
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 1120) closeMobileNav();
+    }, { passive: true });
   }
 
   // Itinerary form submission

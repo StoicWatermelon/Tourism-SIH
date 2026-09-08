@@ -1,0 +1,32 @@
+# ==============================================================================
+# BHARAT EXPLORE — Search Engine Crawler Directives (SIH 2026)
+# Standardized per robots.txt protocol (RFC 9309)
+# ==============================================================================
+
+User-agent: *
+Allow: /
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+Allow: /src/
+Allow: /html/
+
+# Prevent crawlers from indexing dynamic internal API endpoints and session states
+Disallow: /api/
+Disallow: /api/*
+
+# Explicit Crawler Identity Rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Canonical XML Sitemap Declaration
+Sitemap: https://bharatexplore.gov.in/sitemap.xml

@@ -2243,66 +2243,79 @@ def serve_html_file(filename: str, inject_carto: bool = False):
 
 @app.get("/")
 @app.get("/home")
+@app.get("/home/")
 @app.get("/home.html")
 def serve_home():
     return serve_html_file("home.html")
 
 @app.get("/index.html")
 @app.get("/overview")
+@app.get("/overview/")
 def serve_index():
     return serve_html_file("index.html", inject_carto=True)
 
 @app.get("/explore")
+@app.get("/explore/")
 @app.get("/explore.html")
 def serve_explore():
     return serve_html_file("explore.html")
 
 @app.get("/circuits")
+@app.get("/circuits/")
 @app.get("/circuits.html")
 def serve_circuits():
     return serve_html_file("circuits.html")
 
 @app.get("/map")
+@app.get("/map/")
 @app.get("/map.html")
 def serve_map():
     return serve_html_file("map.html", inject_carto=True)
 
 @app.get("/planner")
+@app.get("/planner/")
 @app.get("/planner.html")
 def serve_planner():
     return serve_html_file("planner.html")
 
 @app.get("/ai")
+@app.get("/ai/")
 @app.get("/ai.html")
 def serve_ai():
     return serve_html_file("ai.html")
 
 @app.get("/responsible")
+@app.get("/responsible/")
 @app.get("/responsible.html")
 def serve_responsible():
     return serve_html_file("responsible.html")
 
 @app.get("/culture")
+@app.get("/culture/")
 @app.get("/culture.html")
 def serve_culture():
     return serve_html_file("culture.html")
 
 @app.get("/food")
+@app.get("/food/")
 @app.get("/food.html")
 def serve_food():
     return serve_html_file("food.html")
 
 @app.get("/login")
+@app.get("/login/")
 @app.get("/login.html")
 def serve_login():
     return serve_html_file("login.html")
 
 @app.get("/register")
+@app.get("/register/")
 @app.get("/register.html")
 def serve_register():
     return serve_html_file("register.html")
 
 @app.get("/profile")
+@app.get("/profile/")
 @app.get("/profile.html")
 def serve_profile():
     return serve_html_file("profile.html")
@@ -2310,9 +2323,33 @@ def serve_profile():
 @app.get("/CodeBreakerz.html")
 @app.get("/CodeBrekerz.html")
 @app.get("/codebreakerz")
+@app.get("/codebreakerz/")
 @app.get("/team")
+@app.get("/team/")
 def serve_codebreakerz():
     return serve_html_file("CodeBreakerz.html")
+
+@app.get("/robots.txt")
+def serve_robots():
+    robots_file = BASE_DIR / "robots.txt"
+    if robots_file.exists():
+        return FileResponse(str(robots_file), media_type="text/plain; charset=utf-8")
+    raise HTTPException(status_code=404, detail="robots.txt not found")
+
+@app.get("/sitemap.xml")
+def serve_sitemap():
+    sitemap_file = BASE_DIR / "sitemap.xml"
+    if sitemap_file.exists():
+        return FileResponse(str(sitemap_file), media_type="application/xml; charset=utf-8")
+    raise HTTPException(status_code=404, detail="sitemap.xml not found")
+
+@app.get("/manifest.json")
+@app.get("/site.webmanifest")
+def serve_manifest():
+    manifest_file = BASE_DIR / "manifest.json"
+    if manifest_file.exists():
+        return FileResponse(str(manifest_file), media_type="application/manifest+json; charset=utf-8")
+    raise HTTPException(status_code=404, detail="manifest.json not found")
 
 @app.get("/favicon.ico")
 @app.get("/favicon.png")

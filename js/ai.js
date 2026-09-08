@@ -12,6 +12,7 @@
   const $$ = window.$$ || (s => [...document.querySelectorAll(s)]);
   const toast = (...args) => (window.toast ? window.toast(...args) : console.log(...args));
   const updateResponsibleScore = (...args) => (window.updateResponsibleScore ? window.updateResponsibleScore(...args) : null);
+  const AI_API_ORIGIN = window.location.protocol.startsWith("http") ? "" : "http://127.0.0.1:8000";
 
   // Active conversational state tracking
   let activeDestination = null;
@@ -413,7 +414,7 @@
         active_destination: activeDestination
       };
 
-      const res = await fetch("http://127.0.0.1:8000/api/chat", {
+      const res = await fetch(`${AI_API_ORIGIN}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -566,7 +567,7 @@
       passData = await window.fetchPassesFromAPI();
     } else {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/passes");
+        const res = await fetch(`${AI_API_ORIGIN}/api/passes`);
         if (res.ok) passData = await res.json();
       } catch (err) {
         passData = {
