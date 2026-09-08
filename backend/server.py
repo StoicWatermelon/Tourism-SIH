@@ -409,9 +409,11 @@ INITIAL_PASSES = [
 ]
 
 def seed_supabase_tables():
-    """Seeds initial destinations and pass advisories into Supabase tables if empty."""
+    """Seeds initial destinations and pass advisories into Supabase tables if empty.
+    Callable on-demand; NOT executed on boot to keep startup instantaneous.
+    """
     if not is_supabase_configured():
-        return
+        return False
     try:
         d_res = supabase.table("destinations").select("id", count="exact").limit(1).execute()
         if not d_res.data or (hasattr(d_res, "count") and d_res.count == 0):
@@ -427,9 +429,9 @@ def seed_supabase_tables():
             print("[Supabase] Seeded pass_advisories table.")
     except Exception as e:
         print(f"[Supabase] Pass advisories seeding note: {e}")
+    return True
 
-# Run startup seed
-seed_supabase_tables()
+# Automatic boot-time table queries removed: boot is now 100% instantaneous with zero remote network blocking.
 
 
 # FastAPI Application
@@ -447,6 +449,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Development No-Cache Middleware for instant CSS and JS reload
+@app.middleware("http")
+async def no_cache_dev_middleware(request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if any(path.endswith(ext) for ext in [".css", ".js", ".html"]) or path in ["/", "/index.html"]:
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
 
 # Initialize Gemini Client
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
@@ -1101,6 +1114,21 @@ def delete_user_trip(trip_id: str, current_user: dict = Depends(get_current_user
 
 # --- Resource Modules: Destinations, Mountain Passes & Journey Bookmarks ---
 
+_destinations_table_available: bool = True
+_pass_advisories_table_available: bool = True
+
+@app.post("/api/admin/seed-tables")
+def trigger_seed_tables():
+    """Manually triggers table seeding into Supabase Cloud on-demand (never runs at boot)."""
+    global _destinations_table_available, _pass_advisories_table_available
+    success = seed_supabase_tables()
+    _destinations_table_available = True
+    _pass_advisories_table_available = True
+    return {
+        "status": "ok" if success else "error",
+        "message": "Manual table seed completed."
+    }
+
 @app.get("/api/destinations")
 def get_destinations(
     category: Optional[str] = Query(None, description="Filter by category e.g. mountains, culture, adventure"),
@@ -1109,29 +1137,34 @@ def get_destinations(
     search: Optional[str] = Query(None, description="Search term across name, location, and description")
 ):
     """Returns curated destinations directly from Supabase table with high-speed query filtering."""
-    try:
-        query = supabase.table("destinations").select("*")
-        if category:
-            query = query.ilike("category", f"%{category}%")
-        if state:
-            query = query.ilike("state", f"%{state}%")
-        if emotion:
-            query = query.ilike("emotion", f"%{emotion}%")
+    global _destinations_table_available
+    if _destinations_table_available and is_supabase_configured():
+        try:
+            query = supabase.table("destinations").select("*")
+            if category:
+                query = query.ilike("category", f"%{category}%")
+            if state:
+                query = query.ilike("state", f"%{state}%")
+            if emotion:
+                query = query.ilike("emotion", f"%{emotion}%")
 
-        res = query.execute()
-        if res and res.data and len(res.data) > 0:
-            results = res.data
-            if search:
-                s = search.lower()
-                results = [
-                    d for d in results
-                    if s in d.get("name", "").lower()
-                    or s in d.get("location", "").lower()
-                    or s in d.get("desc", "").lower()
-                ]
-            return results
-    except Exception as e:
-        print(f"[Supabase] destinations query note: {e}")
+            res = query.execute()
+            if res and res.data and len(res.data) > 0:
+                results = res.data
+                if search:
+                    s = search.lower()
+                    results = [
+                        d for d in results
+                        if s in d.get("name", "").lower()
+                        or s in d.get("location", "").lower()
+                        or s in d.get("desc", "").lower()
+                    ]
+                return results
+        except Exception as e:
+            err_str = str(e)
+            if "PGRST205" in err_str or "Could not find the table" in err_str:
+                _destinations_table_available = False
+            print(f"[Supabase] destinations query note: {e}")
 
     # Fallback to rich built-in dataset to maintain instant visual interface
     filtered = INITIAL_DESTINATIONS
@@ -1154,12 +1187,16 @@ def get_destinations(
 @app.get("/api/destinations/{dest_id}")
 def get_destination_detail(dest_id: str):
     """Retrieves destination detail from Supabase table."""
-    try:
-        res = supabase.table("destinations").select("*").eq("id", dest_id).single().execute()
-        if res and res.data:
-            return res.data
-    except Exception:
-        pass
+    global _destinations_table_available
+    if _destinations_table_available and is_supabase_configured():
+        try:
+            res = supabase.table("destinations").select("*").eq("id", dest_id).single().execute()
+            if res and res.data:
+                return res.data
+        except Exception as e:
+            err_str = str(e)
+            if "PGRST205" in err_str or "Could not find the table" in err_str:
+                _destinations_table_available = False
 
     for d in INITIAL_DESTINATIONS:
         if d["id"] == dest_id:
@@ -1169,22 +1206,27 @@ def get_destination_detail(dest_id: str):
 @app.get("/api/passes")
 def get_all_passes():
     """Returns live mountain pass telemetry keyed by pass name directly from Supabase."""
+    global _pass_advisories_table_available
     result = {}
-    try:
-        res = supabase.table("pass_advisories").select("*").execute()
-        if res and res.data and len(res.data) > 0:
-            for p in res.data:
-                result[p.get("name")] = {
-                    "status": p.get("status"),
-                    "altitude": p.get("altitude"),
-                    "condition": p.get("condition"),
-                    "safe": p.get("safe", True),
-                    "temperature": p.get("temperature", "-2°C"),
-                    "updated": p.get("updated") or "Live"
-                }
-            return result
-    except Exception as e:
-        print(f"[Supabase] pass_advisories query note: {e}")
+    if _pass_advisories_table_available and is_supabase_configured():
+        try:
+            res = supabase.table("pass_advisories").select("*").execute()
+            if res and res.data and len(res.data) > 0:
+                for p in res.data:
+                    result[p.get("name")] = {
+                        "status": p.get("status"),
+                        "altitude": p.get("altitude"),
+                        "condition": p.get("condition"),
+                        "safe": p.get("safe", True),
+                        "temperature": p.get("temperature", "-2°C"),
+                        "updated": p.get("updated") or "Live"
+                    }
+                return result
+        except Exception as e:
+            err_str = str(e)
+            if "PGRST205" in err_str or "Could not find the table" in err_str:
+                _pass_advisories_table_available = False
+            print(f"[Supabase] pass_advisories query note: {e}")
 
     for p in INITIAL_PASSES:
         result[p["name"]] = {
@@ -2170,59 +2212,107 @@ async def chat_stream_endpoint(req: ChatRequest):
     return StreamingResponse(token_generator(), headers=headers)
 
 # Static file serving to allow opening web app directly from FastAPI server
+HTML_DIR = BASE_DIR / "html"
+
 if (BASE_DIR / "css").exists():
     app.mount("/css", StaticFiles(directory=str(BASE_DIR / "css")), name="css")
 if (BASE_DIR / "js").exists():
     app.mount("/js", StaticFiles(directory=str(BASE_DIR / "js")), name="js")
 if (BASE_DIR / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(BASE_DIR / "assets")), name="assets")
+if (BASE_DIR / "src").exists():
+    app.mount("/src", StaticFiles(directory=str(BASE_DIR / "src")), name="src")
+if HTML_DIR.exists():
+    app.mount("/html", StaticFiles(directory=str(HTML_DIR)), name="html")
+
+def serve_html_file(filename: str, inject_carto: bool = False):
+    from fastapi.responses import HTMLResponse
+    target_file = HTML_DIR / filename
+    if not target_file.exists():
+        target_file = BASE_DIR / filename
+    if target_file.exists():
+        if inject_carto:
+            reload_environment()
+            carto_key = os.getenv("CARTO_API_KEY", "YOUR_CARTO_API_KEY_HERE").strip()
+            html = target_file.read_text(encoding="utf-8")
+            injected = f'<script>window.CARTO_API_KEY = "{carto_key}";</script>\n</head>'
+            html = html.replace('</head>', injected, 1)
+            return HTMLResponse(content=html, media_type="text/html")
+        return FileResponse(str(target_file), media_type="text/html")
+    raise HTTPException(status_code=404, detail=f"Page {filename} not found")
 
 @app.get("/")
+@app.get("/home")
+@app.get("/home.html")
+def serve_home():
+    return serve_html_file("home.html")
+
+@app.get("/index.html")
+@app.get("/overview")
 def serve_index():
-    from fastapi.responses import HTMLResponse
-    index_file = BASE_DIR / "index.html"
-    if index_file.exists():
-        reload_environment()
-        carto_key = os.getenv("CARTO_API_KEY", "YOUR_CARTO_API_KEY_HERE").strip()
-        html = index_file.read_text(encoding="utf-8")
-        injected = f'<script>window.CARTO_API_KEY = "{carto_key}";</script>\n</head>'
-        html = html.replace('</head>', injected, 1)
-        return HTMLResponse(content=html, media_type="text/html")
-    return {"message": "Bharat Explore API is running. Access endpoints via /api/destinations or /api/passes"}
+    return serve_html_file("index.html", inject_carto=True)
+
+@app.get("/explore")
+@app.get("/explore.html")
+def serve_explore():
+    return serve_html_file("explore.html")
+
+@app.get("/circuits")
+@app.get("/circuits.html")
+def serve_circuits():
+    return serve_html_file("circuits.html")
+
+@app.get("/map")
+@app.get("/map.html")
+def serve_map():
+    return serve_html_file("map.html", inject_carto=True)
+
+@app.get("/planner")
+@app.get("/planner.html")
+def serve_planner():
+    return serve_html_file("planner.html")
+
+@app.get("/ai")
+@app.get("/ai.html")
+def serve_ai():
+    return serve_html_file("ai.html")
+
+@app.get("/responsible")
+@app.get("/responsible.html")
+def serve_responsible():
+    return serve_html_file("responsible.html")
+
+@app.get("/culture")
+@app.get("/culture.html")
+def serve_culture():
+    return serve_html_file("culture.html")
+
+@app.get("/food")
+@app.get("/food.html")
+def serve_food():
+    return serve_html_file("food.html")
 
 @app.get("/login")
 @app.get("/login.html")
 def serve_login():
-    login_file = BASE_DIR / "login.html"
-    if login_file.exists():
-        return FileResponse(str(login_file), media_type="text/html")
-    raise HTTPException(status_code=404, detail="Login page not found")
+    return serve_html_file("login.html")
 
 @app.get("/register")
 @app.get("/register.html")
 def serve_register():
-    reg_file = BASE_DIR / "register.html"
-    if reg_file.exists():
-        return FileResponse(str(reg_file), media_type="text/html")
-    raise HTTPException(status_code=404, detail="Registration page not found")
+    return serve_html_file("register.html")
 
 @app.get("/profile")
 @app.get("/profile.html")
 def serve_profile():
-    prof_file = BASE_DIR / "profile.html"
-    if prof_file.exists():
-        return FileResponse(str(prof_file), media_type="text/html")
-    raise HTTPException(status_code=404, detail="Profile page not found")
+    return serve_html_file("profile.html")
 
 @app.get("/CodeBreakerz.html")
 @app.get("/CodeBrekerz.html")
 @app.get("/codebreakerz")
 @app.get("/team")
 def serve_codebreakerz():
-    cb_file = BASE_DIR / "CodeBreakerz.html"
-    if cb_file.exists():
-        return FileResponse(str(cb_file), media_type="text/html")
-    raise HTTPException(status_code=404, detail="CodeBreakerz document not found")
+    return serve_html_file("CodeBreakerz.html")
 
 @app.get("/favicon.ico")
 @app.get("/favicon.png")

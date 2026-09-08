@@ -14,12 +14,15 @@
     en: {
       // Navbar
       brand: "BHARAT <b>EXPLORE</b>",
-      nav_explore: "Explore",
-      nav_circuits: "3D Portals",
+      nav_home: "Home",
+      nav_explore: "Destinations",
+      nav_circuits: "Portals",
       nav_map: "State Map",
-      nav_planner: "Plan Journey",
+      nav_planner: "Itinerary",
       nav_ai: "Bharat AI",
-      nav_responsible: "Responsible Travel",
+      nav_responsible: "Eco Travel",
+      nav_culture: "Culture",
+      nav_food: "Cuisine",
       nav_search: "Global Search",
       nav_offline_pass: "🛡️ Offline Pass",
       nav_saved_title: "My Journey Bookmarks",
@@ -292,12 +295,15 @@
     hi: {
       // Navbar
       brand: "भारत <b>एक्सप्लोर</b>",
-      nav_explore: "अन्वेषण करें",
-      nav_circuits: "3D परिपथ",
-      nav_map: "राज्य मानचित्र",
+      nav_home: "मुख्य पृष्ठ",
+      nav_explore: "गंतव्य स्थल",
+      nav_circuits: "पोर्टल्स",
+      nav_map: "मानचित्र",
       nav_planner: "यात्रा योजना",
       nav_ai: "भारत AI",
-      nav_responsible: "जिम्मेदार पर्यटन",
+      nav_responsible: "इको ट्रैवल",
+      nav_culture: "संस्कृति",
+      nav_food: "व्यंजन",
       nav_search: "खोजें",
       nav_offline_pass: "🛡️ ऑफलाइन पास",
       nav_saved_title: "मेरी सुरक्षित यात्रा",
@@ -570,12 +576,15 @@
     bn: {
       // Navbar
       brand: "ভারত <b>এক্সপ্লোর</b>",
-      nav_explore: "অন্বেষণ করুন",
-      nav_circuits: "3D পোর্টাল",
-      nav_map: "রাজ্য মানচিত্র",
+      nav_home: "হোম",
+      nav_explore: "গন্তব্যসমূহ",
+      nav_circuits: "পোর্টাল",
+      nav_map: "মানচিত্র",
       nav_planner: "ভ্রমণ পরিকল্পনা",
       nav_ai: "ভারত AI",
-      nav_responsible: "দায়িত্বশীল পর্যটন",
+      nav_responsible: "ইকো ট্রাভেল",
+      nav_culture: "সংস্কৃতি",
+      nav_food: "খাবার",
       nav_search: "অনুসন্ধান",
       nav_offline_pass: "🛡️ অফলাইন পাস",
       nav_saved_title: "আমার সংরক্ষিত ভ্রমণ",
@@ -996,7 +1005,9 @@
 
   function t(key, lang = currentLang) {
     const bundle = TRANSLATIONS[lang] || TRANSLATIONS.en;
-    return bundle[key] || TRANSLATIONS.en[key] || key;
+    if (bundle && bundle[key] !== undefined) return bundle[key];
+    if (TRANSLATIONS.en && TRANSLATIONS.en[key] !== undefined) return TRANSLATIONS.en[key];
+    return null;
   }
 
   function setLanguage(lang) {
@@ -1010,7 +1021,7 @@
     $$("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
       const val = t(key, lang);
-      if (val) {
+      if (val && val !== key) {
         if (el.innerHTML.includes("<") || val.includes("<")) {
           el.innerHTML = val;
         } else {

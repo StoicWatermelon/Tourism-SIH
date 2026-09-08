@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bharat Explore — Venture without edges. Uncover India's living corridors and smart eco-tourism itineraries.">
+  <meta name="theme-color" content="#000000">
+  <title>Home — Bharat Explore | Venture Without Edges</title>
+
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="shortcut icon" href="assets/images/favicon.png">
+  <link rel="apple-touch-icon" href="assets/images/favicon.png">
+
+  <!-- Typography: Inter & Project Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Project Styles & Liquid Glass -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="src/index.css">
+
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* GSAP Entrance Animation Initial States */
+    .hero-typography-container {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    .bottom-block-container {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    /* Smooth Action Button Glow */
+    .cta-plan-btn {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cta-plan-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 32px 4px rgba(255, 255, 255, 0.2);
+    }
+    .cta-plan-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Fixed Top Navbar Glass Styling for Home */
+    .cinematic-header {
+      background: rgba(7, 23, 17, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+
+  <!-- GSAP Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="min-h-screen bg-black text-white overflow-x-hidden relative select-none" style="font-family: 'Inter', sans-serif;">
+
+  <!-- Global Header / Institutional Navbar -->
+  <header class="nav cinematic-header" id="navbar">
+    <a class="brand" href="/" aria-label="Bharat Explore home">
+      <img src="assets/images/favicon.png" alt="Bharat Explore Logo" class="brand-logo" width="34" height="34">
+      <span data-i18n="brand">BHARAT <b>EXPLORE</b></span>
+    </a>
+    <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+    <nav id="mainNav">
+      <a href="/" class="active" data-i18n="nav_home">Home</a>
+      <a href="html/explore.html" data-i18n="nav_explore">Destinations</a>
+      <a href="html/circuits.html" data-i18n="nav_circuits">Portals</a>
+      <a href="html/map.html" data-i18n="nav_map">State Map</a>
+      <a href="html/planner.html" data-i18n="nav_planner">Itinerary</a>
+      <a href="html/ai.html" data-i18n="nav_ai">Bharat AI</a>
+      <a href="html/responsible.html" data-i18n="nav_responsible">Eco Travel</a>
+      <a href="html/culture.html" data-i18n="nav_culture">Culture</a>
+      <a href="html/food.html" data-i18n="nav_food">Cuisine</a>
+    </nav>
+    <div class="nav-actions">
+      <button id="searchBtn" title="Global Search" aria-label="Global Search" data-i18n-title="nav_search">⌕</button>
+      <button id="fieldKitQuickBtn" title="Offline Travel Field Kit" aria-label="Offline Travel Field Kit" class="field-kit-badge-btn" data-i18n="nav_offline_pass">
+        🛡️ Offline Pass
+      </button>
+      <button id="savedBtn" title="My Journey Bookmarks" aria-label="My Journey Bookmarks" class="has-badge" data-i18n-title="nav_saved_title">
+        ♥ <span class="badge-count" id="navSavedCount">0</span>
+      </button>
+      <button id="navAuthBtn" class="nav-auth-btn" title="Sign In or View Profile" aria-label="Sign In or View Profile">
+        <span class="auth-icon">👤</span>
+        <span class="auth-label">Sign In</span>
+      </button>
+      <select id="language" aria-label="Language">
+        <option value="en">EN</option>
+        <option value="hi">हिं</option>
+        <option value="bn">বাং</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Video Background Layer with Scale and Parallax Container -->
+  <div id="videoParallaxContainer" class="fixed inset-0 z-0 w-full h-full scale-[1.08] origin-center pointer-events-none">
+    <video
+      id="heroVideo"
+      class="w-full h-full object-cover"
+      src="assets/videos/upscaled-video.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+    ></video>
+    <!-- Cinematic Vignette Mesh Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/85"></div>
+  </div>
+
+  <!-- Hero Typography (Fixed, top: 120px, z-20, centered) -->
+  <div id="heroTypography" class="hero-typography-container fixed top-[120px] left-0 right-0 z-20 flex flex-col items-center justify-center text-center px-4 pointer-events-none">
+    <h1 style="font-size: clamp(40px, 5.4vw, 72px); line-height: 1.1; letter-spacing: -0.02em; font-family: 'Inter', sans-serif;" class="m-0 p-0 font-normal">
+      <span class="block text-white font-medium drop-shadow-md">
+        Venture without edges.
+      </span>
+      <span class="block font-normal mt-1 drop-shadow-sm" style="color: rgba(255, 255, 255, 0.55);">
+        Uncover with keen instinct.
+      </span>
+    </h1>
+  </div>
+
+  <!-- Bottom Block (Fixed bottom-14, z-20, flex-col items-center gap-6) -->
+  <div id="bottomBlock" class="bottom-block-container fixed bottom-14 left-0 right-0 z-20 flex flex-col items-center gap-6 px-4 text-center">
+    <!-- Subtitle Paragraph -->
+    <p class="max-w-[620px] text-[15px] leading-relaxed m-0">
+      <span class="text-white">
+        Our smart itineraries shape around you — your rhythm, your vibe, your hunger for adventure.
+      </span>
+      <span style="color: rgba(255, 255, 255, 0.55);">
+        Each getaway is tailored, seamless, and wholly yours.
+      </span>
+    </p>
+
+    <!-- Action Button -->
+    <div>
+      <a
+        href="html/planner.html"
+        class="cta-plan-btn inline-block bg-white text-black text-[15px] font-medium rounded-full px-8 py-3.5 cursor-pointer no-underline"
+      >
+        Plan my escape today
+      </a>
+    </div>
+
+    <!-- Security Badge Row with Lucide Lock Icon -->
+    <div class="flex items-center gap-2">
+      <!-- Lucide Lock SVG (size=13, strokeWidth=1.5) -->
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        style="color: rgba(255, 255, 255, 0.7);"
+      >
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      <span class="text-[11px] font-medium tracking-[0.14em] uppercase" style="color: rgba(255, 255, 255, 0.7);">
+        SECURE BY DESIGN. ZERO DATA LEAKS.
+      </span>
+    </div>
+  </div>
+
+  <!-- GSAP Motion & Interaction Engine -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroVideo = document.getElementById('heroVideo');
+      const videoContainer = document.getElementById('videoParallaxContainer');
+      const heroTypography = document.getElementById('heroTypography');
+      const bottomBlock = document.getElementById('bottomBlock');
+
+      // 1. Programmatic 1.25x Playback Rate on metadata load
+      if (heroVideo) {
+        const setRate = () => { heroVideo.playbackRate = 1.25; };
+        if (heroVideo.readyState >= 1) {
+          setRate();
+        } else {
+          heroVideo.addEventListener('loadedmetadata', setRate);
+        }
+      }
+
+      // 2. On-mount GSAP Entrance Transitions
+      if (typeof gsap !== 'undefined') {
+        gsap.to(heroTypography, {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: 'power3.out'
+        });
+
+        gsap.to(bottomBlock, {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          delay: 0.35,
+          ease: 'power3.out'
+        });
+
+        // 3. Mouse Parallax GSAP lerp loop on requestAnimationFrame
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+          const cx = window.innerWidth / 2;
+          const cy = window.innerHeight / 2;
+          targetX = ((e.clientX - cx) / cx) * 20;
+          targetY = ((e.clientY - cy) / cy) * 20;
+        }, { passive: true });
+
+        const lerpParallax = () => {
+          currentX += (targetX - currentX) * 0.06;
+          currentY += (targetY - currentY) * 0.06;
+
+          if (videoContainer) {
+            gsap.set(videoContainer, {
+              x: currentX,
+              y: currentY,
+              force3D: true
+            });
+          }
+
+          requestAnimationFrame(lerpParallax);
+        };
+
+        requestAnimationFrame(lerpParallax);
+      } else {
+        // Fallback if GSAP is unavailable
+        heroTypography.style.opacity = '1';
+        heroTypography.style.transform = 'translateY(0)';
+        bottomBlock.style.opacity = '1';
+        bottomBlock.style.transform = 'translateY(0)';
+      }
+
+      // Mobile navbar toggle support
+      const navToggle = document.querySelector('.nav-toggle');
+      if (navToggle) {
+        navToggle.addEventListener('click', () => {
+          const nav = document.getElementById('navbar');
+          nav.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', nav.classList.contains('open'));
+        });
+      }
+    });
+  </script>
+
+  <!-- Global App Scripts for Authentication, Offline Pass & i18n -->
+  <script src="js/i18n.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

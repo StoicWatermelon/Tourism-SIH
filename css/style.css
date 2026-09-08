@@ -162,7 +162,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 11px;
   margin: 0 auto;
   font-size: 12.5px;
   font-weight: 500;
@@ -199,6 +199,17 @@ button {
 
 .nav nav a:hover::after {
   width: 80%;
+}
+
+.nav nav a.active {
+  opacity: 1;
+  color: var(--gold-pop, #e9c46a);
+  font-weight: 700;
+}
+
+.nav nav a.active::after {
+  width: 80%;
+  background: var(--gold-pop, #e9c46a);
 }
 
 .nav-actions {
@@ -522,6 +533,107 @@ button {
   opacity: 0.8;
 }
 
+/* =========================================================
+   Atmospheric Dedicated Subpage Hero Headers
+   ========================================================= */
+.page-hero {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 120px 8vw 54px;
+  background: radial-gradient(circle at 80% 20%, rgba(82, 183, 136, 0.22) 0%, transparent 50%),
+              radial-gradient(circle at 20% 80%, rgba(45, 106, 79, 0.28) 0%, transparent 60%),
+              #071711;
+  color: #fff;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(82, 183, 136, 0.2);
+}
+
+.page-hero .ambient-depth-mesh {
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(circle at 65% 35%, rgba(82, 183, 136, 0.16) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(233, 196, 106, 0.1) 0%, transparent 55%);
+  pointer-events: none;
+  animation: ambientMeshDrift 20s ease-in-out infinite alternate;
+}
+
+.page-hero-content {
+  position: relative;
+  z-index: 3;
+  max-width: 920px;
+}
+
+.page-breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 16px;
+}
+
+.page-breadcrumbs a {
+  color: var(--teal-pop, #52b788);
+  transition: color 0.2s ease;
+}
+
+.page-breadcrumbs a:hover {
+  color: var(--gold-pop, #e9c46a);
+}
+
+.page-breadcrumbs span {
+  opacity: 0.4;
+}
+
+.page-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(34px, 4.5vw, 56px);
+  font-weight: 700;
+  line-height: 1.12;
+  margin: 8px 0 16px;
+  letter-spacing: -0.02em;
+}
+
+.page-title span {
+  color: var(--gold-pop, #e9c46a);
+}
+
+.page-sub {
+  font-size: clamp(15px, 1.3vw, 18px);
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  max-width: 740px;
+  margin-bottom: 24px;
+}
+
+.page-hero-stats {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.page-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-stat-item strong {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold-pop, #e9c46a);
+}
+
+.page-stat-item small {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Clean, Flat Quick Search Card */
 .quick-search {
   background: #ffffff;
@@ -672,16 +784,17 @@ button {
 
 .circuits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .circuit-card {
   position: relative;
-  height: 230px;
-  border-radius: 16px;
+  min-height: 350px;
+  height: 350px;
+  border-radius: 18px;
   border: 1.5px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -690,11 +803,12 @@ button {
   transform-style: preserve-3d;
   will-change: transform;
   transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  box-sizing: border-box;
 }
 
 .circuit-card:hover {
   border-color: var(--gold-pop);
-  box-shadow: 0 16px 36px rgba(255, 183, 3, 0.22);
+  box-shadow: 0 18px 42px rgba(255, 183, 3, 0.25);
 }
 
 .circuit-card::before {
@@ -719,53 +833,55 @@ button {
 .circuit-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 18, 26, 0.15) 0%, rgba(10, 18, 26, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(10, 18, 26, 0.05) 0%, rgba(10, 18, 26, 0.35) 40%, rgba(10, 18, 26, 0.94) 80%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 18px;
+  padding: 22px;
   color: #fff;
   z-index: 1;
   transition: background 0.3s ease;
+  box-sizing: border-box;
 }
 
 .circuit-card:hover .circuit-card-overlay {
-  background: linear-gradient(180deg, rgba(10, 18, 26, 0.05) 0%, rgba(10, 18, 26, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(10, 18, 26, 0.02) 0%, rgba(10, 18, 26, 0.42) 38%, rgba(10, 18, 26, 0.97) 80%);
 }
 
 .circuit-tag {
   display: inline-block;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--gold-pop);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .circuit-card h3 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   color: #fff;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .circuit-card p {
-  font-size: 12px;
-  color: #b8c8d2;
-  margin: 0 0 8px;
-  line-height: 1.35;
+  font-size: 12.5px;
+  color: #c5d6e2;
+  margin: 0 0 12px;
+  line-height: 1.45;
 }
 
 .circuit-card .circuit-action {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--emerald-pop);
   display: inline-flex;
   align-items: center;
   gap: 4px;
   transition: transform 0.2s ease;
+  margin-top: 2px;
 }
 
 .circuit-card:hover .circuit-action {
@@ -898,20 +1014,23 @@ button {
 /* Flat Results Grid */
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
   margin-top: 30px;
 }
 
 .result-card {
+  min-height: 260px;
   background: #ffffff;
   border-radius: var(--radius-sm);
-  padding: 22px;
+  padding: 24px;
   box-shadow: var(--depth-sm);
   border: 1px solid rgba(45, 106, 79, 0.12);
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .result-card:hover {
@@ -929,13 +1048,16 @@ button {
 
 .result-card h3 {
   margin: 6px 0;
-  font-size: 18px;
+  font-size: 19px;
+  line-height: 1.3;
 }
 
 .result-card p {
   color: var(--muted);
   flex-grow: 1;
   font-size: 13.5px;
+  line-height: 1.5;
+  margin: 8px 0 14px;
 }
 
 .result-card small {
@@ -1029,18 +1151,19 @@ button {
 .destination-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
+  gap: 24px;
   perspective: 1200px;
 }
 
 .destination {
-  min-height: 440px;
+  min-height: 540px;
   border-radius: var(--radius);
   /* No overflow:hidden — it clips the 3D rotateX perspective effect.
      Use ::before gradient instead of clip for the dark overlay. */
   position: relative;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 22px;
   background-size: cover;
   background-position: center;
@@ -1049,6 +1172,7 @@ button {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
   will-change: transform;
   transform-style: preserve-3d;
+  box-sizing: border-box;
 }
 
 /* Specular mouse-tracking glow overlay */
@@ -1072,8 +1196,10 @@ button {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(8, 17, 22, 0.1) 15%, rgba(8, 17, 22, 0.94) 85%);
+  background: linear-gradient(180deg, rgba(8, 17, 22, 0.35) 0%, rgba(8, 17, 22, 0.05) 25%, rgba(8, 17, 22, 0.5) 55%, rgba(8, 17, 22, 0.97) 85%);
   z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .destination:hover {
@@ -1086,14 +1212,15 @@ button {
 }
 
 .dest-top-badges {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  z-index: 2;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 3;
+  margin-bottom: auto;
   pointer-events: none;
 }
 
@@ -1105,40 +1232,64 @@ button {
   padding: 4px 10px;
   border-radius: 99px;
   box-shadow: 0 2px 8px rgba(42, 157, 143, 0.5);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  max-width: 100%;
+}
+
+.dest-altitude-badge {
+  background: rgba(7, 24, 17, 0.78);
+  color: #d1fae5;
+  border: 1px solid rgba(116, 198, 157, 0.35);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 99px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .community-benefit-badge {
-  background: rgba(255, 183, 3, 0.22);
+  background: rgba(18, 48, 36, 0.85);
   color: var(--gold-pop);
   border: 1px solid var(--gold-pop);
   font-size: 10px;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 99px;
   font-weight: 700;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .dest-info {
   position: relative;
   z-index: 2;
   width: 100%;
+  margin-top: 20px;
 }
 
 .dest-info h3 {
-  font: 600 25px "Playfair Display";
+  font: 600 24px/1.25 "Playfair Display", Georgia, serif;
   margin: 4px 0 6px;
+  color: #ffffff;
+  word-break: break-word;
 }
 
-.dest-info p {
-  margin: 3px 0;
+.dest-info p.dest-desc {
+  margin: 4px 0 8px;
   font-size: 12.5px;
-  opacity: 0.88;
+  line-height: 1.45;
+  opacity: 0.9;
+  color: #e2ecf0;
 }
 
 .eco-chips {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   flex-wrap: wrap;
   margin: 8px 0 10px;
 }
@@ -1153,6 +1304,8 @@ button {
   border-radius: 99px;
   cursor: pointer;
   transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
 }
 
 .eco-chip:hover {
@@ -1161,19 +1314,27 @@ button {
   transform: translateY(-1px);
 }
 
+.dest-meta {
+  margin: 6px 0;
+  font-size: 12px;
+  color: #c9d8dc;
+  line-height: 1.4;
+}
+
 .dest-actions {
   display: flex;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 .dest-actions button {
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
-  padding: 7px 14px;
+  padding: 8px 15px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
@@ -1199,13 +1360,14 @@ button {
 .experience-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 20px;
   perspective: 1000px;
 }
 
 .experience-grid article {
-  border-radius: 16px;
-  padding: 30px 24px;
+  min-height: 340px;
+  border-radius: 18px;
+  padding: 32px 24px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
   border: 1.5px solid rgba(255, 255, 255, 0.18);
   background-size: cover;
@@ -1217,6 +1379,10 @@ button {
   position: relative;
   overflow: hidden;
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-sizing: border-box;
 }
 
 .experience-grid article::after {
@@ -1245,32 +1411,34 @@ button {
 }
 
 .exp-icon {
-  font-size: 34px;
+  font-size: 36px;
   display: block;
 }
 
 .exp-badge {
   display: inline-block;
+  align-self: flex-start;
   background: rgba(42, 157, 143, 0.9);
   color: #fff;
   font-size: 10px;
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 99px;
-  margin-top: 6px;
+  margin-top: 8px;
   box-shadow: 0 2px 8px rgba(42, 157, 143, 0.4);
 }
 
 .experience-grid h3 {
-  font: 600 22px "Playfair Display";
-  margin: 14px 0 8px;
+  font: 600 23px/1.3 "Playfair Display", Georgia, serif;
+  margin: 16px 0 8px;
   color: #fff;
 }
 
 .experience-grid p {
   color: #d8e5ec;
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 1.55;
+  margin: 0;
 }
 
 /* Culture & Living Traditions */
@@ -1330,26 +1498,28 @@ button {
 /* Food cards 3D */
 .food-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 20px;
   perspective: 900px;
 }
 
 .food {
-  height: 290px;
+  min-height: 400px;
+  height: auto;
   border-radius: var(--radius-sm);
   overflow: hidden;
   position: relative;
   background-size: cover;
   background-position: center;
   color: #fff;
-  padding: 18px;
+  padding: 22px;
   display: flex;
   align-items: flex-end;
   box-shadow: var(--depth-sm);
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
   cursor: pointer;
   transform-style: preserve-3d;
+  box-sizing: border-box;
 }
 
 .food::before {
@@ -1374,8 +1544,8 @@ button {
 .food::after {
   content: "";
   position: absolute;
-  inset: 20% 0 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.92));
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.28) 30%, rgba(0, 0, 0, 0.95) 75%);
   z-index: 1;
 }
 
@@ -1387,44 +1557,55 @@ button {
 .food div {
   position: relative;
   z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .food h3 {
-  margin: 0;
-  font: 600 20px "Playfair Display";
+  margin: 3px 0 6px;
+  font: 600 20px/1.3 "Playfair Display", Georgia, serif;
+  color: #ffffff;
 }
 
 .food p {
-  font-size: 11.5px;
-  margin: 4px 0 6px;
-  opacity: 0.9;
+  font-size: 12px;
+  margin: 6px 0 10px;
+  opacity: 0.92;
+  line-height: 1.45;
+  color: #e4edf1;
 }
 
 .food-tags {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
+  margin: 4px 0 6px;
 }
 
 .food-tag {
   background: rgba(42, 157, 143, 0.9);
   color: #fff;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.02em;
 }
 
 .food-revenue-share {
-  background: rgba(255, 183, 3, 0.25);
+  background: rgba(255, 183, 3, 0.22);
   color: var(--gold-pop);
-  border: 1px solid rgba(255, 183, 3, 0.45);
-  font-size: 10px;
-  font-weight: 800;
-  padding: 2px 7px;
+  border: 1px solid var(--gold-pop);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
   border-radius: 99px;
-  display: inline-block;
+  backdrop-filter: blur(6px);
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 4px;
 }
 
 /* Responsible Tourism & Score Card */
@@ -2617,7 +2798,7 @@ button {
     grid-template-columns: repeat(3, 1fr);
   }
   .food-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
   .map-layout {
     grid-template-columns: 1fr;
@@ -2756,7 +2937,7 @@ button {
     grid-template-columns: 1fr;
   }
   .food-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
   .experience-grid {
     grid-template-columns: 1fr;
@@ -3154,4 +3335,39 @@ body.modal-open {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 700;
+}
+
+/* Cinematic Liquid Glass & Font Utilities */
+@font-face {
+  font-family: 'Dirtyline';
+  src: url('https://cdnfonts.com') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+
+.liquid-glass {
+  background: rgba(255,255,255,0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0.15) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.15) 80%,
+    rgba(255,255,255,0.45) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }

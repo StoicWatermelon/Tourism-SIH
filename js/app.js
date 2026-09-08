@@ -276,6 +276,236 @@ const localDestinations = [
     ],
     img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=85",
     desc: "Cold desert valley renowned for Key Gompa, Tabo world heritage murals, and Langza marine fossil protection sites."
+  },
+  {
+    id: "gulmarg",
+    name: "Gulmarg Meadow of Flowers",
+    location: "Jammu & Kashmir",
+    state: "Jammu & Kashmir",
+    category: "mountains",
+    emotion: "adventure",
+    bestSeason: "Year-Round",
+    difficulty: "Moderate",
+    type: "Alpine Crest",
+    budget: 6500,
+    altitude: "8,694 ft",
+    isOffbeat: false,
+    footfall: "Popular Crest",
+    communityBenefit: "88% Direct Community Revenue",
+    ecoBadges: [
+      "Clean Snow Certification",
+      "High-Altitude Gondola",
+      "Zero-Litter Alpine"
+    ],
+    img: "assets/images/gulmarg.png",
+    desc: "Premier alpine ski and meadow crest featuring pristine pine forests and one of the highest operating cable cars."
+  },
+  {
+    id: "auli",
+    name: "Auli Snow & Oak Slopes",
+    location: "Uttarakhand",
+    state: "Uttarakhand",
+    category: "mountains",
+    emotion: "nature",
+    bestSeason: "Nov–Apr",
+    difficulty: "Moderate",
+    type: "Alpine Meadow",
+    budget: 5500,
+    altitude: "9,200 ft",
+    isOffbeat: true,
+    footfall: "Eco-Dispersion Gem",
+    communityBenefit: "93% Direct Community Revenue",
+    ecoBadges: [
+      "Nanda Devi Sanctuary Buffer",
+      "Zero Single-Use Plastic",
+      "Solar Mountain Lodges"
+    ],
+    img: "assets/images/Auli.png",
+    desc: "Himalayan ski slopes fringed by coniferous and oak forests with breathtaking panoramas of Nanda Devi and Kamet."
+  },
+  {
+    id: "dharamshala",
+    name: "Dharamshala & Kangra Valley",
+    location: "Himachal Pradesh",
+    state: "Himachal Pradesh",
+    category: "culture",
+    emotion: "peace",
+    bestSeason: "Sep–Jun",
+    difficulty: "Easy",
+    type: "Mountain Sanctuary",
+    budget: 4500,
+    altitude: "4,780 ft",
+    isOffbeat: false,
+    footfall: "Cultural Core",
+    communityBenefit: "91% Direct Community Revenue",
+    ecoBadges: [
+      "Monastic Heritage Trail",
+      "Organic Tea Gardens",
+      "Clean Mountain Water"
+    ],
+    img: "assets/images/dharamshala.png",
+    desc: "Peaceful hillside town nestled under the Dhauladhar ranges, center of Tibetan culture, cedar trails, and tea estates."
+  },
+  {
+    id: "jaisalmer",
+    name: "Jaisalmer Living Fort",
+    location: "Rajasthan",
+    state: "Rajasthan",
+    category: "heritage",
+    emotion: "culture",
+    bestSeason: "Oct–Mar",
+    difficulty: "Easy",
+    type: "Desert Citadel",
+    budget: 4800,
+    altitude: "738 ft",
+    isOffbeat: false,
+    footfall: "Living Fort Heritage",
+    communityBenefit: "94% Direct Artisan Revenue",
+    ecoBadges: [
+      "Artisan Collective Certified",
+      "Sustainable Camel Caravans",
+      "Heritage Haveli Trust"
+    ],
+    img: "assets/images/jaisalmer.png",
+    desc: "A golden sandstone living fortress rising from Thar desert dunes, sustained by resident artisan families and music guilds."
+  },
+  {
+    id: "dawki",
+    name: "Dawki Crystal Umngot River",
+    location: "Meghalaya",
+    state: "Meghalaya",
+    category: "nature",
+    emotion: "peace",
+    bestSeason: "Nov–Apr",
+    difficulty: "Easy",
+    type: "Clear River Gorge",
+    budget: 3800,
+    altitude: "2,050 ft",
+    isOffbeat: true,
+    footfall: "Eco-Dispersion Gem",
+    communityBenefit: "96% Direct Boatmen Revenue",
+    ecoBadges: [
+      "Zero-Motor Clear Waters",
+      "Leave-No-Trace Riverbed",
+      "Indigenous Boatmen Guild"
+    ],
+    img: "assets/images/dawki.png",
+    desc: "Glass-transparent waters where wooden boats appear to float in mid-air over polished pebbles and green gorges."
+  },
+  {
+    id: "dzukou",
+    name: "Dzukou Valley Lily Sanctuary",
+    location: "Nagaland",
+    state: "Nagaland",
+    category: "nature",
+    emotion: "nature",
+    bestSeason: "Jun–Sep",
+    difficulty: "Hard",
+    type: "High-Altitude Valley",
+    budget: 4200,
+    altitude: "8,045 ft",
+    isOffbeat: true,
+    footfall: "Eco-Dispersion Gem",
+    communityBenefit: "98% Direct Tribal Council",
+    ecoBadges: [
+      "Plastic-Free Strictly Enforced",
+      "Endemic Dzukou Lily Habitat",
+      "Solar Forest Trek"
+    ],
+    img: "assets/images/dzukouvalley.png",
+    desc: "Undulating emerald dwarf-bamboo valley famous for seasonal endemic lilies, pristine brooks, and silence."
+  },
+  {
+    id: "gir",
+    name: "Gir Asiatic Lion Habitat",
+    location: "Gujarat",
+    state: "Gujarat",
+    category: "nature",
+    emotion: "adventure",
+    bestSeason: "Dec–Mar",
+    difficulty: "Moderate",
+    type: "Wildlife Reserve",
+    budget: 5200,
+    altitude: "450 ft",
+    isOffbeat: false,
+    footfall: "Protected Habitat",
+    communityBenefit: "92% Direct Eco-Guide Revenue",
+    ecoBadges: [
+      "Apex Predator Conservation",
+      "Maldhari Coexistence Zone",
+      "Restricted Electric Safaris"
+    ],
+    img: "assets/images/gir.png",
+    desc: "The only sanctuary in the world protecting wild Asiatic lions, coexisting alongside pastoral Maldhari settlements."
+  },
+  {
+    id: "coorg",
+    name: "Coorg Mist & Shade Coffee",
+    location: "Karnataka",
+    state: "Karnataka",
+    category: "nature",
+    emotion: "peace",
+    bestSeason: "Oct–Apr",
+    difficulty: "Easy",
+    type: "Shade Plantation",
+    budget: 4600,
+    altitude: "3,800 ft",
+    isOffbeat: false,
+    footfall: "Hill Retreat",
+    communityBenefit: "89% Direct Planter Revenue",
+    ecoBadges: [
+      "Bird-Friendly Shade Grown",
+      "Western Ghats Biodiversity",
+      "Zero-Chemical Estates"
+    ],
+    img: "assets/images/coorg.png",
+    desc: "Lush Western Ghats hill district celebrated for bird-friendly shade-grown coffee, spice hills, and Kodava hospitality."
+  },
+  {
+    id: "konark",
+    name: "Konark Sun Temple Chariot",
+    location: "Odisha",
+    state: "Odisha",
+    category: "heritage",
+    emotion: "culture",
+    bestSeason: "Oct–Mar",
+    difficulty: "Easy",
+    type: "UNESCO Monument",
+    budget: 3200,
+    altitude: "10 ft",
+    isOffbeat: false,
+    footfall: "Heritage Monument",
+    communityBenefit: "90% Direct Artisan Revenue",
+    ecoBadges: [
+      "Kalinga Stone Conservation",
+      "Solar Sound & Light Show",
+      "Coastal Marine Buffer"
+    ],
+    img: "assets/images/konark.png",
+    desc: "13th-century monumental stone chariot carved with 24 intricate astronomical wheels pulled by seven galloping horses."
+  },
+  {
+    id: "chitrakote",
+    name: "Chitrakote Horseshoe Falls",
+    location: "Chhattisgarh",
+    state: "Chhattisgarh",
+    category: "nature",
+    emotion: "nature",
+    bestSeason: "Jul–Feb",
+    difficulty: "Easy",
+    type: "Horseshoe Waterfall",
+    budget: 3400,
+    altitude: "1,800 ft",
+    isOffbeat: true,
+    footfall: "Eco-Dispersion Gem",
+    communityBenefit: "95% Direct Tribal Revenue",
+    ecoBadges: [
+      "Indravati River Basin Protection",
+      "Tribal Craft Cooperative",
+      "Zero Industrial Runoff"
+    ],
+    img: "assets/images/chitrakote.png",
+    desc: "The Niagara of India, a 300-meter wide horseshoe waterfall roaring across granite cliffs into virgin sal forests."
   }
 ];
 
@@ -395,44 +625,100 @@ const states = {
 // Local Economy Direct-Link Foods with zero food miles & community cooperative tags
 const foods = [
   {
-    name: "Organic Momos",
-    origin: "Ladakh",
-    desc: "Steamed dumplings stuffed with wild mountain greens or pasture yak chhurpi cheese.",
-    tags: ["Locally Sourced", "Zero Food Miles", "Community-Led Cooperative"],
+    name: "Amritsari Kulcha & Chole",
+    origin: "Punjab",
+    desc: "Crisp multi-layered tandoori flatbread stuffed with spiced potatoes, served with slow-cooked pindi chole.",
+    tags: ["Locally Sourced", "Zero Food Miles", "Community Cooperative"],
+    revenueShare: "95% Direct Farmer Revenue",
+    img: "assets/images/AmritsariKulcha.png"
+  },
+  {
+    name: "Dal Baati Churma",
+    origin: "Rajasthan",
+    desc: "Wood-fired baked baatis drenched in pure desi ghee, paired with five-lentil panchmel dal and sweet churma.",
+    tags: ["Traditional Recipe", "Zero Food Miles", "Heritage Kitchens"],
     revenueShare: "92% Direct Community Revenue",
-    img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?auto=format&fit=crop&w=700&q=80"
+    img: "assets/images/dalbaatichurma.png"
   },
   {
-    name: "High-Altitude Thukpa",
-    origin: "Ladakh",
-    desc: "Warming whole-grain noodle soup slow-simmered with mountain celery, root radish, and garlic broth.",
-    tags: ["Locally Sourced", "Zero Food Miles"],
-    revenueShare: "88% Direct Community Revenue",
-    img: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80"
+    name: "Kashmiri Kahwa",
+    origin: "Kashmir",
+    desc: "Gentle green tea infused with whole saffron strands, green cardamom pods, cinnamon bark, and slivered almonds.",
+    tags: ["High Altitude", "Zero Food Miles", "Artisan Harvested"],
+    revenueShare: "96% Direct Grower Revenue",
+    img: "assets/images/kahwa.png"
   },
   {
-    name: "Traditional Skyu Stew",
-    origin: "Ladakh",
-    desc: "Handcrafted wheat and barley thumb-pasta stew slow-cooked on village solar & clay hearths.",
-    tags: ["Locally Sourced", "Community-Led Cooperative"],
-    revenueShare: "95% Direct Community Revenue",
-    img: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80"
-  },
-  {
-    name: "Steamed Tingmo",
-    origin: "Ladakh",
-    desc: "Fluffy flower-shaped steamed bread made with organic Tsampa stone-ground wheat.",
-    tags: ["Locally Sourced", "Zero Food Miles"],
-    revenueShare: "90% Direct Community Revenue",
-    img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=80"
-  },
-  {
-    name: "Salted Butter Tea (Gur Gur)",
-    origin: "Ladakh",
-    desc: "Essential high-altitude hydration tea churned with pasture yak butter and Himalayan rock salt.",
-    tags: ["Locally Sourced", "Community-Led Cooperative"],
+    name: "Kerala Appam with Stew",
+    origin: "Kerala",
+    desc: "Soft fermented rice batter hoppers with fluffy lace edges, served with aromatic coconut milk vegetable stew.",
+    tags: ["Zero Food Miles", "Organic Coconut", "Women's Cooperative"],
     revenueShare: "94% Direct Community Revenue",
-    img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=700&q=80"
+    img: "assets/images/appam.png"
+  },
+  {
+    name: "Khaman Dhokla",
+    origin: "Gujarat",
+    desc: "Steamed fluffy gram flour cakes tempered with mustard seeds, curry leaves, and green chillies.",
+    tags: ["Locally Sourced", "Zero Food Miles", "Heritage Recipe"],
+    revenueShare: "91% Direct Community Revenue",
+    img: "assets/images/dhokla.png"
+  },
+  {
+    name: "Hyderabadi Dum Biryani",
+    origin: "Telangana",
+    desc: "Fragrant aged basmati rice cooked in sealed handis with saffron, mint, fried shallots, and royal spice potpourri.",
+    tags: ["Slow Food", "Community Cooperative"],
+    revenueShare: "89% Direct Community Revenue",
+    img: "assets/images/biryani.png"
+  },
+  {
+    name: "Traditional Bebinca",
+    origin: "Goa",
+    desc: "Indo-Portuguese seven-layered coconut milk and egg pudding delicately baked on gentle hearth embers.",
+    tags: ["Heritage Bakeries", "Artisan Recipe"],
+    revenueShare: "93% Direct Bakery Revenue",
+    img: "assets/images/bebinca.png"
+  },
+  {
+    name: "Crisp Masala Dosa",
+    origin: "Karnataka",
+    desc: "Fermented rice and black lentil crepe roasted golden with butter, filled with spiced potato masala and fresh coconut chutney.",
+    tags: ["Zero Food Miles", "Community Sourced"],
+    revenueShare: "90% Direct Community Revenue",
+    img: "assets/images/dosa.png"
+  },
+  {
+    name: "Goan Coastal Fish Curry",
+    origin: "Goa",
+    desc: "Fresh catch simmered in rich Kashmiri chilli and tangy kokum coconut gravy, honoring sustainable coastal fisheries.",
+    tags: ["Sustainable Catch", "Zero Food Miles", "Fisherfolk Cooperative"],
+    revenueShare: "95% Direct Fisherfolk Revenue",
+    img: "assets/images/fishcurry.png"
+  },
+  {
+    name: "Aloo ke Gutke",
+    origin: "Uttarakhand",
+    desc: "Kumaoni mountain potatoes stir-fried in fragrant mustard oil with wild Himalayan jumboo herb and red chillies.",
+    tags: ["Mountain Foraged", "Zero Food Miles", "Village Organic"],
+    revenueShare: "97% Direct Homestay Revenue",
+    img: "assets/images/alookegutke.png"
+  },
+  {
+    name: "Himachali Dham",
+    origin: "Himachal Pradesh",
+    desc: "Traditional satvik festive feast cooked in brass pots by Botis, featuring Madra, Mah ki Dal, and Khatta.",
+    tags: ["Ancient Feast", "Zero Food Miles", "Solar Kitchens"],
+    revenueShare: "93% Direct Community Revenue",
+    img: "assets/images/dham.png"
+  },
+  {
+    name: "Chhena Poda",
+    origin: "Odisha",
+    desc: "Baked cottage cheese confection wrapped in sal leaves and caramelized slowly over charcoal embers.",
+    tags: ["Dairy Cooperative", "Zero Food Miles"],
+    revenueShare: "94% Direct Dairy Farmer Revenue",
+    img: "assets/images/chhenapoda.png"
   }
 ];
 
@@ -731,7 +1017,7 @@ function renderDestinations() {
 
     const offbeatBadgeHtml = d.isOffbeat 
       ? `<span class="offbeat-badge">${ecoGemLabel}</span>` 
-      : `<span style="font-size:10px; opacity:0.85;">📍 ${d.altitude || "Himalayas"}</span>`;
+      : `<span class="dest-altitude-badge">📍 ${d.altitude || "Himalayas"}</span>`;
     
     const benefitBadgeHtml = d.communityBenefit 
       ? `<span class="community-benefit-badge">🤝 ${d.communityBenefit}</span>` 
@@ -753,9 +1039,9 @@ function renderDestinations() {
         <div class="dest-info">
           <span class="eyebrow">${d.location.toUpperCase()} • ${d.type}</span>
           <h3>${displayName}</h3>
-          <p>${displayDesc}</p>
+          <p class="dest-desc">${displayDesc}</p>
           <div class="eco-chips">${chipsHtml}</div>
-          <p><b>${seasonLabel}</b> ${d.bestSeason || d.best_season} • <b>${budgetLabel}</b> ₹${(d.budget || 3000).toLocaleString()}</p>
+          <p class="dest-meta"><b>${seasonLabel}</b> ${d.bestSeason || d.best_season} • <b>${budgetLabel}</b> ₹${(d.budget || 3000).toLocaleString()}</p>
           <div class="dest-actions">
             <button onclick="saveDestination('${d.id}')">${addText}</button>
             <button onclick="showDestination('${d.id}')">${exploreText}</button>
@@ -765,11 +1051,12 @@ function renderDestinations() {
     `;
   }).join("");
 
-  // Specular mouse-tracking glow — cached rect on enter to avoid layout thrashing
+  // Specular mouse-tracking glow & z-index elevation on hover
   grid.querySelectorAll(".destination").forEach(card => {
     let rect = null;
     card.addEventListener("mouseenter", () => {
       rect = card.getBoundingClientRect();
+      card.style.zIndex = "15";
     }, { passive: true });
     card.addEventListener("mousemove", (e) => {
       if (!rect) rect = card.getBoundingClientRect();
@@ -780,6 +1067,7 @@ function renderDestinations() {
     }, { passive: true });
     card.addEventListener("mouseleave", () => {
       rect = null;
+      card.style.zIndex = "";
     }, { passive: true });
   });
 }
@@ -840,6 +1128,7 @@ function addCard3D(cards, opts = {}) {
 
     card.addEventListener("mouseenter", () => {
       rect = card.getBoundingClientRect();
+      card.style.zIndex = "15";
     }, { passive: true });
 
     card.addEventListener("mousemove", (e) => {
@@ -869,6 +1158,7 @@ function addCard3D(cards, opts = {}) {
       rect = null;
       if (rafId) cancelAnimationFrame(rafId);
       card.style.transform = "";
+      card.style.zIndex = "";
     }, { passive: true });
   });
 }

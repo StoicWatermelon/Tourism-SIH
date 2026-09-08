@@ -84,7 +84,7 @@ const indiaHotspots = [
     desc: "Premier alpine ski and trekking destination featuring one of the world's highest operating passenger cable cars.",
     culture: "Himalayan alpine guiding, shepherd encampments, winter mountain sports.",
     food: "Harissa, Modur Pulao, Noon Chai with crisp Bakarkhani.",
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/gulmarg.png",
     badge: "Alpine Ski Crest"
   },
   {
@@ -101,7 +101,7 @@ const indiaHotspots = [
     desc: "Surreal Trans-Himalayan barren valley holding thousand-year-old Buddhist monasteries, deep gorges, and marine fossils.",
     culture: "Bodh monastic life, fossil preservation, solar homestays.",
     food: "Siddu, Thukpa, Seabuckthorn Tea, Chhang.",
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/dharamshala.png",
     badge: "Cold Desert Wonder"
   },
   {
@@ -118,7 +118,7 @@ const indiaHotspots = [
     desc: "Verdant pine-clad valley surrounded by dramatic Pir Panjal peaks, serving as the gateway to the Lahaul high passes.",
     culture: "Kullu shawls and handlooms, Hadimba Devi temple folklore, Himalayan eco-cafes.",
     food: "Himachali Dham feast, Trout Fish, Babru, Bhey (lotus stem).",
-    img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/dham.png",
     badge: "Alpine Gateway"
   },
   {
@@ -135,7 +135,7 @@ const indiaHotspots = [
     desc: "Spiritual haven where the emerald Ganges river rushes down from the Himalayan peaks into the peaceful Shivalik foothills.",
     culture: "Vedic chanting, ancient yoga ashrams, evening fire ceremonies.",
     food: "Aloo ke Gutke, Kafuli, Garhwali Thali, Fresh Mountain Herbal Teas.",
-    img: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/alookegutke.png",
     badge: "Yoga & River Capital"
   },
   {
@@ -152,7 +152,7 @@ const indiaHotspots = [
     desc: "UNESCO World Heritage alpine valley carpeted in hundreds of rare wildflowers against hanging glaciers and cascading waterfalls.",
     culture: "Sacred mountain pilgrim trails, zero-waste biodiversity stewardship.",
     food: "Chainsoo, Mandua (finger millet) Roti, Jhangora Ki Kheer.",
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/Auli.png",
     badge: "UNESCO Biosphere"
   },
   {
@@ -169,7 +169,7 @@ const indiaHotspots = [
     desc: "Spiritual epicenter of Sikhism, revered for the luminous gilded sanctum surrounded by the sacred Amrit Sarovar tank.",
     culture: "Sikh seva (selfless service), vibrant Gurbani kirtan, rich Punjabi warmth.",
     food: "Amritsari Kulcha with Chole, Creamy Makhan Lassi, Pinni.",
-    img: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/AmritsariKulcha.png",
     badge: "Living Heritage"
   },
   {
@@ -222,7 +222,7 @@ const indiaHotspots = [
     desc: "Capital of India's first 100% organic state, perched on mountain ridges overlooking cloud valleys and snowy Himalayan summits.",
     culture: "Lepcha, Bhutia, and Nepali traditions, organic sustainable farming.",
     food: "Steamed Momos, Thukpa, Gundruk soup, Kinema ferment, Tingmo.",
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/gangtok.png",
     badge: "100% Organic State"
   },
   {
@@ -375,7 +375,7 @@ const indiaHotspots = [
     desc: "The Queen of the Hills, renowned for heritage narrow-gauge steam trains and world-famous champagne orthodox black teas.",
     culture: "Tea estate worker cooperatives, colonial hill station legacy, Sherpa climbing history.",
     food: "Darjeeling Momos, Thukpa, Churpee soup, Fresh Single-Estate First Flush Tea.",
-    img: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/Auli.png",
     badge: "Queen of the Hills"
   },
 
@@ -394,7 +394,7 @@ const indiaHotspots = [
     desc: "UNESCO World Heritage royal capital with terracotta pink facades, monumental hilltop forts, and geometric astronomical observatories.",
     culture: "Rajput chivalric lore, block-printing, blue pottery, Kalbelia folk dance.",
     food: "Dal Baati Churma, Ker Sangri, Pyaaz Kachori, Ghevar.",
-    img: "https://images.unsplash.com/photo-1600100397608-f010e42a981c?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/dalbaatichurma.png",
     badge: "UNESCO Pink City"
   },
   {
@@ -411,7 +411,7 @@ const indiaHotspots = [
     desc: "Golden sandstone fortress rising majestically from the Thar Desert sands, alive with resident artisans, havelis, and desert musicians.",
     culture: "Manganiyar musical tradition, desert camel caravans, mirror embroidery.",
     food: "Gatte ki Sabzi, Laal Maas, Ker Sangri, Makhania Lassi.",
-    img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/jaisalmer.png",
     badge: "Living Desert Fortress"
   },
   {
@@ -428,7 +428,7 @@ const indiaHotspots = [
     desc: "Romantic Venice of the East with ornate marble palaces reflected in shimmering blue waters under the Aravali ranges.",
     culture: "Mewari royal art, miniature paintings, puppet theater, lake conservation.",
     food: "Dal Baati, Banjara Gosht, Mirchi Bada, Mewari Kadhi.",
-    img: "https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/churma.png",
     badge: "Royal Lake Capital"
   },
   {
@@ -445,7 +445,7 @@ const indiaHotspots = [
     desc: "One of the largest seasonal salt deserts in the world, glowing supernatural silver under moonlit nights.",
     culture: "Kutchi master weavers, Rogan fabric painting, Rabari pastoral nomads.",
     food: "Kutchi Dabeli, Khichdi Kadhi, Bajra Rotla with white butter and jaggery.",
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/ahmedabad.png",
     badge: "White Salt Desert"
   },
   {
@@ -462,7 +462,7 @@ const indiaHotspots = [
     desc: "The only place on Earth where the magnificent Asiatic lion roams free in protected dry deciduous teak forests.",
     culture: "Maldhari pastoralist co-existence with apex predators, forest folklore.",
     food: "Kathiyawadi Thali, Ringna No Oro (roasted eggplant), Sev Tameta Nu Shaak.",
-    img: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/gir.png",
     badge: "Asiatic Lion Domain"
   },
   {
@@ -513,7 +513,7 @@ const indiaHotspots = [
     desc: "One of the oldest continuously inhabited cities on Earth, where 84 stone ghats meet the sacred Ganges under temple bells.",
     culture: "Timeless spiritual traditions, Banarasi brocade silk weaving, classical Hindustani music.",
     food: "Banarasi Kachori Sabzi, Malaiyo winter froth, Tamatar Chaat, Banarasi Paan.",
-    img: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/agra.png",
     badge: "Oldest Living City"
   },
   {
@@ -547,7 +547,7 @@ const indiaHotspots = [
     desc: "The pinnacle of rock-cut architecture, where the colossal Kailash temple was carved top-down from a single basalt cliff.",
     culture: "Buddhist, Hindu, and Jain harmony, ancient mineral pigment frescoes.",
     food: "Misal Pav, Pithla Bhakri, Aurangabad Naan Qalia, Puran Poli.",
-    img: "https://images.unsplash.com/photo-1600100397608-f010e42a981c?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/agantaandellora.png",
     badge: "Monolithic Wonder"
   },
   {
@@ -598,7 +598,7 @@ const indiaHotspots = [
     desc: "The world's largest coastal mangrove forest delta, accessible exclusively by silent electric boats through winding tidal channels.",
     culture: "Bonbibi mangrove goddess folklore, honey-gatherer courage, delta boat craftsmanship.",
     food: "Bhetki Macher Paturi, Chingri Malai Curry, Nolen Gur Sandesh.",
-    img: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/fishcurry.png",
     badge: "UNESCO Mangrove Delta"
   },
 
@@ -668,7 +668,7 @@ const indiaHotspots = [
     desc: "Pristine sandy shores, fragrant spice estates, eco-kayaking through backwaters, and colorful Portuguese colonial villas.",
     culture: "Konkani-Portuguese synthesis, brass fado music, sustainable beach shacks.",
     food: "Goan Fish Curry Thali, Chicken Xacuti, Pork Vindaloo, Traditional Bebinca.",
-    img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/baga.png",
     badge: "Coastal & Heritage"
   },
   {
@@ -685,7 +685,7 @@ const indiaHotspots = [
     desc: "Undulating emerald carpets of mist-bathed tea hills and shola forests, sanctuary of the endangered Nilgiri Tahr.",
     culture: "Highland tea farming communities, indigenous Muthuvan tribal knowledge.",
     food: "Appam with Vegetable Stew, Puttu with Kadala Curry, Ela Sadya, Cardamom Tea.",
-    img: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/coorg.png",
     badge: "Emerald Tea Crest"
   },
   {
@@ -702,7 +702,7 @@ const indiaHotspots = [
     desc: "Tranquil green labyrinth of palm-fringed lagoons, lotus canals, and solar-powered traditional wooden houseboats.",
     culture: "Nehru Trophy snake boat races, Kathakali dance, coir rope making.",
     food: "Karimeen Pollichathu (pearl spot in banana leaf), Kerala Sadya, Kappa with Fish Curry.",
-    img: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/kochi.png",
     badge: "Backwater Capital"
   },
   {
@@ -719,7 +719,7 @@ const indiaHotspots = [
     desc: "7th-century Pallava coastal sanctuary featuring monolithic rock temples that have stood resilient against Bay of Bengal waves for 1,300 years.",
     culture: "Traditional stone sculptors' guild, Dravidian temple art, Bharatanatyam.",
     food: "Crisp Medu Vada, Masala Dosa, Sambar, Filter Coffee, Coastal Prawn Roast.",
-    img: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=700&q=80",
+    img: "assets/images/chennai.png",
     badge: "UNESCO Coastal Stone"
   },
   {
