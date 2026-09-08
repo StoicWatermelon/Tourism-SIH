@@ -2242,17 +2242,19 @@ def serve_html_file(filename: str, inject_carto: bool = False):
     raise HTTPException(status_code=404, detail=f"Page {filename} not found")
 
 @app.get("/")
+@app.get("/index")
+@app.get("/index/")
+@app.get("/index.html")
 @app.get("/home")
 @app.get("/home/")
 @app.get("/home.html")
-def serve_home():
-    return serve_html_file("home.html")
+def serve_landing():
+    return serve_html_file("index.html")
 
-@app.get("/index.html")
 @app.get("/overview")
 @app.get("/overview/")
-def serve_index():
-    return serve_html_file("index.html", inject_carto=True)
+def serve_overview():
+    return serve_html_file("home.html", inject_carto=True)
 
 @app.get("/explore")
 @app.get("/explore/")
