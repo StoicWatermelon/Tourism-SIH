@@ -1,0 +1,54 @@
+{
+  "name": "Bharat Explore — Smart Tourism Platform",
+  "short_name": "BharatExplore",
+  "description": "AI-powered smart sustainable tourism intelligence, high passes, cultural corridors, and offline travel field kit.",
+  "start_url": "/",
+  "id": "/?source=pwa",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#071711",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["travel", "navigation", "lifestyle", "education"],
+  "icons": [
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Destinations",
+      "short_name": "Destinations",
+      "url": "/explore",
+      "icons": [{ "src": "/assets/images/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "State Map",
+      "short_name": "Map",
+      "url": "/map",
+      "icons": [{ "src": "/assets/images/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bharat AI",
+      "short_name": "AI Chat",
+      "url": "/ai",
+      "icons": [{ "src": "/assets/images/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Trip Planner",
+      "short_name": "Planner",
+      "url": "/planner",
+      "icons": [{ "src": "/assets/images/favicon.png", "sizes": "192x192" }]
+    }
+  ]
+}
