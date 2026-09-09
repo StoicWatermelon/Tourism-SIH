@@ -6,30 +6,42 @@
       "use": "@vercel/python"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "api/index.py"
+      "src": "/api(.*)",
+      "dest": "api/index.py"
     },
     {
-      "source": "/css/(.*)",
-      "destination": "/css/$1"
+      "src": "/css/(.*)",
+      "dest": "/css/$1"
     },
     {
-      "source": "/js/(.*)",
-      "destination": "/js/$1"
+      "src": "/js/(.*)",
+      "dest": "/js/$1"
     },
     {
-      "source": "/assets/(.*)",
-      "destination": "/assets/$1"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
-      "source": "/html/(.*)",
-      "destination": "/html/$1"
+      "src": "/html/(.*)",
+      "dest": "/html/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/html/index.html"
+      "src": "/(manifest\\.json|robots\\.txt|sitemap\\.xml)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/favicon\\.(ico|png)",
+      "dest": "/assets/images/favicon.png"
+    },
+    {
+      "src": "/(explore|circuits|map|planner|ai|responsible|culture|food|home|login|register|profile|CodeBreakerz)(\\.html)?",
+      "dest": "/html/$1.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
