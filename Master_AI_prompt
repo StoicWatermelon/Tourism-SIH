@@ -1,0 +1,581 @@
+# Build an Autonomous India Tourism Travel Agent
+
+You are upgrading an existing India Tourism website.
+
+The current AI is only a chatbot.
+
+Transform it into a **goal-driven travel assistant agent** that plans
+complete trips instead of simply answering questions.
+
+The experience should feel like talking to a real travel planner.
+
+## Mandatory Project Scan — DO THIS FIRST
+
+**IMPORTANT: Before writing, modifying, deleting, or replacing ANY code, scan and understand the entire existing project.**
+
+Do not immediately start implementing the features described below.
+
+### Phase 0 — Existing Project Audit
+
+First, inspect the complete project/codebase and determine:
+
+- Project/framework being used
+- Frontend technology and structure
+- Backend technology and structure
+- Existing AI/chatbot implementation
+- Existing API integrations
+- Existing database/session/storage system
+- Existing authentication, if any
+- Existing environment variables and configuration
+- Existing routing/navigation
+- Existing UI components and styling system
+- Existing travel-related features
+- Existing map, hotel, flight, weather, or places integrations
+- Existing error handling
+- Existing caching
+- Existing model/API providers
+- Existing dependencies
+- Existing build and deployment configuration
+
+Scan all relevant source files, configuration files, API routes, components, services, utilities, and documentation.
+
+Do **not** assume that a feature is missing simply because it is not mentioned in this prompt. Verify the actual codebase first.
+
+### Create a Project Understanding Report
+
+Before implementation, internally establish:
+
+```text
+PROJECT TYPE:
+FRONTEND:
+BACKEND:
+DATABASE:
+AI MODEL:
+AI PROVIDERS:
+EXTERNAL APIs:
+AUTHENTICATION:
+SESSION STORAGE:
+MAIN ENTRY POINTS:
+IMPORTANT COMPONENTS:
+IMPORTANT SERVICES:
+CURRENT CHAT FLOW:
+CURRENT TRAVEL FEATURES:
+CURRENT LIMITATIONS:
+POTENTIAL CONFLICTS:
+MISSING FEATURES:
+```
+
+Identify which existing components can be **reused, extended, or refactored** rather than unnecessarily rebuilding them.
+
+### Preserve Existing Functionality
+
+The existing website is the foundation of this project.
+
+Therefore:
+
+- Do not rewrite the entire project unnecessarily.
+- Do not replace working systems without a reason.
+- Do not remove existing features unless they directly conflict with the new agent architecture.
+- Preserve the current UI style where practical.
+- Reuse existing components, utilities, API clients, database logic, and styling.
+- Maintain backward compatibility wherever possible.
+- Avoid introducing duplicate systems that already exist in the project.
+
+### Dependency & Architecture Check
+
+Before adding a dependency:
+
+1. Check whether the project already has an equivalent dependency.
+2. Check whether the required functionality already exists somewhere in the codebase.
+3. Prefer the existing architecture when practical.
+4. Only introduce a new dependency when it provides a clear benefit.
+
+Do not create unnecessary abstractions or frameworks.
+
+### Configuration & Secrets
+
+Inspect the existing configuration and `.env` usage.
+
+Never hardcode:
+
+- API keys
+- API secrets
+- Authentication tokens
+- Database credentials
+- Private URLs
+
+Reuse the project's existing environment-variable conventions.
+
+If a required API key or service is missing, identify it clearly instead of inserting fake credentials.
+
+### Implementation Plan After Scan
+
+Only after completing the project audit should implementation begin.
+
+Create an implementation plan based on the **actual existing codebase**, not on assumptions.
+
+The plan should identify:
+
+```text
+1. Files/components that will be modified
+2. Files/components that will be created
+3. Existing systems that will be reused
+4. APIs/tools that need to be connected
+5. Database/session changes
+6. AI/model-router changes
+7. Frontend changes
+8. Testing requirements
+9. Potential breaking changes
+```
+
+Then implement the features incrementally.
+
+### Do Not Stop at Analysis
+
+The scan is a preparation phase, **not the final deliverable**.
+
+After understanding the project:
+
+**SCAN → UNDERSTAND → PLAN → IMPLEMENT → TEST → FIX → VERIFY**
+
+Do not simply produce a report and wait for further instructions unless a genuinely blocking issue requires clarification.
+
+### Work Incrementally
+
+After each major implementation stage:
+
+1. Check the affected files.
+2. Check for syntax/type errors.
+3. Check imports and dependencies.
+4. Check API connections.
+5. Check that existing functionality still works.
+6. Fix issues before moving to the next stage.
+
+### Existing Code Takes Priority
+
+When this specification conflicts with the existing implementation details, first determine whether the existing system can be adapted.
+
+The goal is to **upgrade the existing India Tourism website into an autonomous travel agent**, not blindly rebuild it from scratch.
+
+### Final Verification
+
+Before considering the task complete, perform a final project-wide review.
+
+Verify that:
+
+- The existing website still starts successfully.
+- Existing major features still work.
+- The new AI agent works.
+- Conversation state is preserved.
+- Planner state is preserved.
+- Tool failures are handled.
+- Model fallback works.
+- Rate-limit recovery works.
+- Offline fallback works.
+- API keys are not exposed.
+- No obvious dead code or broken imports were introduced.
+- The frontend and backend communicate correctly.
+- The application does not rely on fabricated live travel data.
+
+Only then consider the implementation complete.
+
+## Core Objective
+
+A user should be able to type:
+
+> "I don't want to plan anything. I have ₹25,000 for 4 days in Kerala."
+
+The agent should then handle the planning workflow automatically.
+
+## Agent Architecture
+
+Implement the system as an agent with:
+
+-   Conversation Memory
+-   Planner
+-   Tool Calling
+-   Task Execution
+-   Result Verification
+-   Graceful Fallback
+
+Workflow:
+
+`User Goal → Planner → Ask Questions → Task List → Flights / Hotels / Attractions / Itinerary`
+
+The agent must keep state during the conversation.
+
+## Information Gathering
+
+Never ask every question at once.
+
+Ask only the missing information needed.
+
+Collect:
+
+### Essential
+
+-   Starting city
+-   Destination
+-   Budget
+-   Number of travelers
+-   Travel dates
+-   Number of days
+
+### Optional
+
+-   Children
+-   Senior citizens
+-   Disabilities
+-   Medical conditions
+-   Preferred transport
+-   Hotel preference
+-   Food preference
+-   Adventure vs relaxation
+-   Weather preference
+-   Wheelchair accessibility
+
+Example:
+
+> User: "Plan me a trip to Kashmir."
+
+Agent:
+
+> "Great. I need four things first:
+>
+> 1.  Which city are you leaving from?
+> 2.  What's your total budget?
+> 3.  How many people?
+> 4.  Rough travel dates?"
+
+## Planner Module
+
+Convert user intent into tasks.
+
+Example:
+
+``` text
+Goal:
+Plan 5-day Kashmir trip under ₹35,000.
+
+Tasks:
+1. Find cheapest flight.
+2. Compare hotel prices.
+3. Build daily itinerary.
+4. Estimate local transport.
+5. Recommend restaurants.
+6. Include emergency hospitals.
+7. Calculate total cost.
+```
+
+The planner should update tasks dynamically.
+
+## Tool System
+
+The agent should use tools instead of hallucinating.
+
+Supported tools:
+
+-   Flight search
+-   Hotel search
+-   Maps
+-   Weather
+-   Places search
+-   Distance calculator
+-   Currency conversion
+-   Hospital lookup
+
+Example integrations:
+
+-   Google Maps
+-   OpenStreetMap
+-   Booking.com
+-   MakeMyTrip
+-   Skyscanner
+-   TripAdvisor
+
+The agent should browse these services to collect information instead of
+inventing prices.
+
+## Flight Planning
+
+The flight module should:
+
+-   compare multiple providers
+-   recommend cheapest nearby day
+-   suggest alternative airports
+-   estimate baggage costs
+-   explain tradeoffs
+
+Example:
+
+  Date       Price
+  ---------- ---------
+  Friday     ₹7,800
+  Saturday   ₹10,900
+  Sunday     ₹6,400
+
+Recommendation:
+
+> "Leave Sunday to save ₹4,500."
+
+## Hotel Planning
+
+Search hotels matching:
+
+-   budget
+-   family size
+-   location
+-   rating
+-   cancellation policy
+
+Output:
+
+  Hotel     Price    Rating
+  --------- -------- --------
+  Hotel A   ₹1,800   4.5
+  Hotel B   ₹2,100   4.7
+  Hotel C   ₹1,500   4.2
+
+Mention:
+
+-   breakfast included
+-   Wi-Fi
+-   AC
+-   distance from attractions
+
+## Attraction Planner
+
+Instead of dumping tourist spots, optimize travel.
+
+Group nearby attractions to minimize travel time.
+
+## Daily Itinerary
+
+Generate hour-by-hour plans.
+
+  Time    Activity
+  ------- -------------
+  8:00    Breakfast
+  9:00    Leave hotel
+  10:00   Fort
+  1:00    Lunch
+  2:00    Museum
+  6:00    Sunset
+  8:00    Dinner
+
+Include travel time.
+
+## Budget Breakdown
+
+  Category    Cost
+  ----------- ---------
+  Flights     ₹8,000
+  Hotel       ₹12,000
+  Food        ₹5,000
+  Transport   ₹3,000
+  Tickets     ₹2,000
+
+Show remaining budget.
+
+## Smart Recommendations
+
+Adapt recommendations based on:
+
+-   children
+-   elderly travelers
+-   disabilities
+-   asthma
+-   adventure preference
+
+Avoid unsafe or exhausting plans where appropriate.
+
+## Emergency Assistant
+
+Always include:
+
+-   nearest hospital
+-   emergency numbers
+-   police
+-   pharmacy
+-   weather alerts
+
+## Memory
+
+Remember:
+
+-   budget
+-   preferences
+-   previous destination
+
+If the user changes one constraint, update the plan instead of
+restarting.
+
+## Multi-Step Execution
+
+Workflow:
+
+1.  Gather missing info.
+2.  Search flights.
+3.  Search hotels.
+4.  Build itinerary.
+5.  Calculate costs.
+6.  Present final plan.
+
+Show progress:
+
+-   ✅ Flights
+-   🔄 Hotels
+-   ⏳ Itinerary
+
+## Frontend UX
+
+Use:
+
+-   itinerary cards
+-   hotel cards
+-   flight cards
+-   map previews
+-   progress tracker
+
+Avoid giant walls of text.
+
+## Agent Safety
+
+Never fabricate:
+
+-   hotel availability
+-   live prices
+-   flight prices
+
+Clearly label estimates.
+
+## Model Rate Limit Protection (Critical)
+
+The project must continue working even after the primary LLM reaches its
+rate limit.
+
+Implement a model router.
+
+Priority:
+
+1.  Primary model
+2.  Backup model
+3.  Smaller backup
+4.  Local fallback
+
+Example:
+
+``` text
+GPT
+ ↓
+429 Rate Limit
+ ↓
+Gemini
+ ↓
+Rate Limit
+ ↓
+Qwen
+ ↓
+Rate Limit
+ ↓
+Local model
+```
+
+The conversation state must survive model switching.
+
+Store:
+
+-   conversation history
+-   planner state
+-   completed tasks
+-   user preferences
+
+in persistent session storage.
+
+## Local Fallback Mode
+
+When every API fails:
+
+Switch into Offline Travel Assistant.
+
+Still provide:
+
+-   itinerary generation
+-   budget calculation
+-   attraction recommendations
+-   packing list
+-   travel checklist
+
+Display:
+
+> "Live booking services are temporarily unavailable. I'm continuing
+> with offline planning."
+
+The website should never become unusable.
+
+## Caching
+
+Cache:
+
+-   city information
+-   tourist attractions
+-   common itineraries
+-   weather
+-   hotel search results
+
+This reduces token usage.
+
+## Error Recovery
+
+If a tool fails:
+
+Retry automatically.
+
+Instead of:
+
+> "Error."
+
+Say:
+
+> "Booking search failed. I'll retry with another provider."
+
+## Deliverables
+
+Build a modular AI agent with:
+
+-   Planner
+-   Memory
+-   Tool calling
+-   Flight search
+-   Hotel search
+-   Attraction optimizer
+-   Budget calculator
+-   Emergency recommendations
+-   Progress tracker
+-   Model router
+-   Offline fallback
+-   Session persistence
+-   Caching
+-   Automatic retries
+-   Responsive card-based UI
+
+The final experience should resemble an autonomous travel assistant that
+takes a vague travel goal, asks only necessary questions, performs
+multi-step planning, recovers from failures, and continues functioning
+even after the primary model reaches its rate limit.
+
+## Hackathon Differentiator
+
+Add an **Execution Queue**.
+
+Save checkpoints after every completed task.
+
+Example:
+
+-   ✅ Budget collected
+-   ✅ Flights compared
+-   ✅ Hotels shortlisted
+-   🔄 Building itinerary (45%)
+
+If a 429 rate limit happens, switch models and resume from the last
+completed checkpoint instead of restarting the conversation.

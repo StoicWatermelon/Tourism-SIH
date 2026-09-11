@@ -1,0 +1,596 @@
+/* AI & Planner Responsive Adjustments */
+@media (max-width: 1100px) {
+  .split-section {
+    grid-template-columns: 1fr;
+  }
+  .planner {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .chat {
+    height: 520px;
+    max-height: 75vh;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   AUTONOMOUS TRAVEL AGENT — PROGRESS TRACKER & EXECUTION QUEUE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.agent-tracker-wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  padding: 16px 24px;
+  background: rgba(10, 33, 24, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(82, 183, 136, 0.28);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.agent-tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-tracker-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #e9c46a;
+  text-transform: uppercase;
+}
+
+.agent-checkpoint-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(45, 106, 79, 0.45);
+  border: 1px solid rgba(82, 183, 136, 0.5);
+  color: #74c69d;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 99px;
+}
+
+.agent-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 880px) {
+  .agent-steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .agent-steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.agent-step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.agent-step-item.pending {
+  opacity: 0.5;
+}
+
+.agent-step-item.active {
+  opacity: 1;
+  background: rgba(82, 183, 136, 0.16);
+  border-color: #52b788;
+  box-shadow: 0 0 14px rgba(82, 183, 136, 0.3);
+}
+
+.agent-step-item.completed {
+  opacity: 1;
+  background: rgba(45, 106, 79, 0.28);
+  border-color: rgba(82, 183, 136, 0.45);
+}
+
+.step-badge-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.agent-step-item.active .step-badge-icon {
+  background: #e9c46a;
+  color: #071711;
+  animation: pulseIcon 1.5s infinite;
+}
+
+.agent-step-item.completed .step-badge-icon {
+  background: #2a9d8f;
+  color: #fff;
+}
+
+@keyframes pulseIcon {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.step-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.step-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step-status {
+  font-size: 10px;
+  color: #9db2be;
+  margin-top: 1px;
+}
+
+.agent-step-item.completed .step-status {
+  color: #74c69d;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RICH AGENT CARDS (FLIGHTS, HOTELS, ITINERARIES, BUDGET, EMERGENCY)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.agent-card {
+  background: #ffffff;
+  border: 1px solid rgba(45, 106, 79, 0.18);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-top: 14px;
+  box-shadow: 0 4px 16px rgba(10, 26, 19, 0.08);
+  color: #0a1c14;
+}
+
+.agent-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #1b4332;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.agent-card-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.agent-card-tag.verified {
+  background: rgba(42, 157, 143, 0.15);
+  color: #2a9d8f;
+  border: 1px solid rgba(42, 157, 143, 0.35);
+}
+
+/* Savings highlight callout */
+.deal-savings-banner {
+  background: linear-gradient(135deg, rgba(233, 196, 106, 0.22) 0%, rgba(244, 162, 97, 0.18) 100%);
+  border: 1px dashed #e76f51;
+  border-radius: 10px;
+  padding: 9px 13px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #9d4218;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Day-by-Day price comparison pills */
+.day-price-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+}
+
+.day-price-pill {
+  flex: 1;
+  min-width: 85px;
+  padding: 8px;
+  background: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.day-price-pill.best-deal {
+  background: rgba(42, 157, 143, 0.12);
+  border-color: #2a9d8f;
+}
+
+.day-price-pill .day-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5f707a;
+}
+
+.day-price-pill.best-deal .day-name {
+  color: #2a9d8f;
+}
+
+.day-price-pill .day-cost {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0a1c14;
+  margin-top: 2px;
+}
+
+/* Flight option row */
+.flight-option-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f8faf9;
+  border: 1px solid rgba(45, 106, 79, 0.12);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.flight-option-item.recommended {
+  border: 1.5px solid #2d6a4f;
+  background: #f0f7f3;
+}
+
+.airline-badge {
+  font-weight: 800;
+  font-size: 13px;
+  color: #1b4332;
+}
+
+.flight-timings {
+  font-size: 11.5px;
+  color: #5f707a;
+  margin-top: 2px;
+}
+
+.flight-fare {
+  text-align: right;
+}
+
+.flight-price-inr {
+  font-size: 15px;
+  font-weight: 800;
+  color: #2d6a4f;
+}
+
+.flight-baggage {
+  font-size: 10px;
+  color: #5f707a;
+}
+
+/* Hotel Card Grid */
+.hotel-cards-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.hotel-item {
+  border: 1px solid rgba(45, 106, 79, 0.14);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fcfbf9;
+}
+
+.hotel-item.recommended {
+  border-color: #52b788;
+  background: #f2f9f5;
+}
+
+.hotel-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.hotel-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0a1c14;
+}
+
+.hotel-rating-badge {
+  background: #1b4332;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.hotel-location-text {
+  font-size: 11.5px;
+  color: #5f707a;
+  margin-bottom: 8px;
+}
+
+.amenity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.amenity-chip {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(45, 106, 79, 0.09);
+  color: #1b4332;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.hotel-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2d6a4f;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  padding-top: 6px;
+}
+
+/* Daily Itinerary Timeline Card */
+.itinerary-day-box {
+  margin-bottom: 14px;
+  border: 1px solid rgba(45, 106, 79, 0.12);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.day-box-header {
+  background: #f4efe4;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.day-box-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #1b4332;
+}
+
+.day-box-area {
+  font-size: 11px;
+  color: #5f707a;
+}
+
+.timeline-slot-item {
+  display: grid;
+  grid-template-columns: 65px 1fr;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 12px;
+}
+
+.timeline-slot-item:last-child {
+  border-bottom: 0;
+}
+
+.slot-time {
+  font-weight: 800;
+  color: #2d6a4f;
+  font-size: 11.5px;
+}
+
+.slot-activity-title {
+  font-weight: 700;
+  color: #0a1c14;
+}
+
+.slot-meta-row {
+  font-size: 11px;
+  color: #5f707a;
+  margin-top: 2px;
+}
+
+/* Budget Breakdown Card */
+.budget-overview-bar {
+  height: 12px;
+  width: 100%;
+  border-radius: 99px;
+  background: #e9ecef;
+  display: flex;
+  overflow: hidden;
+  margin: 10px 0 14px;
+}
+
+.bar-segment {
+  height: 100%;
+}
+
+.budget-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.stat-box {
+  background: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.stat-label {
+  font-size: 10.5px;
+  color: #5f707a;
+  font-weight: 600;
+}
+
+.stat-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0a1c14;
+  margin-top: 2px;
+}
+
+.stat-val.highlight-green {
+  color: #2a9d8f;
+}
+
+.budget-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Emergency Safeguard Card */
+.emergency-card-box {
+  background: #fff8f8;
+  border: 1.5px solid rgba(230, 57, 70, 0.3);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.emergency-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c92a2a;
+  font-weight: 800;
+  font-size: 13.5px;
+  margin-bottom: 8px;
+}
+
+.emergency-hosp-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0a1c14;
+}
+
+.emergency-contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.emergency-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: #c92a2a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.emergency-btn.secondary {
+  background: #1b4332;
+}
+
+/* Quick Action Chips */
+.agent-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.agent-action-chip {
+  font-size: 11.5px;
+  font-weight: 700;
+  background: #f0f7f3;
+  color: #1b4332;
+  border: 1px solid rgba(45, 106, 79, 0.25);
+  padding: 6px 14px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.agent-action-chip:hover {
+  background: #2d6a4f;
+  color: #fff;
+  border-color: #2d6a4f;
+}
+
+/* Offline Fallback Alert */
+.offline-agent-alert {
+  background: rgba(244, 162, 97, 0.15);
+  border: 1px solid #f4a261;
+  color: #e76f51;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

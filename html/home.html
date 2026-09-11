@@ -73,7 +73,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   
   <!-- Leaflet Map CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -301,7 +301,7 @@
           <button data-question="What is the mandatory acclimatization protocol for Leh?" data-i18n="sug_acclimat">48-Hr Acclimatization</button>
         </div>
         <div style="margin-top: 18px;">
-          <a href="ai.html" class="btn ghost-mini">Open Fullscreen AI Console ↗</a>
+          <a href="ai.html?chat=open#chatWindow" class="btn ghost-mini" id="openFullscreenAiBtn">Open Fullscreen AI Console ↗</a>
         </div>
       </div>
 
@@ -338,15 +338,88 @@
           <a href="planner.html" class="text-btn" style="margin-top: 6px; display: inline-block;">Open Dedicated Planner Page →</a>
         </div>
       </div>
+
+      <!-- AI Autonomous Expedition Planner Teaser -->
+      <div class="planner-ai-hero" style="margin-bottom: 28px;">
+        <div class="planner-hero-header">
+          <div class="planner-hero-orb">🗺️</div>
+          <div class="planner-hero-title">
+            <h3>Autonomous AI Expedition Planner</h3>
+            <small>Natural Language • Pan-India Flights, Stays &amp; Routes</small>
+          </div>
+          <a href="planner.html" class="planner-cta-pill" style="display:inline-flex; align-items:center; gap:6px; background:rgba(82,183,136,0.15); border:1px solid rgba(82,183,136,0.35); color:#74c69d; border-radius:999px; padding:6px 14px; font-size:12px; font-weight:700; text-decoration:none; margin-left:auto;">
+            Full Experience ↗
+          </a>
+        </div>
+
+        <form class="planner-nl-form" onsubmit="event.preventDefault(); const q = document.getElementById('homePlannerNLInput').value.trim(); if (q) window.location.href = 'planner.html?q=' + encodeURIComponent(q);">
+          <div class="planner-nl-input-wrap">
+            <textarea
+              id="homePlannerNLInput"
+              class="planner-nl-textarea"
+              rows="1"
+              placeholder="e.g. 4 days in Kerala under ₹25,000 with backwaters and local food..."
+              aria-label="Describe your dream trip"
+            ></textarea>
+            <button type="submit" class="planner-nl-send">
+              <span>⚡</span> Plan It
+            </button>
+          </div>
+          <p class="planner-nl-hint">
+            Popular: 
+            <span onclick="window.location.href='planner.html?q=' + encodeURIComponent('Plan me 4 days in Kerala backwaters under ₹28,000 for 2 people');">Kerala Backwaters (4D)</span> • 
+            <span onclick="window.location.href='planner.html?q=' + encodeURIComponent('Plan a 7-day Ladakh high-altitude expedition under ₹45,000');">Ladakh High Passes (7D)</span> • 
+            <span onclick="window.location.href='planner.html?q=' + encodeURIComponent('Plan a 3-day Goa beach weekend under ₹18,000 for 2');">Goa Weekend (3D)</span> • 
+            <span onclick="window.location.href='planner.html?q=' + encodeURIComponent('Plan a 5-day royal Rajasthan heritage tour under ₹35,000');">Rajasthan Forts (5D)</span>
+          </p>
+        </form>
+      </div>
       
       <div class="planner">
         <form id="plannerForm" class="planner-form">
           <label>
             <span data-i18n="plan_lbl_dest">Destination</span>
-            <select id="planDestination">
-              <option value="Ladakh" data-i18n="opt_ladakh">Ladakh (High Altitude Focus)</option>
-              <option value="Himachal Pradesh" data-i18n="opt_hp">Himachal Pradesh</option>
-            </select>
+            <input id="planDestination" list="destinationListHome" type="text" value="Hampi" placeholder="Search or type ANY place in India (e.g. Hampi, Udaipur, Darjeeling)..." style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.15); background:#fff; font-size:14px; font-weight:600; color:#1d2d44;">
+            <datalist id="destinationListHome">
+              <option value="Hampi">Hampi — Ancient Vijayanagara UNESCO Boulder Ruins (Karnataka)</option>
+              <option value="Coorg">Coorg (Kodagu) — Coffee Estates & Misty Falls (Karnataka)</option>
+              <option value="Gokarna">Gokarna — Crescent Beaches & Mahabaleshwar (Karnataka)</option>
+              <option value="Mysore">Mysore — Royal Wodeyar Palace & Silk Heritage (Karnataka)</option>
+              <option value="Udaipur">Udaipur — Lake Pichola & Royal Palaces (Rajasthan)</option>
+              <option value="Jaipur">Jaipur — Pink City & Amer Fort Heritage (Rajasthan)</option>
+              <option value="Jodhpur">Jodhpur — Blue City & Mehrangarh Citadel (Rajasthan)</option>
+              <option value="Jaisalmer">Jaisalmer — Golden Thar Dunes & Sonar Qila (Rajasthan)</option>
+              <option value="Darjeeling">Darjeeling — Kanchenjunga Sunrise & Tea Plantations (West Bengal)</option>
+              <option value="Rishikesh">Rishikesh — Yoga Capital & Ganga River Rafting (Uttarakhand)</option>
+              <option value="Amritsar">Amritsar — Golden Temple & Wagah Border (Punjab)</option>
+              <option value="Pachmarhi">Pachmarhi — Satpura Hill Canyons & Waterfalls (Madhya Pradesh)</option>
+              <option value="Khajuraho">Khajuraho — UNESCO Sandstone Temples & Gorges (Madhya Pradesh)</option>
+              <option value="Pondicherry">Pondicherry — French White Town & Auroville (Puducherry)</option>
+              <option value="Kodaikanal">Kodaikanal — Misty Star Lake & Pillar Rocks (Tamil Nadu)</option>
+              <option value="Varanasi">Varanasi — Sacred Ghats & Evening Ganga Aarti (Uttar Pradesh)</option>
+              <option value="Kerala">Kerala — Backwaters, Solar Ferries & Tea Trails</option>
+              <option value="Ladakh">Ladakh — High Himalayan Passes & Alpine Lakes</option>
+              <option value="Goa">Goa — Coastal Beaches & Portuguese Heritage</option>
+              <option value="Meghalaya">Meghalaya — Living Root Bridges & Crystal Rivers</option>
+              <option value="Sikkim">Sikkim — Gangtok & Alpine Monasteries</option>
+              <option value="Spiti Valley">Spiti Valley — Cold Desert & Key Gompa (Himachal)</option>
+              <option value="Manali">Manali — Pine Valleys & Solang Adventure (Himachal)</option>
+              <option value="Puri">Puri — Golden Blue Flag Beach & Jagannath Shrine (Odisha)</option>
+              <option value="Andaman">Andaman Islands — Coral Reefs & Radhanagar Beach</option>
+              <option value="Kutch">Rann of Kutch — White Salt Desert (Gujarat)</option>
+              <option value="Kaziranga">Kaziranga — One-Horned Rhino Safari (Assam)</option>
+              <option value="Ziro Valley">Ziro Valley — Apatani Tribal Homestays (Arunachal)</option>
+              <option value="Kashmir">Kashmir — Dal Lake Houseboats & Gulmarg Gondola</option>
+              <option value="Himachal Pradesh">Himachal Pradesh</option>
+              <option value="Uttarakhand">Uttarakhand</option>
+              <option value="Rajasthan">Rajasthan</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Madhya Pradesh">Madhya Pradesh</option>
+              <option value="Assam">Assam</option>
+              <option value="West Bengal">West Bengal</option>
+            </datalist>
           </label>
           
           <div class="planner-row">
@@ -778,6 +851,52 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Persistent Floating AI Assistant Widget (Bottom-Right) -->
+  <button class="floating-chat-trigger" id="floatingChatTrigger" title="Chat with Bharat AI" aria-label="Open Bharat AI Travel Assistant">
+    <span class="floating-orb-dot">✦</span>
+    <span class="floating-chat-label">Bharat AI</span>
+    <span class="floating-online-pulse"></span>
+  </button>
+
+  <div class="floating-chat-widget" id="floatingChatWidget" role="dialog" aria-label="Bharat AI Assistant" aria-hidden="true">
+    <div class="floating-chat-header">
+      <div class="floating-header-info">
+        <span class="ai-orb idle" id="floatingAiOrb">✦</span>
+        <div>
+          <div class="floating-header-title">BHARAT <b>AI</b></div>
+          <div class="floating-header-status" id="floatingAiStatus">Active • Gemini 3.1 Flash Lite</div>
+        </div>
+      </div>
+      <div class="floating-header-actions">
+        <a href="ai.html?chat=open#chatWindow" class="floating-action-btn" title="Open Fullscreen Console" aria-label="Open Fullscreen Console">↗</a>
+        <button class="floating-action-btn floating-chat-close-btn" id="floatingChatCloseBtn" title="Minimize Chat" aria-label="Minimize Chat">✕</button>
+      </div>
+    </div>
+
+    <!-- Quick Suggestion Pills -->
+    <div class="floating-suggestions-scroll">
+      <button class="floating-sug-btn" data-q="Tell me about Kolkata & West Bengal heritage">Kolkata</button>
+      <button class="floating-sug-btn" data-q="What are the must-visit places in Jaipur & Rajasthan?">Jaipur</button>
+      <button class="floating-sug-btn" data-q="What should I pack for high-altitude passes like Khardung La?">Packing</button>
+      <button class="floating-sug-btn" data-q="What is the mandatory acclimatization protocol for Leh?">AMS Protocol</button>
+      <button class="floating-sug-btn" data-q="What are the best offbeat places in Meghalaya?">Meghalaya</button>
+      <button class="floating-sug-btn" data-q="Weekend getaway trip to Sikkim">Sikkim</button>
+    </div>
+
+    <!-- Messages Window -->
+    <div class="floating-chat-messages" id="floatingMessages">
+      <div class="msg bot">
+        Namaste! 🙏 I am Bharat AI, your intelligent travel companion. Ask me anything about destinations, passes, local cuisine, packing, or custom itineraries!
+      </div>
+    </div>
+
+    <!-- Chat Input Form -->
+    <form class="floating-chat-form" id="floatingChatForm">
+      <input id="floatingChatInput" placeholder="Ask Bharat AI about India travel..." autocomplete="off" aria-label="Chat input">
+      <button type="submit" aria-label="Send message" id="floatingSendBtn">➤</button>
+    </form>
   </div>
 
   <!-- Ambient Toast Notification -->

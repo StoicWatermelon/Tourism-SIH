@@ -1083,10 +1083,41 @@ function renderHotspotInPanel(h) {
       <button class="btn primary" style="padding:9px 18px; font-size:13px;" onclick="loadStateIntoPlanner('${h.name}')">
         ${btnPlanText}
       </button>
+      <button class="btn ghost" style="padding:9px 16px; font-size:13px; border:1px solid rgba(82,183,136,0.5); color:#74c69d;" onclick="triggerHotspotAIIntel('${h.id}')">
+        ✨ AI Intel
+      </button>
       <button class="map-reset-btn" onclick="resetMapView()">${btnResetText}</button>
     </div>
   `;
 }
+
+function triggerHotspotAIIntel(hotspotId) {
+  const h = indiaHotspots.find(x => x.id === hotspotId || x.name.toLowerCase() === hotspotId.toLowerCase());
+  if (!h) return;
+  if (typeof window.openAICardInsight === "function") {
+    window.openAICardInsight({
+      title: h.name,
+      category: h.badge || "Destination",
+      location: h.state,
+      desc: h.desc,
+      img: h.img
+    });
+  }
+}
+window.triggerHotspotAIIntel = triggerHotspotAIIntel;
+
+function triggerStateAIIntel(stateName) {
+  const s = indiaStates[stateName] || (typeof states !== "undefined" ? states[stateName] : null);
+  if (typeof window.openAICardInsight === "function") {
+    window.openAICardInsight({
+      title: stateName,
+      category: "State Circuit",
+      location: stateName,
+      desc: s ? s.exp : ""
+    });
+  }
+}
+window.triggerStateAIIntel = triggerStateAIIntel;
 
 function statePanel(name) {
   // Check if it's one of the rich hotspots
@@ -1101,20 +1132,20 @@ function statePanel(name) {
   }
 
   // Fallback to legacy states dictionary
-  const s = states[name];
+  const s = indiaStates[name] || (typeof states !== "undefined" ? states[name] : null);
   const panel = $("#statePanel");
-  if (!s || !panel) return;
+  if (!panel || !s) return;
 
   currentActivePanelTarget = { type: 'state', data: name };
   const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
   const lblCap = lang === "hi" ? "राजधानी:" : lang === "bn" ? "রাজধানী:" : "Capital:";
   const lblAlt = lang === "hi" ? "ऊंचाई:" : lang === "bn" ? "উচ্চতা:" : "Altitude:";
-  const lblSeason = lang === "hi" ? "मुख्य मौसम:" : lang === "bn" ? "প্রধান ঋতু:" : "Prime Season:";
-  const lblHighlights = lang === "hi" ? "मुख्य आकर्षण:" : lang === "bn" ? "প্রধান আকর্ষণ:" : "Highlights:";
-  const lblExp = lang === "hi" ? "प्रमुख अनुभव:" : lang === "bn" ? "বিশেষ অভিজ্ঞতা:" : "Signature Experiences:";
-  const lblCulture = lang === "hi" ? "सजीव संस्कृति:" : lang === "bn" ? "জীবন্ত সংস্কৃতি:" : "Living Culture:";
-  const lblFood = lang === "hi" ? "स्थानीय स्वाद:" : lang === "bn" ? "স্থানীয় খাদ্য:" : "Local Flavors:";
-  const btnPlanText = lang === "hi" ? `योजना बनाएं (${name}) →` : lang === "bn" ? `ভ্রমণ পরিকল্পনা (${name}) →` : `Plan Itinerary for ${name} →`;
+  const lblSeason = lang === "hi" ? "सर्वश्रेष्ठ मौसम:" : lang === "bn" ? "সেরা মরশুম:" : "Ideal Season:";
+  const lblHighlights = lang === "hi" ? "प्रमुख आकर्षण:" : lang === "bn" ? "প্রধান আকর্ষণ:" : "Top Highlights:";
+  const lblExp = lang === "hi" ? "अनुभव:" : lang === "bn" ? "অভিজ্ঞতা:" : "Signature Experience:";
+  const lblCulture = lang === "hi" ? "सांस्कृतिक विरासत:" : lang === "bn" ? "সাংস্কৃতিক ঐতিহ্য:" : "Living Heritage:";
+  const lblFood = lang === "hi" ? "स्थानीय व्यंजन:" : lang === "bn" ? "স্থানীয় খাবার:" : "Local Cuisine:";
+  const btnPlanText = lang === "hi" ? "योजना बनाएं →" : lang === "bn" ? "ভ্রমণ পরিকল্পনা →" : "Plan Itinerary →";
   const btnResetText = lang === "hi" ? "↺ संपूर्ण मानचित्र" : lang === "bn" ? "↺ সমগ্র মানচিত্র" : "↺ Overview Map";
 
   panel.innerHTML = `
@@ -1129,6 +1160,9 @@ function statePanel(name) {
     <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
       <button class="btn primary" style="padding:9px 18px; font-size:13px;" onclick="loadStateIntoPlanner('${name}')">
         ${btnPlanText}
+      </button>
+      <button class="btn ghost" style="padding:9px 16px; font-size:13px; border:1px solid rgba(82,183,136,0.5); color:#74c69d;" onclick="triggerStateAIIntel('${name}')">
+        ✨ AI Intel
       </button>
       <button class="map-reset-btn" onclick="resetMapView()">${btnResetText}</button>
     </div>
@@ -1146,24 +1180,40 @@ window.addEventListener("bharat-lang-changed", () => {
 });
 
 function loadStateIntoPlanner(stateName) {
-  const select = $("#planDestination");
-  if (!select) return;
+  const el = $("#planDestination");
+  if (!el) return;
 
-  let exists = false;
-  for (let i = 0; i < select.options.length; i++) {
-    if (select.options[i].value.toLowerCase() === stateName.toLowerCase() || select.options[i].text.toLowerCase().includes(stateName.toLowerCase())) {
-      select.selectedIndex = i;
-      exists = true;
-      break;
+  if (el.tagName === "INPUT") {
+    el.value = stateName;
+    const listId = el.getAttribute("list");
+    if (listId) {
+      const dl = document.getElementById(listId);
+      if (dl) {
+        const opts = Array.from(dl.options || []);
+        if (!opts.some(o => o.value.toLowerCase() === stateName.toLowerCase())) {
+          const opt = document.createElement("option");
+          opt.value = stateName;
+          dl.appendChild(opt);
+        }
+      }
     }
-  }
+  } else if (el.options) {
+    let exists = false;
+    for (let i = 0; i < el.options.length; i++) {
+      if (el.options[i].value.toLowerCase() === stateName.toLowerCase() || el.options[i].text.toLowerCase().includes(stateName.toLowerCase())) {
+        el.selectedIndex = i;
+        exists = true;
+        break;
+      }
+    }
 
-  if (!exists) {
-    const opt = document.createElement("option");
-    opt.value = stateName;
-    opt.text = stateName;
-    select.add(opt);
-    select.value = stateName;
+    if (!exists) {
+      const opt = document.createElement("option");
+      opt.value = stateName;
+      opt.text = stateName;
+      el.add(opt);
+      el.value = stateName;
+    }
   }
 
   toast(`Selected ${stateName} for safety-audited itinerary generation.`);

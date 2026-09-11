@@ -79,7 +79,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ai.css">
@@ -158,76 +158,200 @@
       </div>
     </section>
 
-    <!-- Smart Itinerary Builder Section -->
+    <!-- AI-Powered Smart Itinerary Builder Section -->
     <section class="section" id="planner" style="padding-top: 40px;">
       <div class="section-head">
         <div>
-          <p class="eyebrow" data-i18n="plan_eyebrow">EXPEDITION PARAMETERS</p>
-          <h2 data-i18n="plan_title">Custom Expedition Generator</h2>
+          <p class="eyebrow">AUTONOMOUS AI EXPEDITION PLANNER</p>
+          <h2>Just Tell Me Your Travel Dream</h2>
         </div>
-        <p data-i18n="plan_sub">Specify your expedition timeframe, budget per traveler, style, and environmental preferences below.</p>
+        <p>Our autonomous Bharat AI agent handles everything — flights, hotels, day-by-day itinerary, budget, and emergency contacts — from a single natural sentence.</p>
       </div>
-      
-      <div class="planner">
-        <form id="plannerForm" class="planner-form">
-          <label>
-            <span data-i18n="plan_lbl_dest">Destination</span>
-            <select id="planDestination">
-              <option value="Ladakh" data-i18n="opt_ladakh">Ladakh (High Altitude Focus)</option>
-              <option value="Himachal Pradesh" data-i18n="opt_hp">Himachal Pradesh</option>
-            </select>
-          </label>
-          
-          <div class="planner-row">
-            <label>
-              <span data-i18n="plan_lbl_days">Days</span>
-              <input id="planDays" type="number" min="1" max="14" value="5">
-            </label>
-            <label>
-              <span data-i18n="plan_lbl_budget">Budget per person (₹)</span>
-              <input id="planBudget" type="number" min="5000" step="1000" value="32000">
-            </label>
+
+      <!-- ── Checkpoint Session Pill ── -->
+      <div class="planner-checkpoint-pill" id="plannerCheckpointPill">
+        🛡️ <span id="plannerCheckpointText">Agent ready • Gemini 3.1 Flash Lite</span>
+      </div>
+
+      <!-- ── AI Hero Input Box ── -->
+      <div class="planner-ai-hero">
+        <div class="planner-hero-header">
+          <div class="planner-hero-orb" id="plannerHeroOrb">🗺️</div>
+          <div class="planner-hero-title">
+            <h3>Bharat AI Travel Planner</h3>
+            <small>Autonomous • Pan-India • All 36 States & UTs</small>
           </div>
+        </div>
 
-          <label>
-            <span data-i18n="plan_lbl_style">Travel style</span>
-            <select id="planStyle">
-              <option value="Adventure" data-i18n="opt_style_adventure">⚡ Adventure & Mountain Pass Exploration</option>
-              <option value="Offbeat Eco" data-i18n="opt_style_offbeat">🌱 Offbeat Decongestion & Village Homestays</option>
-              <option value="Culture" data-i18n="opt_style_culture">◈ Heritage, Monasteries & Living Traditions</option>
-              <option value="Photography" data-i18n="opt_style_photo">📷 Landscape & Astrophotography</option>
-            </select>
-          </label>
-
-          <label>
-            <span data-i18n="plan_lbl_interest">Primary Interest</span>
-            <select id="planInterest">
-              <option value="High Passes" data-i18n="opt_int_passes">High Mountain Passes & Summits</option>
-              <option value="Offbeat Villages" data-i18n="opt_int_villages">Offbeat Border Villages (Turtuk, Hanle)</option>
-              <option value="Lakes & Nature" data-i18n="opt_int_lakes">Alpine Lakes (Pangong & Tso Moriri)</option>
-              <option value="Monasteries" data-i18n="opt_int_monasteries">Historic Gompas & Ancient Murals</option>
-              <option value="Eco Trails" data-i18n="opt_int_ecotrails">Community Homestays & Eco Trails</option>
-            </select>
-          </label>
-
-          <label class="checkbox-label">
-            <input type="checkbox" id="planEcoHomestays" checked>
-            <span data-i18n="plan_chk_homestays">Prioritize Certified Eco-Homestays (+15 Responsible Score)</span>
-          </label>
-
-          <label class="checkbox-label">
-            <input type="checkbox" id="planPublicTransit" checked>
-            <span data-i18n="plan_chk_transit">Opt for Shared/EV Transits & Carbon-Neutral Trails (+10 Score)</span>
-          </label>
-
-          <button class="btn primary" type="submit" data-i18n="plan_btn_generate">⚡ Generate Safety-Audited Itinerary</button>
+        <form class="planner-nl-form" id="plannerNLForm" onsubmit="return false;">
+          <div class="planner-nl-input-wrap">
+            <textarea
+              id="plannerNLInput"
+              class="planner-nl-textarea"
+              rows="1"
+              placeholder="e.g. Plan me 4 days in Kerala under ₹25,000 — I love backwaters and local food"
+              aria-label="Tell the AI your travel goal"
+            ></textarea>
+            <button type="submit" class="planner-nl-send" id="plannerNLSend">
+              <span>⚡</span> Plan It
+            </button>
+          </div>
+          <p class="planner-nl-hint">
+            Try: <span onclick="const q='I have ₹18,000 for a 3-day Goa trip for 2 people'; document.getElementById('plannerNLInput').value=q; window.askPlannerAI && askPlannerAI(q);">Goa weekend</span>,
+            <span onclick="const q='Plan a 7-day Ladakh expedition under ₹45,000 — adventure focus'; document.getElementById('plannerNLInput').value=q; window.askPlannerAI && askPlannerAI(q);">Ladakh 7 days</span>,
+            <span onclick="const q='Explore Meghalaya for 4 days, eco-friendly with family of 4'; document.getElementById('plannerNLInput').value=q; window.askPlannerAI && askPlannerAI(q);">Meghalaya family</span>
+          </p>
         </form>
+      </div>
 
-        <div id="itineraryOutput" class="itinerary-output">
-          <div class="empty-state">
-            <span style="font-size:48px; display:block; margin-bottom:12px;">🗺️</span>
-            <h3 data-i18n="plan_empty_title">Safety-Audited Dynamic Route</h3>
-            <p data-i18n="plan_empty_sub">Fill out the expedition parameters on the left to compute a live itinerary audited against real-time mountain pass telemetry and AMS acclimatization pacing.</p>
+      <!-- ── Quick Intent Pills ── -->
+      <div class="planner-quick-pills-section">
+        <div class="planner-pills-label">✨ One-Click Quick Plans:</div>
+        <div class="planner-quick-pills" id="plannerQuickPills">
+          <button class="planner-pill" onclick="window.askPlannerAI && askPlannerAI('Plan me 4 days in Kerala backwaters under ₹28,000 for 2 people')">🌊 Kerala Backwaters (4D)</button>
+          <button class="planner-pill" onclick="window.askPlannerAI && askPlannerAI('Plan a 7-day Ladakh high-altitude expedition under ₹45,000 — adventure travel')">🏔️ Ladakh Expedition (7D)</button>
+          <button class="planner-pill" onclick="window.askPlannerAI && askPlannerAI('Plan a 3-day Goa beach weekend under ₹18,000 for 2 people')">🏖️ Goa Weekend (3D)</button>
+          <button class="planner-pill" onclick="window.askPlannerAI && askPlannerAI('Plan a 5-day royal Rajasthan heritage tour under ₹35,000 for a couple')">🏛️ Rajasthan Royal (5D)</button>
+          <button class="planner-pill" onclick="window.askPlannerAI && askPlannerAI('Explore Meghalaya for 5 days — eco-friendly, caves, living root bridges')">🌿 Meghalaya Explore</button>
+          <button class="planner-pill" onclick="window.askPlannerAI && askPlannerAI('Plan a 3-day Varanasi spiritual and heritage trip under ₹15,000')">🕌 Varanasi Heritage (3D)</button>
+        </div>
+      </div>
+
+      <!-- ── 5-Step Progress Tracker ── -->
+      <div class="planner-progress-section" id="plannerProgressSection">
+        <div class="planner-progress-header">
+          <span class="planner-progress-title">🚀 Execution Queue</span>
+          <span class="planner-model-tag" id="plannerModelTag">Gemini 3.1 Flash Lite</span>
+        </div>
+        <div class="planner-steps">
+          <div class="planner-step step-pending" id="pstep-1">
+            <span class="step-icon">🎯</span>
+            <span class="step-label">Gather Intent</span>
+            <span class="step-status" id="pstep1Status">Queued</span>
+          </div>
+          <div class="planner-step step-pending" id="pstep-2">
+            <span class="step-icon">✈️</span>
+            <span class="step-label">Search Flights</span>
+            <span class="step-status" id="pstep2Status">Queued</span>
+          </div>
+          <div class="planner-step step-pending" id="pstep-3">
+            <span class="step-icon">🏨</span>
+            <span class="step-label">Find Hotels</span>
+            <span class="step-status" id="pstep3Status">Queued</span>
+          </div>
+          <div class="planner-step step-pending" id="pstep-4">
+            <span class="step-icon">🗺️</span>
+            <span class="step-label">Build Route</span>
+            <span class="step-status" id="pstep4Status">Queued</span>
+          </div>
+          <div class="planner-step step-pending" id="pstep-5">
+            <span class="step-icon">💰</span>
+            <span class="step-label">Budget & Safety</span>
+            <span class="step-status" id="pstep5Status">Queued</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Agent Output Area ── -->
+      <div class="planner-output-area" id="plannerOutputArea"></div>
+
+      <!-- ── Legacy Form (Collapsible) ── -->
+      <div class="planner-legacy-toggle" id="plannerLegacyToggle" onclick="window.togglePlannerLegacyForm && togglePlannerLegacyForm()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 6 8 10 12 6"/></svg>
+        Use structured form instead (All Destinations Across India)
+      </div>
+      <div class="planner-legacy-form" id="plannerLegacyForm">
+        <div class="planner">
+          <form id="plannerForm" class="planner-form">
+            <label>
+              <span data-i18n="plan_lbl_dest">Destination</span>
+              <input id="planDestination" list="destinationList" type="text" value="Hampi" placeholder="Search or type ANY place in India (e.g. Hampi, Udaipur, Darjeeling)..." style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.15); background:#fff; font-size:14px; font-weight:600; color:#1d2d44;">
+              <datalist id="destinationList">
+                <option value="Hampi">Hampi — Ancient Vijayanagara UNESCO Boulder Ruins (Karnataka)</option>
+                <option value="Coorg">Coorg (Kodagu) — Coffee Estates & Misty Falls (Karnataka)</option>
+                <option value="Gokarna">Gokarna — Crescent Beaches & Mahabaleshwar (Karnataka)</option>
+                <option value="Mysore">Mysore — Royal Wodeyar Palace & Silk Heritage (Karnataka)</option>
+                <option value="Udaipur">Udaipur — Lake Pichola & Royal Palaces (Rajasthan)</option>
+                <option value="Jaipur">Jaipur — Pink City & Amer Fort Heritage (Rajasthan)</option>
+                <option value="Jodhpur">Jodhpur — Blue City & Mehrangarh Citadel (Rajasthan)</option>
+                <option value="Jaisalmer">Jaisalmer — Golden Thar Dunes & Sonar Qila (Rajasthan)</option>
+                <option value="Darjeeling">Darjeeling — Kanchenjunga Sunrise & Tea Plantations (West Bengal)</option>
+                <option value="Rishikesh">Rishikesh — Yoga Capital & Ganga River Rafting (Uttarakhand)</option>
+                <option value="Amritsar">Amritsar — Golden Temple & Wagah Border (Punjab)</option>
+                <option value="Pachmarhi">Pachmarhi — Satpura Hill Canyons & Waterfalls (Madhya Pradesh)</option>
+                <option value="Khajuraho">Khajuraho — UNESCO Sandstone Temples & Gorges (Madhya Pradesh)</option>
+                <option value="Pondicherry">Pondicherry — French White Town & Auroville (Puducherry)</option>
+                <option value="Kodaikanal">Kodaikanal — Misty Star Lake & Pillar Rocks (Tamil Nadu)</option>
+                <option value="Varanasi">Varanasi — Sacred Ghats & Evening Ganga Aarti (Uttar Pradesh)</option>
+                <option value="Kerala">Kerala — Backwaters, Solar Ferries & Tea Trails</option>
+                <option value="Ladakh">Ladakh — High Himalayan Passes & Alpine Lakes</option>
+                <option value="Goa">Goa — Coastal Beaches & Portuguese Heritage</option>
+                <option value="Meghalaya">Meghalaya — Living Root Bridges & Crystal Rivers</option>
+                <option value="Sikkim">Sikkim — Gangtok & Alpine Monasteries</option>
+                <option value="Spiti Valley">Spiti Valley — Cold Desert & Key Gompa (Himachal)</option>
+                <option value="Manali">Manali — Pine Valleys & Solang Adventure (Himachal)</option>
+                <option value="Puri">Puri — Golden Blue Flag Beach & Jagannath Shrine (Odisha)</option>
+                <option value="Andaman">Andaman Islands — Coral Reefs & Radhanagar Beach</option>
+                <option value="Kutch">Rann of Kutch — White Salt Desert (Gujarat)</option>
+                <option value="Kaziranga">Kaziranga — One-Horned Rhino Safari (Assam)</option>
+                <option value="Ziro Valley">Ziro Valley — Apatani Tribal Homestays (Arunachal)</option>
+                <option value="Kashmir">Kashmir — Dal Lake Houseboats & Gulmarg Gondola</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Assam">Assam</option>
+                <option value="West Bengal">West Bengal</option>
+              </datalist>
+            </label>
+            <div class="planner-row">
+              <label>
+                <span data-i18n="plan_lbl_days">Days</span>
+                <input id="planDays" type="number" min="1" max="14" value="5">
+              </label>
+              <label>
+                <span data-i18n="plan_lbl_budget">Budget per person (₹)</span>
+                <input id="planBudget" type="number" min="5000" step="1000" value="32000">
+              </label>
+            </div>
+            <label>
+              <span data-i18n="plan_lbl_style">Travel style</span>
+              <select id="planStyle">
+                <option value="Adventure" data-i18n="opt_style_adventure">⚡ Adventure & Mountain Pass Exploration</option>
+                <option value="Offbeat Eco" data-i18n="opt_style_offbeat">🌱 Offbeat Decongestion & Village Homestays</option>
+                <option value="Culture" data-i18n="opt_style_culture">◈ Heritage, Monasteries & Living Traditions</option>
+                <option value="Photography" data-i18n="opt_style_photo">📷 Landscape & Astrophotography</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="plan_lbl_interest">Primary Interest</span>
+              <select id="planInterest">
+                <option value="High Passes" data-i18n="opt_int_passes">High Mountain Passes & Summits</option>
+                <option value="Offbeat Villages" data-i18n="opt_int_villages">Offbeat Border Villages (Turtuk, Hanle)</option>
+                <option value="Lakes & Nature" data-i18n="opt_int_lakes">Alpine Lakes (Pangong & Tso Moriri)</option>
+                <option value="Monasteries" data-i18n="opt_int_monasteries">Historic Gompas & Ancient Murals</option>
+                <option value="Eco Trails" data-i18n="opt_int_ecotrails">Community Homestays & Eco Trails</option>
+              </select>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="planEcoHomestays" checked>
+              <span data-i18n="plan_chk_homestays">Prioritize Certified Eco-Homestays (+15 Responsible Score)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="planPublicTransit" checked>
+              <span data-i18n="plan_chk_transit">Opt for Shared/EV Transits & Carbon-Neutral Trails (+10 Score)</span>
+            </label>
+            <button class="btn primary" type="submit" data-i18n="plan_btn_generate">⚡ Generate Safety-Audited Itinerary</button>
+          </form>
+          <div id="itineraryOutput" class="itinerary-output">
+            <div class="empty-state">
+              <span style="font-size:48px; display:block; margin-bottom:12px;">🗺️</span>
+              <h3 data-i18n="plan_empty_title">Safety-Audited Dynamic Route</h3>
+              <p data-i18n="plan_empty_sub">Fill out the expedition parameters on the left to compute a live itinerary audited against real-time mountain pass telemetry and AMS acclimatization pacing.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -468,5 +592,6 @@
   <script src="../js/field_pass.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/ai.js"></script>
+  <script src="../js/ai_card_insight.js"></script>
 </body>
 </html>

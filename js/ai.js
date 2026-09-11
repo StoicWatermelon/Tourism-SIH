@@ -260,10 +260,460 @@
   }
 
   // ═══════════════════════════════════════════════════════
-  //  STREAMING AI CHAT ENGINE WITH ADAPTIVE TOKEN DISPATCHER
+  //  AUTONOMOUS AGENT CLIENT & CARD RENDERING ENGINE
   // ═══════════════════════════════════════════════════════
 
   let isGenerating = false;
+  let agentSessionId = localStorage.getItem("bharat_agent_session_id");
+  if (!agentSessionId) {
+    agentSessionId = "sess-" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem("bharat_agent_session_id", agentSessionId);
+  }
+  let currentAgentPlan = null;
+
+  function updateAgentTracker(stepNumber, checkpoints, activeModel, isOffline) {
+    const pill = $("#agentCheckpointPill");
+    const countText = $("#checkpointCountText");
+    const modelTag = $("#activeModelTag");
+
+    if (pill && countText) {
+      if (isOffline) {
+        countText.innerHTML = "⚠️ Offline Autonomous Fallback • Active";
+        pill.style.borderColor = "#f4a261";
+        pill.style.color = "#e76f51";
+      } else {
+        const count = checkpoints ? checkpoints.length : (stepNumber >= 5 ? 5 : stepNumber);
+        countText.innerHTML = `🛡️ ${count}/5 Checkpoints Saved • Active: ${activeModel || 'Gemini 3.1 Flash Lite'}`;
+      }
+    }
+
+    if (modelTag) {
+      modelTag.textContent = isOffline ? "Offline Mode" : (activeModel || "Gemini 3.1 Flash Lite");
+    }
+
+    for (let i = 1; i <= 5; i++) {
+      const el = $(`#step-${i}`);
+      const statusEl = $(`#step${i}Status`);
+      if (!el) continue;
+
+      if (i < stepNumber) {
+        el.className = "agent-step-item completed";
+        if (statusEl) statusEl.textContent = "✅ Completed";
+      } else if (i === stepNumber) {
+        el.className = "agent-step-item active";
+        if (statusEl) statusEl.textContent = stepNumber === 1 ? "Gathering intent..." : "In progress...";
+      } else {
+        el.className = "agent-step-item pending";
+        if (statusEl) statusEl.textContent = "Queued";
+      }
+    }
+
+    if (stepNumber >= 5) {
+      for (let i = 1; i <= 5; i++) {
+        const el = $(`#step-${i}`);
+        const statusEl = $(`#step${i}Status`);
+        if (el) el.className = "agent-step-item completed";
+        if (statusEl) statusEl.textContent = "✅ Completed";
+      }
+    }
+  }
+
+  function renderWebGroundedBadge(plan) {
+    if (!plan || !plan.web_search_summary) return "";
+    const sourceLink = (plan.web_sources && plan.web_sources.length > 0) 
+      ? `<a href="${plan.web_sources[0]}" target="_blank" rel="noopener noreferrer" style="color:#2a9d8f; text-decoration:underline; font-weight:700; margin-left:8px;">Read Full Travel Guide ↗</a>` 
+      : "";
+    return `
+      <div class="agent-card" style="background: linear-gradient(135deg, rgba(42,157,143,0.06), rgba(82,183,136,0.12)); border: 1px solid rgba(42,157,143,0.3); border-left: 4px solid #2a9d8f;">
+        <div class="agent-card-title" style="margin-bottom:8px;">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span>🌐</span>
+            <span>LIVE INTERNET TRAVEL INTELLIGENCE</span>
+          </span>
+          <span class="agent-card-tag verified" style="background:rgba(42,157,143,0.15); color:#1b4332; border-color:#2a9d8f;">WIKIVOYAGE VERIFIED</span>
+        </div>
+        <p style="font-size:12.5px; color:#264653; line-height:1.55; margin:0 0 8px;">
+          ${plan.web_search_summary}
+        </p>
+        <div style="font-size:11px; color:#5f707a; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+          <span>⚡ Grounded with live Wikivoyage & Wikimedia regional open data</span>
+          ${sourceLink}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFlightCard(flights) {
+    if (!flights || !flights.options || flights.options.length === 0) return "";
+
+    let dayPillsHtml = "";
+    if (flights.day_comparisons && flights.day_comparisons.length > 0) {
+      dayPillsHtml = `
+        <div class="day-price-row">
+          ${flights.day_comparisons.map((d, idx) => `
+            <div class="day-price-pill ${idx === 2 || (d.difference_note && d.difference_note.includes('Save')) ? 'best-deal' : ''}">
+              <div class="day-name">${d.day}</div>
+              <div class="day-cost">₹${d.price_inr.toLocaleString()}</div>
+              ${d.difference_note ? `<div style="font-size:9.5px; margin-top:2px; color:${idx === 2 ? '#2a9d8f' : '#888'}; font-weight:700;">${d.difference_note}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    const optionsHtml = flights.options.map(opt => `
+      <div class="flight-option-item ${opt.is_recommended ? 'recommended' : ''}">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="airline-badge">${opt.airline} ${opt.flight_number}</span>
+            ${opt.is_recommended ? '<span style="font-size:10px; background:#2d6a4f; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800;">CHEAPEST RECOMMENDED</span>' : ''}
+          </div>
+          <div class="flight-timings">🕒 ${opt.departure_time} ➔ ${opt.arrival_time} • ${opt.duration} (${opt.stops})</div>
+          <div class="flight-baggage">🧳 Cabin: ${opt.cabin_baggage} • Check-in: ${opt.checkin_baggage}</div>
+        </div>
+        <div class="flight-fare">
+          <div class="flight-price-inr">₹${opt.price_inr.toLocaleString()}</div>
+          <div style="font-size:10px; color:#5f707a;">per person</div>
+        </div>
+      </div>
+    `).join('');
+
+    const altAirportsHtml = flights.alternative_airports && flights.alternative_airports.length > 0
+      ? `<div style="margin-top:8px; font-size:11.5px; color:#5f707a;"><b>Alternative Hubs:</b> ${flights.alternative_airports.join(' • ')}</div>`
+      : '';
+
+    return `
+      <div class="agent-card">
+        <div class="agent-card-title">
+          <span>✈️ FLIGHT INTELLIGENCE: ${flights.origin.toUpperCase()} ➔ ${flights.destination.toUpperCase()}</span>
+          <span class="agent-card-tag verified">VERIFIED BENCHMARK</span>
+        </div>
+        ${flights.savings_callout ? `
+          <div class="deal-savings-banner">
+            <span>💡</span>
+            <span>${flights.savings_callout}</span>
+          </div>
+        ` : ''}
+        ${dayPillsHtml}
+        <div class="flight-options-list">
+          ${optionsHtml}
+        </div>
+        ${altAirportsHtml}
+        ${flights.tradeoff_summary ? `
+          <div style="margin-top:10px; padding:8px 10px; background:#f4efe4; border-radius:6px; font-size:11.5px; color:#4a5568; line-height:1.4;">
+            <b>Trade-off Analysis:</b> ${flights.tradeoff_summary}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  function renderHotelCard(hotels) {
+    if (!hotels || !hotels.options || hotels.options.length === 0) return "";
+
+    const itemsHtml = hotels.options.map(h => `
+      <div class="hotel-item ${h.is_recommended ? 'recommended' : ''}">
+        <div class="hotel-item-head">
+          <div>
+            <div class="hotel-name">${h.name}</div>
+            <div style="font-size:11px; color:#5f707a; margin-top:2px;">${h.category} • ${h.location}</div>
+          </div>
+          <div class="hotel-rating-badge">★ ${h.rating}</div>
+        </div>
+        <div class="hotel-location-text">📍 ${h.distance_from_attractions}</div>
+        <div class="amenity-chips">
+          ${h.amenities.map(a => `<span class="amenity-chip">✓ ${a}</span>`).join('')}
+        </div>
+        <div class="hotel-price-row">
+          <span>₹${h.price_per_night_inr.toLocaleString()} / night</span>
+          <span><b>₹${h.total_price_inr.toLocaleString()}</b> total (${hotels.nights} nights)</span>
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="agent-card">
+        <div class="agent-card-title">
+          <span>🏨 VERIFIED ACCOMMODATION SHORTLIST (${hotels.nights} NIGHTS)</span>
+          <span class="agent-card-tag verified">BOOKING.COM AUDITED</span>
+        </div>
+        <div class="hotel-cards-list">
+          ${itemsHtml}
+        </div>
+        ${hotels.recommendation_note ? `
+          <p style="margin-top:10px; font-size:11.5px; color:#5f707a; line-height:1.4;">${hotels.recommendation_note}</p>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  function renderItineraryCard(itinerary) {
+    if (!itinerary || itinerary.length === 0) return "";
+
+    const daysHtml = itinerary.map(d => `
+      <div class="itinerary-day-box">
+        <div class="day-box-header">
+          <div>
+            <span class="day-box-title">DAY ${String(d.day_number).padStart(2, '0')}: ${d.theme}</span>
+          </div>
+          <div class="day-box-area">📍 ${d.area_cluster}</div>
+        </div>
+        ${d.acclimatization_safety_note ? `
+          <div style="background:#fff3cd; color:#856404; padding:6px 12px; font-size:11.5px; font-weight:700;">
+            ⚠️ ${d.acclimatization_safety_note}
+          </div>
+        ` : ''}
+        <div class="timeline-slots">
+          ${d.activities.map(a => `
+            <div class="timeline-slot-item">
+              <div class="slot-time">${a.time_slot}</div>
+              <div>
+                <div class="slot-activity-title">${a.activity}</div>
+                <div class="slot-meta-row">
+                  <span>📍 ${a.location}</span>
+                  ${a.transit_mins_from_prev > 0 ? `<span> • 🚗 ${a.transit_mins_from_prev} min transit</span>` : ''}
+                  ${a.estimated_cost_inr > 0 ? `<span> • 💰 ₹${a.estimated_cost_inr}</span>` : ''}
+                </div>
+                ${a.tip ? `<div style="font-size:11px; color:#2d6a4f; margin-top:2px;"><i>Tip: ${a.tip}</i></div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="agent-card">
+        <div class="agent-card-title">
+          <span>🗺️ OPTIMIZED CLUSTERED DAILY ITINERARY (${itinerary.length} DAYS)</span>
+          <span class="agent-card-tag verified">ZERO-ZIGZAG ROUTING</span>
+        </div>
+        <p style="font-size:12px; color:#5f707a; margin:0 0 12px;">Attractions grouped by geographical corridors to minimize intra-city travel times.</p>
+        <div class="itinerary-days-container">
+          ${daysHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderBudgetCard(budget) {
+    if (!budget) return "";
+
+    const barColors = ["#2a9d8f", "#e76f51", "#f4a261", "#457b9d", "#6a4c93", "#3d5a80"];
+    const barSegmentsHtml = budget.categories.map((c, i) => `
+      <div class="bar-segment" style="width: ${c.percentage}%; background: ${barColors[i % barColors.length]};" title="${c.category}: ${c.percentage}% (₹${c.cost_inr.toLocaleString()})"></div>
+    `).join('');
+
+    const categoryRowsHtml = budget.categories.map((c, i) => `
+      <div class="cat-row" style="padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:${barColors[i % barColors.length]}; display:inline-block; flex-shrink:0;"></span>
+            <strong style="color:#1d2d44; font-size:13px;">${c.category}</strong>
+          </div>
+          ${c.description ? `<div style="font-size:11.5px; color:#5f707a; margin-left:18px; margin-top:2px;">${c.description}</div>` : ''}
+        </div>
+        <div style="text-align:right; flex-shrink:0; margin-left:12px;">
+          <b style="color:#1b4332; font-size:13.5px;">₹${c.cost_inr.toLocaleString()}</b>
+          <div style="font-size:11px; color:#5f707a;">${c.percentage}%</div>
+        </div>
+      </div>
+    `).join('');
+
+    const tipsHtml = (budget.cost_saving_tips && budget.cost_saving_tips.length > 0)
+      ? `<div style="margin-top:14px; padding:12px 14px; background:rgba(82,183,136,0.08); border:1px solid rgba(82,183,136,0.25); border-radius:8px;">
+          <div style="font-size:11.5px; font-weight:700; color:#2d6a4f; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">💡 Smart Money-Saving Tips For This Route</div>
+          <ul style="margin:0; padding-left:18px; font-size:12px; color:#264653; line-height:1.5;">
+            ${budget.cost_saving_tips.map(t => `<li style="margin-bottom:4px;">${t}</li>`).join('')}
+          </ul>
+        </div>`
+      : '';
+
+    const rationaleHtml = budget.strategy_rationale
+      ? `<div style="margin-top:14px; padding:12px 14px; background:#f4efe4; border-left:4px solid #b78628; border-radius:4px 8px 8px 4px; font-size:12px; color:#3d3a37; line-height:1.45;">
+          <strong style="color:#b78628; display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em; font-size:11px;">🧠 Intelligent Division Strategy</strong>
+          ${budget.strategy_rationale}
+        </div>`
+      : '';
+
+    return `
+      <div class="agent-card">
+        <div class="agent-card-title">
+          <span>💰 SMART EXPEDITION BUDGET ALLOCATION</span>
+          <span class="agent-card-tag verified">INTERNET GROUNDED</span>
+        </div>
+        <div class="budget-stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Total Budget</div>
+            <div class="stat-val">₹${budget.total_budget_inr.toLocaleString()}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Allocated</div>
+            <div class="stat-val">₹${budget.total_allocated_inr.toLocaleString()}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">${budget.daily_avg_spend_inr ? 'Daily Average' : 'Est. Daily Spend'}</div>
+            <div class="stat-val" style="color:#457b9d;">₹${(budget.daily_avg_spend_inr || Math.round(budget.total_allocated_inr / 4)).toLocaleString()}/day</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Strategic Cushion</div>
+            <div class="stat-val ${budget.remaining_cushion_inr >= 0 ? 'highlight-green' : ''}" style="${budget.remaining_cushion_inr < 0 ? 'color:#e63946;' : ''}">
+              ₹${budget.remaining_cushion_inr.toLocaleString()}
+            </div>
+          </div>
+        </div>
+        <div class="budget-overview-bar" style="margin-top:14px;">
+          ${barSegmentsHtml}
+        </div>
+        <div class="budget-category-list" style="margin-top:8px;">
+          ${categoryRowsHtml}
+        </div>
+        ${rationaleHtml}
+        ${budget.cushion_health_advice ? `
+          <div style="margin-top:12px; padding:10px 12px; background:#f0f7f3; border-radius:8px; font-size:12px; color:#1b4332; line-height:1.4;">
+            <b>Cushion Health:</b> ${budget.cushion_health_advice}
+          </div>
+        ` : ''}
+        ${tipsHtml}
+      </div>
+    `;
+  }
+
+  function renderEmergencyCard(emergency) {
+    if (!emergency) return "";
+
+    return `
+      <div class="agent-card">
+        <div class="agent-card-title">
+          <span>🛡️ EMERGENCY MEDICAL & SAFETY DOSSIER</span>
+          <span class="agent-card-tag" style="background:#fee2e2; color:#ef4444; border:1px solid #f87171;">24/7 SAFEGUARD</span>
+        </div>
+        <div class="emergency-card-box">
+          <div class="emergency-head">
+            <span>🏥</span>
+            <span>Nearest Apex Trauma Center:</span>
+          </div>
+          <div class="emergency-hosp-name">${emergency.nearest_hospital.name}</div>
+          <div style="font-size:11.5px; color:#5f707a; margin-top:3px;">
+            ${emergency.nearest_hospital.address} (${emergency.nearest_hospital.distance})
+          </div>
+          <div class="emergency-contact-row">
+            <a class="emergency-btn" href="tel:${emergency.nearest_hospital.phone}">📞 Call Hospital (${emergency.nearest_hospital.phone})</a>
+            <a class="emergency-btn secondary" href="tel:112">🚨 National Emergency: 112</a>
+            <a class="emergency-btn secondary" href="tel:1363">ℹ️ Tourist Helpline: 1363</a>
+          </div>
+          ${emergency.weather_alert ? `
+            <div style="margin-top:10px; font-size:11.5px; color:#856404; background:#fff3cd; padding:6px 10px; border-radius:6px;">
+              <b>Weather Advisory:</b> ${emergency.weather_alert}
+            </div>
+          ` : ''}
+          ${emergency.high_altitude_medical_tips ? `
+            <div style="margin-top:6px; font-size:11.5px; color:#1e40af; background:#dbeafe; padding:6px 10px; border-radius:6px;">
+              <b>High Altitude Warning:</b> ${emergency.high_altitude_medical_tips}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderWebGroundedBadge(plan) {
+    if (!plan || !plan.web_search_summary) return "";
+    const sourceUrl = (plan.web_sources && plan.web_sources.length > 0) ? plan.web_sources[0] : "https://www.incredibleindia.gov.in";
+    const destName = plan.constraints && plan.constraints.destination ? plan.constraints.destination : "Destination";
+    return `
+      <div class="web-grounded-badge-card">
+        <div class="web-grounded-header">
+          <span class="web-grounded-dot"></span>
+          <span>LIVE INTERNET GROUNDED • WIKIPEDIA & INCREDIBLE INDIA</span>
+          <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="web-grounded-source-link">View Source ↗</a>
+        </div>
+        <p class="web-grounded-summary"><b>${destName}:</b> ${plan.web_search_summary}</p>
+      </div>
+    `;
+  }
+
+  function renderQuickActions(plan) {
+    const days = plan.constraints && plan.constraints.number_of_days ? plan.constraints.number_of_days : 4;
+    const budget = plan.constraints && plan.constraints.budget ? Math.round(plan.constraints.budget) : 25000;
+    const travelers = plan.constraints && plan.constraints.number_of_travelers ? plan.constraints.number_of_travelers : 1;
+
+    return `
+      <div class="agent-quick-actions">
+        <button class="agent-action-chip" onclick="window.modifyAgentConstraint('add_day', 1)">🗓️ +1 Day (${days + 1}D)</button>
+        ${days > 2 ? `<button class="agent-action-chip" onclick="window.modifyAgentConstraint('remove_day', 1)">🗓️ -1 Day (${days - 1}D)</button>` : ''}
+        <button class="agent-action-chip" onclick="window.modifyAgentConstraint('lower_budget', 1)">📉 Lower Budget (₹${Math.round(budget * 0.8).toLocaleString()})</button>
+        <button class="agent-action-chip" onclick="window.modifyAgentConstraint('upgrade_budget', 1)">⭐ Luxury Upgrade (₹${Math.round(budget * 1.3).toLocaleString()})</button>
+        <button class="agent-action-chip" onclick="window.modifyAgentConstraint('travel_style', 'Relaxation & Eco-Homestays')">🌿 Eco Homestay Style</button>
+        ${travelers === 1 ? `<button class="agent-action-chip" onclick="window.modifyAgentConstraint('number_of_travelers', 2)">👥 Set 2 Travelers</button>` : `<button class="agent-action-chip" onclick="window.modifyAgentConstraint('number_of_travelers', 1)">👤 Solo Traveler</button>`}
+        <button class="agent-action-chip" onclick="window.savePlanToJourney()">♥ Save to My Journey</button>
+        <button class="agent-action-chip" onclick="window.downloadFieldPassPdf ? window.downloadFieldPassPdf() : window.location.href='/api/passes/download-safety-guidelines-pdf'">🛡️ Download Field Kit PDF</button>
+      </div>
+    `;
+  }
+
+  async function modifyAgentConstraint(key, value) {
+    const box = $("#messages");
+    if (!box) return;
+
+    const botMsg = document.createElement("div");
+    botMsg.className = "msg bot";
+    botMsg.innerHTML = `<span class="bot-text">Updating plan with <b>${key.replace('_', ' ')} = ${value}</b>...</span>`;
+    box.appendChild(botMsg);
+    box.scrollTop = box.scrollHeight;
+
+    const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+
+    try {
+      const res = await fetch(`${AI_API_ORIGIN}/api/agent/update-constraint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: agentSessionId,
+          key: key,
+          value: value,
+          lang: lang
+        })
+      });
+
+      if (!res.ok) throw new Error("Update failed");
+      const data = await res.json();
+      currentAgentPlan = data.plan;
+
+      updateAgentTracker(5, data.checkpoints, "Gemini 3.1 Flash Lite", false);
+
+      let cardsHtml = "";
+      if (data.plan && data.plan.web_search_summary) {
+        cardsHtml += renderWebGroundedBadge(data.plan);
+      }
+      cardsHtml += renderMarkdown(data.message);
+      if (data.plan) {
+        cardsHtml += renderFlightCard(data.plan.flights);
+        cardsHtml += renderHotelCard(data.plan.hotels);
+        cardsHtml += renderItineraryCard(data.plan.itinerary);
+        cardsHtml += renderBudgetCard(data.plan.budget);
+        cardsHtml += renderEmergencyCard(data.plan.emergency);
+        cardsHtml += renderQuickActions(data.plan);
+      }
+      botMsg.innerHTML = cardsHtml;
+      box.scrollTop = box.scrollHeight;
+      toast(`Successfully updated ${key.replace('_', ' ')}!`);
+    } catch (err) {
+      console.warn("Update constraint error:", err);
+      botMsg.innerHTML = `<span class="bot-text">Failed to update constraint automatically. Please try typing your request.</span>`;
+    }
+  }
+
+  window.modifyAgentConstraint = modifyAgentConstraint;
+
+  window.savePlanToJourney = function() {
+    if (!currentAgentPlan) {
+      toast("No active plan to bookmark.");
+      return;
+    }
+    const dest = currentAgentPlan.constraints.destination || "Destination";
+    toast(`Saved ${dest} expedition plan to your journey bookmarks!`);
+  };
 
   async function askAI(q) {
     if (!q || !q.trim() || isGenerating) return;
@@ -425,6 +875,7 @@
         throw new Error(`Server returned HTTP status ${res.status}`);
       }
 
+      if (orb) orb.className = "ai-orb streaming";
       if (statusText) statusText.textContent = streamingText;
 
       const reader = res.body.getReader();
@@ -470,6 +921,310 @@
     }
   }
 
+  // ═══════════════════════════════════════════════════════
+  //  PERSISTENT FLOATING AI CHAT ENGINE & WIDGET CONTROLLER
+  // ═══════════════════════════════════════════════════════
+
+  let isFloatingGenerating = false;
+
+  async function askFloatingAI(q) {
+    if (!q || !q.trim() || isFloatingGenerating) return;
+    const box = $("#floatingMessages");
+    const orb = $("#floatingAiOrb");
+    const statusText = $("#floatingAiStatus");
+    const form = $("#floatingChatForm");
+    const submitBtn = form ? form.querySelector("button[type='submit']") : null;
+    const chatInput = $("#floatingChatInput");
+
+    if (!box) return;
+
+    const detected = detectDestination(q);
+    if (detected) {
+      activeDestination = detected;
+    }
+
+    const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+    const connectingText = lang === "hi" ? "कनेक्ट हो रहा है..." : lang === "bn" ? "সংযুক্ত হচ্ছে..." : "Connecting...";
+    const streamingText = lang === "hi" ? "उत्तर आ रहा है..." : lang === "bn" ? "উত্তর লেখা হচ্ছে..." : "Streaming...";
+    const activeText = "Active • Gemini 3.1 Flash Lite";
+    const placeholderText = lang === "hi" ? "सोच रहा हूँ..." : lang === "bn" ? "চিন্তা করছি..." : "Thinking...";
+
+    isFloatingGenerating = true;
+    if (submitBtn) submitBtn.disabled = true;
+
+    // 1. User message
+    const userMsg = document.createElement("div");
+    userMsg.className = "msg user";
+    userMsg.textContent = q;
+    box.appendChild(userMsg);
+    box.scrollTop = box.scrollHeight;
+
+    // 2. Orb status
+    if (orb) orb.className = "ai-orb thinking";
+    if (statusText) statusText.textContent = connectingText;
+
+    // 3. Bot placeholder
+    const botMsg = document.createElement("div");
+    botMsg.className = "msg bot";
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "bot-text";
+    textSpan.textContent = placeholderText;
+    textSpan.style.opacity = "0.7";
+
+    const cursor = document.createElement("span");
+    cursor.textContent = "▍";
+    cursor.className = "typing-cursor";
+
+    botMsg.appendChild(textSpan);
+    botMsg.appendChild(cursor);
+    box.appendChild(botMsg);
+    box.scrollTop = box.scrollHeight;
+
+    // 4. Token Queue & Dispatcher
+    const tokenQueue = [];
+    let displayedText = "";
+    let isStreamFinished = false;
+    let isDispatcherRunning = false;
+    let isFirstToken = true;
+
+    const controller = new AbortController();
+    let watchdogTimer = setTimeout(() => controller.abort(), 30000);
+
+    function finalizeFloatingUI() {
+      if (watchdogTimer) clearTimeout(watchdogTimer);
+      if (cursor && cursor.parentNode) cursor.remove();
+      if (orb) orb.className = "ai-orb idle";
+      if (statusText) statusText.textContent = activeText;
+      if (submitBtn) submitBtn.disabled = false;
+      if (chatInput) {
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
+      box.scrollTop = box.scrollHeight;
+      isFloatingGenerating = false;
+
+      if (displayedText.trim()) {
+        chatHistory.push({ role: "user", text: q });
+        chatHistory.push({ role: "model", text: displayedText.trim() });
+        if (chatHistory.length > 12) {
+          chatHistory.splice(0, chatHistory.length - 12);
+        }
+      }
+    }
+
+    function processFloatingTokenQueue() {
+      if (tokenQueue.length > 0) {
+        if (isFirstToken) {
+          textSpan.textContent = "";
+          textSpan.style.opacity = "1";
+          isFirstToken = false;
+        }
+
+        let tokensToDrain = tokenQueue.length > 30 ? 3 : tokenQueue.length > 15 ? 2 : 1;
+        let delayMs = tokenQueue.length > 30 ? 6 : tokenQueue.length > 15 ? 10 : 18;
+
+        for (let i = 0; i < tokensToDrain && tokenQueue.length > 0; i++) {
+          displayedText += tokenQueue.shift();
+        }
+
+        textSpan.innerHTML = renderMarkdown(displayedText.trimStart());
+        box.scrollTop = box.scrollHeight;
+
+        setTimeout(processFloatingTokenQueue, delayMs);
+      } else if (!isStreamFinished) {
+        setTimeout(processFloatingTokenQueue, 25);
+      } else {
+        isDispatcherRunning = false;
+        textSpan.innerHTML = renderMarkdown(displayedText.trimStart());
+        finalizeFloatingUI();
+      }
+    }
+
+    try {
+      const payload = {
+        message: q,
+        lang: lang,
+        history: chatHistory.slice(-6),
+        active_destination: activeDestination
+      };
+
+      const res = await fetch(`${AI_API_ORIGIN}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      if (orb) orb.className = "ai-orb streaming";
+      if (statusText) statusText.textContent = streamingText;
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        clearTimeout(watchdogTimer);
+        watchdogTimer = setTimeout(() => controller.abort(), 30000);
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        const tokens = chunk.match(/\S+|\s+/g);
+        if (tokens && tokens.length > 0) {
+          tokenQueue.push(...tokens);
+          if (!isDispatcherRunning) {
+            isDispatcherRunning = true;
+            processFloatingTokenQueue();
+          }
+        }
+      }
+
+      isStreamFinished = true;
+    } catch (err) {
+      console.warn("[Floating AI Stream Catch]:", err);
+      isStreamFinished = true;
+    } finally {
+      if (displayedText.trim().length === 0 && tokenQueue.length === 0) {
+        const fallback = aiReply(q, activeDestination);
+        const tokens = fallback.match(/\S+|\s+/g) || [fallback];
+        tokenQueue.push(...tokens);
+      }
+
+      if (!isDispatcherRunning) {
+        isDispatcherRunning = true;
+        processFloatingTokenQueue();
+      }
+    }
+  }
+
+  function initFloatingChat() {
+    let trigger = $("#floatingChatTrigger");
+    let widget = $("#floatingChatWidget");
+
+    if (!trigger || !widget) {
+      const isSubpage = window.location.pathname.includes("/html/") || (document.querySelector('script[src*="../js/ai.js"]') !== null);
+      const aiConsoleUrl = isSubpage ? "ai.html?chat=open#chatWindow" : "html/ai.html?chat=open#chatWindow";
+
+      const wrapper = document.createElement("div");
+      wrapper.id = "floatingChatContainer";
+      wrapper.innerHTML = `
+        <button class="floating-chat-trigger" id="floatingChatTrigger" title="Chat with Bharat AI" aria-label="Open Bharat AI Travel Assistant">
+          <span class="floating-orb-dot">✦</span>
+          <span class="floating-chat-label">Bharat AI</span>
+          <span class="floating-online-pulse"></span>
+        </button>
+
+        <div class="floating-chat-widget" id="floatingChatWidget" role="dialog" aria-label="Bharat AI Assistant" aria-hidden="true">
+          <div class="floating-chat-header">
+            <div class="floating-header-info">
+              <span class="ai-orb idle" id="floatingAiOrb">✦</span>
+              <div>
+                <div class="floating-header-title">BHARAT <b>AI</b></div>
+                <div class="floating-header-status" id="floatingAiStatus">Active • Gemini 3.1 Flash Lite</div>
+              </div>
+            </div>
+            <div class="floating-header-actions">
+              <a href="${aiConsoleUrl}" class="floating-action-btn" title="Open Fullscreen Console" aria-label="Open Fullscreen Console">↗</a>
+              <button class="floating-action-btn floating-chat-close-btn" id="floatingChatCloseBtn" title="Minimize Chat" aria-label="Minimize Chat">✕</button>
+            </div>
+          </div>
+
+          <div class="floating-suggestions-scroll">
+            <button class="floating-sug-btn" data-q="Tell me about Kolkata & West Bengal heritage">Kolkata</button>
+            <button class="floating-sug-btn" data-q="What are the must-visit places in Jaipur & Rajasthan?">Jaipur</button>
+            <button class="floating-sug-btn" data-q="What should I pack for high-altitude passes like Khardung La?">Packing</button>
+            <button class="floating-sug-btn" data-q="What is the mandatory acclimatization protocol for Leh?">AMS Protocol</button>
+            <button class="floating-sug-btn" data-q="What are the best offbeat places in Meghalaya?">Meghalaya</button>
+            <button class="floating-sug-btn" data-q="Weekend getaway trip to Sikkim">Sikkim</button>
+          </div>
+
+          <div class="floating-chat-messages" id="floatingMessages">
+            <div class="msg bot">
+              Namaste! 🙏 I am Bharat AI, your intelligent travel companion. Ask me anything about destinations, passes, local cuisine, packing, or custom itineraries!
+            </div>
+          </div>
+
+          <form class="floating-chat-form" id="floatingChatForm">
+            <input id="floatingChatInput" placeholder="Ask Bharat AI about India travel..." autocomplete="off" aria-label="Chat input">
+            <button type="submit" aria-label="Send message" id="floatingSendBtn">➤</button>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(wrapper);
+      trigger = $("#floatingChatTrigger");
+      widget = $("#floatingChatWidget");
+    }
+
+    if (!trigger || !widget) return;
+
+    // Toggle widget open/close
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const isActive = widget.classList.toggle("active");
+      widget.setAttribute("aria-hidden", !isActive);
+      if (isActive) {
+        const input = $("#floatingChatInput");
+        if (input) setTimeout(() => input.focus(), 150);
+      }
+    };
+
+    const closeBtn = $("#floatingChatCloseBtn");
+    if (closeBtn) {
+      closeBtn.onclick = (e) => {
+        e.stopPropagation();
+        widget.classList.remove("active");
+        widget.setAttribute("aria-hidden", "true");
+      };
+    }
+
+    // Close on click outside widget
+    document.addEventListener("click", (e) => {
+      if (widget.classList.contains("active") && !widget.contains(e.target) && !trigger.contains(e.target)) {
+        widget.classList.remove("active");
+        widget.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && widget.classList.contains("active")) {
+        widget.classList.remove("active");
+        widget.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    // Form submission
+    const form = $("#floatingChatForm");
+    if (form) {
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const input = $("#floatingChatInput");
+        if (input && input.value.trim()) {
+          const val = input.value.trim();
+          input.value = "";
+          askFloatingAI(val);
+        }
+      };
+    }
+
+    // Floating suggestion buttons
+    $$(".floating-sug-btn").forEach(btn => {
+      btn.onclick = () => {
+        const q = btn.dataset.q || btn.textContent.trim();
+        if (q) {
+          const input = $("#floatingChatInput");
+          if (input) input.value = q;
+          askFloatingAI(q);
+        }
+      };
+    });
+  }
+
 // ═══════════════════════════════════════════════════════
 //  SMART SAFETY-AUDITED ITINERARY PLANNER
 // ═══════════════════════════════════════════════════════
@@ -495,6 +1250,64 @@
     lastItineraryParams = { dest, days, budget, style, interest };
 
     const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+    const queryStr = `Plan me a ${days}-day expedition to ${dest} under ₹${budget} focusing on ${interest} in ${style} travel style`;
+
+    // 1. If on dedicated planner.html with agent console, forward to askPlannerAI
+    if ($("#plannerOutputArea")) {
+      const input = $("#plannerNLInput");
+      if (input) input.value = queryStr;
+      return askPlannerAI(queryStr);
+    }
+
+    // 2. If on home.html with #itineraryOutput, call AI agent endpoint directly
+    const output = $("#itineraryOutput");
+    if (output) {
+      output.innerHTML = `<div style="padding:32px 20px; text-align:center; background:rgba(82,183,136,0.06); border-radius:12px; border:1px solid rgba(82,183,136,0.2);">
+        <div style="font-size:36px; margin-bottom:12px;">⚡</div>
+        <h4 style="margin:0 0 6px; color:#2d6a4f; font-size:16px;">Bharat AI is Formulating Your Expedition...</h4>
+        <p style="font-size:12.5px; color:#5f707a; margin:0 0 12px;">Searching live web pricing for ${dest}, verifying passes, and balancing your ₹${budget.toLocaleString()} budget across journey parts.</p>
+        <div style="display:inline-block; width:48px; height:3px; background:#74c69d; border-radius:99px;"></div>
+      </div>`;
+
+      try {
+        const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: queryStr, session_id: agentSessionId, lang: lang })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.type === "complete_plan" && data.plan) {
+            let fullHtml = `
+              <div style="margin-bottom:16px; padding:12px 16px; background:rgba(82,183,136,0.1); border-left:4px solid #52b788; border-radius:4px 8px 8px 4px;">
+                <div style="font-size:11px; font-weight:800; color:#2d6a4f; text-transform:uppercase; letter-spacing:0.06em;">⚡ Autonomous AI Expedition Formulated</div>
+                <div style="font-size:13px; color:#1d2d44; margin-top:4px;">${renderMarkdown(data.message || "")}</div>
+              </div>
+            `;
+            if (data.plan.web_search_summary) {
+              fullHtml += (typeof renderWebGroundedBadge === "function") ? renderWebGroundedBadge(data.plan) : "";
+            }
+            fullHtml += renderFlightCard(data.plan.flights);
+            fullHtml += renderHotelCard(data.plan.hotels);
+            fullHtml += renderItineraryCard(data.plan.itinerary);
+            fullHtml += renderBudgetCard(data.plan.budget);
+            fullHtml += renderEmergencyCard(data.plan.emergency);
+            fullHtml += `
+              <div style="text-align:center; margin-top:20px; padding:16px; background:#f4efe4; border-radius:8px;">
+                <a href="planner.html?q=${encodeURIComponent(queryStr)}" class="btn primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                  <span>🗺️</span> Open Full Interactive Planner Console →
+                </a>
+              </div>
+            `;
+            output.innerHTML = fullHtml;
+            output.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+          }
+        }
+      } catch (agentErr) {
+        console.warn("[Agent Live Itinerary Failed, falling back to local schedule]:", agentErr);
+      }
+    }
 
     const ladakhItineraryEn = [
       { title: "Leh Arrival & Mandatory 48-Hour Acclimatization", pass: null, notes: "Complete physical rest. Drink 4L water with electrolytes. Monitor SpO2 levels." },
@@ -652,7 +1465,6 @@
       `;
     }
 
-    const output = $("#itineraryOutput");
     if (output) output.innerHTML = html;
   }
 
@@ -669,24 +1481,40 @@
   // ═══════════════════════════════════════════════════════
 
   function loadStateIntoPlanner(stateName) {
-    const select = $("#planDestination");
-    if (!select) return;
+    const el = $("#planDestination");
+    if (!el) return;
 
-    let exists = false;
-    for (let i = 0; i < select.options.length; i++) {
-      if (select.options[i].value.toLowerCase() === stateName.toLowerCase() || select.options[i].text.toLowerCase().includes(stateName.toLowerCase())) {
-        select.selectedIndex = i;
-        exists = true;
-        break;
+    if (el.tagName === "INPUT") {
+      el.value = stateName;
+      const listId = el.getAttribute("list");
+      if (listId) {
+        const dl = document.getElementById(listId);
+        if (dl) {
+          const opts = Array.from(dl.options || []);
+          if (!opts.some(o => o.value.toLowerCase() === stateName.toLowerCase())) {
+            const opt = document.createElement("option");
+            opt.value = stateName;
+            dl.appendChild(opt);
+          }
+        }
       }
-    }
+    } else if (el.options) {
+      let exists = false;
+      for (let i = 0; i < el.options.length; i++) {
+        if (el.options[i].value.toLowerCase() === stateName.toLowerCase() || el.options[i].text.toLowerCase().includes(stateName.toLowerCase())) {
+          el.selectedIndex = i;
+          exists = true;
+          break;
+        }
+      }
 
-    if (!exists) {
-      const opt = document.createElement("option");
-      opt.value = stateName;
-      opt.text = stateName;
-      select.add(opt);
-      select.value = stateName;
+      if (!exists) {
+        const opt = document.createElement("option");
+        opt.value = stateName;
+        opt.text = stateName;
+        el.add(opt);
+        el.value = stateName;
+      }
     }
 
     toast(`Selected ${stateName} for safety-audited itinerary generation.`);
@@ -723,8 +1551,540 @@
 
     // Suggestion buttons
     $$(".ai-suggestions button").forEach(b => {
-      b.onclick = () => askAI(b.dataset.question);
+      b.onclick = () => {
+        const q = b.getAttribute("data-question") || b.getAttribute("data-goal") || b.textContent.trim();
+        if (q) {
+          const input = $("#chatInput");
+          if (input) input.value = q;
+          askAI(q);
+        }
+      };
     });
+
+    // Initialize Pan-India State & Territory Explorer
+    initPanIndiaExplorer();
+
+    // Initialize Persistent Floating AI Chat Widget (Bottom-Right)
+    initFloatingChat();
+
+    // Initialize Planner AI Interface if present on the page
+    initPlannerAI();
+
+    // Auto-scroll, pulse-highlight, and focus chat window if requested via URL (?chat=open or #chatWindow)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const chatWindow = $("#chatWindow");
+      if (chatWindow && (urlParams.get("chat") || window.location.hash === "#chatWindow" || window.location.hash === "#ai")) {
+        setTimeout(() => {
+          chatWindow.scrollIntoView({ behavior: "smooth", block: "center" });
+          chatWindow.classList.add("chat-window-focused");
+          setTimeout(() => chatWindow.classList.remove("chat-window-focused"), 2800);
+          const input = $("#chatInput");
+          if (input) input.focus();
+          if (urlParams.get("chat") === "fullscreen") {
+            toggleFullscreenChat(true);
+          }
+        }, 200);
+      }
+    } catch (e) {
+      console.warn("[Chat Init]:", e);
+    }
+  }
+
+  const PAN_INDIA_CATALOG = [
+    // Northeast (8)
+    { name: "Meghalaya", region: "northeast", icon: "🌿" },
+    { name: "Sikkim", region: "northeast", icon: "🏔️" },
+    { name: "Assam", region: "northeast", icon: "🦏" },
+    { name: "Arunachal Pradesh", region: "northeast", icon: "🏞️" },
+    { name: "Nagaland", region: "northeast", icon: "🪶" },
+    { name: "Manipur", region: "northeast", icon: "🌸" },
+    { name: "Mizoram", region: "northeast", icon: "🎋" },
+    { name: "Tripura", region: "northeast", icon: "🏛️" },
+
+    // North & Himalayas (8)
+    { name: "Jammu and Kashmir", region: "north", icon: "🏔️" },
+    { name: "Ladakh", region: "north", icon: "❄️" },
+    { name: "Himachal Pradesh", region: "north", icon: "🍏" },
+    { name: "Uttarakhand", region: "north", icon: "🧘" },
+    { name: "Punjab", region: "north", icon: "🌾" },
+    { name: "Haryana", region: "north", icon: "🚜" },
+    { name: "Delhi", region: "north", icon: "🏛️" },
+    { name: "Chandigarh", region: "north", icon: "🌳" },
+
+    // West & Central (7)
+    { name: "Rajasthan", region: "west", icon: "🏰" },
+    { name: "Goa", region: "west", icon: "🏖️" },
+    { name: "Gujarat", region: "west", icon: "🦁" },
+    { name: "Maharashtra", region: "west", icon: "🌊" },
+    { name: "Madhya Pradesh", region: "west", icon: "🐅" },
+    { name: "Chhattisgarh", region: "west", icon: "🌲" },
+    { name: "Dadra and Nagar Haveli and Daman and Diu", region: "west", icon: "⛵" },
+
+    // East (4)
+    { name: "West Bengal", region: "east", icon: "🚋" },
+    { name: "Odisha", region: "east", icon: "☀️" },
+    { name: "Bihar", region: "east", icon: "☸️" },
+    { name: "Jharkhand", region: "east", icon: "🏞️" },
+
+    // South & Islands (8)
+    { name: "Kerala", region: "south", icon: "🌴" },
+    { name: "Tamil Nadu", region: "south", icon: "🛕" },
+    { name: "Karnataka", region: "south", icon: "🗿" },
+    { name: "Andhra Pradesh", region: "south", icon: "🌅" },
+    { name: "Telangana", region: "south", icon: "💎" },
+    { name: "Puducherry", region: "south", icon: "🥐" },
+    { name: "Andaman and Nicobar Islands", region: "south", icon: "🏝️" },
+    { name: "Lakshadweep", region: "south", icon: "🪸" }
+  ];
+
+  function renderStateChips(regionFilter) {
+    const container = $("#stateChipsScroll");
+    if (!container) return;
+
+    const filtered = (regionFilter === "all" || !regionFilter)
+      ? PAN_INDIA_CATALOG
+      : PAN_INDIA_CATALOG.filter(s => s.region === regionFilter);
+
+    container.innerHTML = filtered.map(s => `
+      <button class="state-chip" data-state="${s.name}" title="Explore ${s.name} with live internet grounding">
+        <span class="chip-icon">${s.icon}</span>
+        <span>${s.name}</span>
+      </button>
+    `).join("");
+
+    // Wire up chip clicks
+    container.querySelectorAll(".state-chip").forEach(chip => {
+      chip.onclick = () => {
+        const stateName = chip.dataset.state;
+        const chatInput = $("#chatInput");
+        const query = `Explore ${stateName}`;
+        if (chatInput) chatInput.value = query;
+        askAI(query);
+      };
+    });
+  }
+
+  function initPanIndiaExplorer() {
+    renderStateChips("all");
+
+    // Region tab filters
+    $$(".region-tab").forEach(tab => {
+      tab.onclick = () => {
+        $$(".region-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderStateChips(tab.dataset.region);
+      };
+    });
+
+    // Smart Intent Pills
+    $$(".intent-pill").forEach(pill => {
+      pill.onclick = () => {
+        const intent = pill.dataset.intent;
+        const chatInput = $("#chatInput");
+        const currentVal = chatInput ? chatInput.value.trim() : "";
+        let query = "";
+        if (currentVal && !currentVal.toLowerCase().includes(intent.toLowerCase())) {
+          query = `${currentVal} with ${intent}`;
+        } else {
+          query = intent === "Weekend Getaway" ? "Weekend getaway in Sikkim" :
+                  intent === "Family Vacation" ? "Explore Kerala with family" :
+                  intent === "Budget Backpacker" ? "Budget trip to Meghalaya" :
+                  intent === "Royal Luxury" ? "Royal luxury trip to Rajasthan" :
+                  "High passes trek in Ladakh";
+        }
+        if (chatInput) chatInput.value = query;
+        askAI(query);
+      };
+    });
+  }
+
+  window.applyQuickPreset = function(days, budget) {
+    const chatInput = $("#chatInput");
+    const query = `Plan with ${days} days and budget ₹${budget.toLocaleString()}`;
+    if (chatInput) chatInput.value = query;
+    askAI(query);
+  };
+
+  // ═══════════════════════════════════════════════════════
+  //  PLANNER PAGE — AUTONOMOUS AGENT ENGINE
+  //  Master AI Prompt Upgrade (SIH 2026)
+  // ═══════════════════════════════════════════════════════
+
+  let isPlannerGenerating = false;
+
+  // Detect trip-planning intent from a message
+  function detectPlanningIntent(msg) {
+    const t = (msg || "").toLowerCase();
+    const signals = ["plan", "trip", "travel", "visit", "itinerary", "route", "budget", "₹", "days", "nights", "week", "weekend", "explore", "backwater", "heritage", "expedition"];
+    return signals.some(s => t.includes(s));
+  }
+
+  // Update planner progress steps
+  function updatePlannerTracker(stepNumber, modelName, isOffline) {
+    const prog = $("#plannerProgressSection");
+    const modelTag = $("#plannerModelTag");
+    const checkpointText = $("#plannerCheckpointText");
+
+    if (prog && !prog.classList.contains("visible")) {
+      prog.classList.add("visible");
+    }
+
+    if (modelTag) {
+      modelTag.textContent = isOffline ? "Offline Mode" : (modelName || "Gemini 3.1 Flash Lite");
+    }
+    if (checkpointText) {
+      checkpointText.textContent = isOffline
+        ? "⚠️ Offline Planning Mode"
+        : `🛡️ Step ${Math.min(stepNumber, 5)}/5 • ${modelName || "Gemini 3.1 Flash Lite"}`;
+    }
+
+    for (let i = 1; i <= 5; i++) {
+      const el = $(`#pstep-${i}`);
+      const statusEl = $(`#pstep${i}Status`);
+      if (!el) continue;
+
+      if (i < stepNumber) {
+        el.className = "planner-step step-completed";
+        if (statusEl) statusEl.textContent = "✅ Done";
+      } else if (i === stepNumber) {
+        el.className = "planner-step step-active";
+        if (statusEl) statusEl.textContent = i === 1 ? "🔍 Reading goal..." : "⚙️ In progress...";
+      } else {
+        el.className = "planner-step step-pending";
+        if (statusEl) statusEl.textContent = "Queued";
+      }
+    }
+    if (stepNumber >= 5) {
+      for (let i = 1; i <= 5; i++) {
+        const el = $(`#pstep-${i}`);
+        const st = $(`#pstep${i}Status`);
+        if (el) el.className = "planner-step step-completed";
+        if (st) st.textContent = "✅ Done";
+      }
+    }
+  }
+
+  async function askPlannerAI(q) {
+    if (!q || !q.trim() || isPlannerGenerating) return;
+    const outputArea = $("#plannerOutputArea");
+    const sendBtn = $("#plannerNLSend");
+    const textarea = $("#plannerNLInput");
+    const orb = $("#plannerHeroOrb");
+    if (!outputArea) return;
+
+    isPlannerGenerating = true;
+    if (sendBtn) sendBtn.disabled = true;
+    if (textarea) textarea.disabled = true;
+
+    // Disable all quick pills
+    $$(".planner-pill").forEach(p => p.classList.add("loading"));
+
+    // Show progress tracker at step 1
+    updatePlannerTracker(1, "Gemini 3.1 Flash Lite", false);
+
+    // Orb animation to thinking
+    if (orb) orb.textContent = "⚙️";
+
+    const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+
+    // Clear output and show loading narrative
+    outputArea.innerHTML = `<div class="planner-narrative-block" style="opacity:0.7;">
+      <strong style="color:#74c69d;">🎯 Analyzing your travel goal...</strong><br>
+      <span style="color:rgba(200,230,200,0.7); font-size:13px;">Bharat AI is processing: "${q.trim()}"</span>
+    </div>`;
+
+    try {
+      const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: q.trim(),
+          session_id: agentSessionId,
+          lang: lang
+        })
+      });
+
+      if (!res.ok) throw new Error(`Agent API error: ${res.status}`);
+      const data = await res.json();
+
+      // Update session ID if returned
+      if (data.session_id) {
+        agentSessionId = data.session_id;
+        localStorage.setItem("bharat_agent_session_id", agentSessionId);
+      }
+
+      const stepNum = data.progress_step || 1;
+      const modelUsed = data.active_model || "Gemini 3.1 Flash Lite";
+      const isOffline = data.is_offline_mode || false;
+
+      updatePlannerTracker(stepNum, modelUsed, isOffline);
+
+      // Build output HTML
+      let html = "";
+
+      // Narrative / question block
+      if (data.type === "question" || data.type === "clarification") {
+        // Agent is asking for clarification
+        const presets = data.quick_presets || [];
+        const presetsHtml = presets.length > 0
+          ? `<div class="planner-preset-chips">
+              ${presets.map(p => `<button class="planner-preset-chip" onclick="window.askPlannerAI && askPlannerAI('${p.replace(/'/g, "\\'")}')">
+                ${p}
+              </button>`).join("")}
+            </div>`
+          : "";
+
+        html += `<div class="planner-question-block">
+          <div class="planner-question-text">${renderMarkdown(data.message || "")}</div>
+          ${presetsHtml}
+        </div>`;
+
+        updatePlannerTracker(1, modelUsed, isOffline);
+
+      } else if (data.type === "complete_plan" && data.plan) {
+        // Full plan rendered
+        html += `<div class="planner-narrative-block">${renderMarkdown(data.message || "")}</div>`;
+
+        // Render all agent cards (using existing renderers)
+        if (data.plan.web_search_summary) {
+          html += (typeof renderWebGroundedBadge === "function") ? renderWebGroundedBadge(data.plan) : "";
+        }
+        html += renderFlightCard(data.plan.flights);
+        html += renderHotelCard(data.plan.hotels);
+        html += renderItineraryCard(data.plan.itinerary);
+        html += renderBudgetCard(data.plan.budget);
+        html += renderEmergencyCard(data.plan.emergency);
+
+        // Refinement toolbar
+        html += `<div class="quick-actions-toolbar" style="margin-top:18px;">
+          <div style="font-size:11px; font-weight:700; color:#74c69d; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">✨ Refine Your Plan</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="quick-action-btn" onclick="window.askPlannerAI && askPlannerAI('Add 1 more day to this plan')">🗓️ +1 Day</button>
+            <button class="quick-action-btn" onclick="window.askPlannerAI && askPlannerAI('Reduce budget by 20% for this plan')">📉 Lower Budget</button>
+            <button class="quick-action-btn" onclick="window.askPlannerAI && askPlannerAI('Upgrade to luxury hotels and experiences')">⭐ Luxury Upgrade</button>
+            <button class="quick-action-btn" onclick="window.askPlannerAI && askPlannerAI('Prioritize eco-friendly homestays for this plan')">🌿 Eco Style</button>
+            <button class="quick-action-btn" onclick="window.askPlannerAI && askPlannerAI('Adjust plan for 2 travelers instead')">👥 2 Travelers</button>
+          </div>
+        </div>`;
+
+        updatePlannerTracker(6, modelUsed, isOffline);
+
+      } else {
+        // Partial / intermediate response
+        html += `<div class="planner-narrative-block">${renderMarkdown(data.message || "")}</div>`;
+      }
+
+      outputArea.innerHTML = html;
+      outputArea.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    } catch (err) {
+      console.warn("[Planner Agent Error]:", err);
+
+      // Retry notice + offline fallback
+      outputArea.innerHTML = `<div class="planner-question-block">
+        <div class="planner-question-text">
+          <strong style="color:#74c69d;">🔄 Planning services are temporarily reconnecting.</strong><br>
+          <span style="color:rgba(200,230,200,0.7);">Booking search encountered an issue. Let me continue with offline planning.</span>
+        </div>
+        <div class="planner-preset-chips" style="margin-top:12px;">
+          <button class="planner-preset-chip" onclick="window.askPlannerAI && askPlannerAI('${(q || "").replace(/'/g, "\\'")}')">🔄 Retry</button>
+          <button class="planner-preset-chip" onclick="window.askAI && askAI('${(q || "").replace(/'/g, "\\'")}')">💬 Ask Bharat AI instead</button>
+        </div>
+      </div>`;
+
+      updatePlannerTracker(1, "Offline Mode", true);
+    } finally {
+      isPlannerGenerating = false;
+      if (sendBtn) sendBtn.disabled = false;
+      if (textarea) textarea.disabled = false;
+      if (orb) orb.textContent = "🗺️";
+      $$(".planner-pill").forEach(p => p.classList.remove("loading"));
+    }
+  }
+
+  function toggleFullscreenChat(forceState) {
+    const chat = $("#chatWindow");
+    const btn = $("#chatExpandBtn");
+    if (!chat) return;
+    const isFull = typeof forceState === "boolean" ? forceState : !chat.classList.contains("fullscreen-console");
+    chat.classList.toggle("fullscreen-console", isFull);
+    if (btn) {
+      btn.textContent = isFull ? "✕" : "⛶";
+      btn.title = isFull ? "Minimize Console" : "Toggle Fullscreen Console";
+    }
+    const input = $("#chatInput");
+    if (input) input.focus();
+  }
+
+  function resetChatConsole() {
+    chatHistory.length = 0;
+    const box = $("#messages");
+    const welcome = $("#botWelcomeMsg");
+    if (box && welcome) {
+      const clone = welcome.cloneNode(true);
+      box.innerHTML = "";
+      box.appendChild(clone);
+    }
+    const input = $("#chatInput");
+    if (input) {
+      input.value = "";
+      input.focus();
+    }
+  }
+
+  function togglePlannerLegacyForm() {
+    const form = $("#plannerLegacyForm");
+    const toggle = $("#plannerLegacyToggle");
+    if (!form) return;
+    const isOpen = form.classList.toggle("visible");
+    if (toggle) toggle.classList.toggle("open", isOpen);
+  }
+
+  function initPlannerAI() {
+    // Wire up the NL form submit
+    const form = $("#plannerNLForm");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const textarea = $("#plannerNLInput");
+        const val = textarea ? textarea.value.trim() : "";
+        if (val) askPlannerAI(val);
+      });
+    }
+
+    // Auto-expand textarea on input
+    const textarea = $("#plannerNLInput");
+    if (textarea) {
+      textarea.addEventListener("input", () => {
+        textarea.style.height = "auto";
+        textarea.style.height = Math.min(textarea.scrollHeight, 140) + "px";
+      });
+      // Ctrl+Enter or Shift+Enter = newline; plain Enter = submit
+      textarea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey) {
+          e.preventDefault();
+          const val = textarea.value.trim();
+          if (val) askPlannerAI(val);
+        }
+      });
+    }
+
+    // Read URL params for pre-filled query (from home.html teaser)
+    const urlParams = new URLSearchParams(window.location.search);
+    const preQuery = urlParams.get("q") || urlParams.get("query") || urlParams.get("plan");
+    if (preQuery && preQuery.trim()) {
+      const ta = $("#plannerNLInput");
+      if (ta) ta.value = preQuery.trim();
+      // Auto-trigger after a short delay
+      setTimeout(() => askPlannerAI(preQuery.trim()), 600);
+    }
+  }
+
+  // ── Smart Floating Chat Routing ──
+  // Upgrade askFloatingAI to route planning queries to the agent
+  const _originalAskFloatingAI = askFloatingAI;
+
+  async function askFloatingAIUpgraded(q) {
+    if (!q || !q.trim() || isFloatingGenerating) return;
+
+    // Detect planning intent
+    if (detectPlanningIntent(q)) {
+      const box = $("#floatingMessages");
+      const orb = $("#floatingAiOrb");
+      const statusText = $("#floatingAiStatus");
+      const form = $("#floatingChatForm");
+      const submitBtn = form ? form.querySelector("button[type='submit']") : null;
+      const chatInput = $("#floatingChatInput");
+      if (!box) { return _originalAskFloatingAI(q); }
+
+      isFloatingGenerating = true;
+      if (submitBtn) submitBtn.disabled = true;
+
+      // User message
+      const userMsg = document.createElement("div");
+      userMsg.className = "msg user";
+      userMsg.textContent = q;
+      box.appendChild(userMsg);
+      box.scrollTop = box.scrollHeight;
+
+      if (orb) orb.className = "ai-orb thinking";
+      if (statusText) statusText.textContent = "Planning your trip...";
+
+      // Thinking placeholder
+      const botMsg = document.createElement("div");
+      botMsg.className = "msg bot";
+      botMsg.innerHTML = `<span class="bot-text" style="opacity:0.7;">🗺️ Bharat AI Planner is working...</span>`;
+      box.appendChild(botMsg);
+      box.scrollTop = box.scrollHeight;
+
+      const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+      let data = null;
+
+      try {
+        const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: q.trim(), session_id: agentSessionId, lang: lang })
+        });
+
+        if (!res.ok) throw new Error("Agent error");
+        data = await res.json();
+
+        if (data.session_id) {
+          agentSessionId = data.session_id;
+          localStorage.setItem("bharat_agent_session_id", agentSessionId);
+        }
+
+        const plan = data.plan;
+        let compactHtml = `<span class="bot-text">${renderMarkdown(data.message || "")}</span>`;
+
+        // Compact card summary for floating widget
+        if (plan && plan.budget) {
+          const b = plan.budget;
+          compactHtml += `<div class="floating-agent-plan-card">
+            <h4>💰 Budget Summary</h4>
+            <div>Total: ₹${(b.total_allocated_inr || 0).toLocaleString()} • Cushion: ₹${(b.remaining_cushion_inr || 0).toLocaleString()}</div>
+            <a href="../html/planner.html?q=${encodeURIComponent(q)}" class="floating-plan-link">🗺️ View Full Itinerary →</a>
+          </div>`;
+        } else if (plan && plan.itinerary && plan.itinerary.length > 0) {
+          compactHtml += `<div class="floating-agent-plan-card">
+            <h4>🗺️ ${plan.itinerary.length}-Day Itinerary Ready</h4>
+            <div>${plan.goal_summary || ""}</div>
+            <a href="../html/planner.html?q=${encodeURIComponent(q)}" class="floating-plan-link">🗺️ View Full Plan →</a>
+          </div>`;
+        } else {
+          compactHtml += `<div class="floating-agent-plan-card">
+            <h4>🤖 Planning Agent</h4>
+            <a href="../html/planner.html?q=${encodeURIComponent(q)}" class="floating-plan-link">🗺️ Open Full Planner →</a>
+          </div>`;
+        }
+
+        botMsg.innerHTML = compactHtml;
+        box.scrollTop = box.scrollHeight;
+
+      } catch (err) {
+        botMsg.innerHTML = `<span class="bot-text">${renderMarkdown("Let me open the full planner for you!")}</span>
+          <div class="floating-agent-plan-card">
+            <h4>🗺️ Open Planner</h4>
+            <a href="../html/planner.html?q=${encodeURIComponent(q)}" class="floating-plan-link">⚡ Plan in Full Agent →</a>
+          </div>`;
+      } finally {
+        if (orb) orb.className = "ai-orb idle";
+        if (statusText) statusText.textContent = "Active • Gemini 3.1 Flash Lite";
+        if (submitBtn) submitBtn.disabled = false;
+        if (chatInput) { chatInput.disabled = false; chatInput.focus(); }
+        isFloatingGenerating = false;
+        box.scrollTop = box.scrollHeight;
+
+        chatHistory.push({ role: "user", text: q });
+        chatHistory.push({ role: "model", text: data ? (data.message || "") : "" });
+        if (chatHistory.length > 12) chatHistory.splice(0, chatHistory.length - 12);
+      }
+    } else {
+      // Regular streaming chat
+      return _originalAskFloatingAI(q);
+    }
   }
 
   // Expose on window for cross-file and inline HTML button accessibility
@@ -734,6 +2094,14 @@
   window.itinerary = itinerary;
   window.loadStateIntoPlanner = loadStateIntoPlanner;
   window.initAI = initAI;
+  window.initPanIndiaExplorer = initPanIndiaExplorer;
+  window.initFloatingChat = initFloatingChat;
+  window.askFloatingAI = askFloatingAIUpgraded;
+  window.askPlannerAI = askPlannerAI;
+  window.initPlannerAI = initPlannerAI;
+  window.togglePlannerLegacyForm = togglePlannerLegacyForm;
+  window.toggleFullscreenChat = toggleFullscreenChat;
+  window.resetChatConsole = resetChatConsole;
 
   // Auto-initialize if DOM is ready, or on DOMContentLoaded
   if (document.readyState === "complete" || document.readyState === "interactive") {

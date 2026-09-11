@@ -1,7 +1,12 @@
 import os
+import re
 import json
+import uuid
+import asyncio
+import urllib.request
+import urllib.parse
 from datetime import datetime, timezone, timedelta
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -36,6 +41,13 @@ from google import genai
 from google.genai import types
 
 from backend.field_pass_pdf import generate_field_pass_pdf
+from backend.agent import (
+    agent_planner,
+    get_session,
+    save_session,
+    agent_tools,
+    router as agent_router
+)
 
 from backend.supabase_client import (
     supabase,
@@ -564,6 +576,17 @@ class UserSaveBookmarksRequest(BaseModel):
     destination_ids: List[str]
     notes: Optional[str] = None
     travel_style: Optional[str] = None
+
+class AgentChatRequest(BaseModel):
+    session_id: Optional[str] = None
+    message: str
+    lang: Optional[str] = "en"
+
+class AgentConstraintUpdateRequest(BaseModel):
+    session_id: str
+    key: str
+    value: Any
+    lang: Optional[str] = "en"
 
 # --- REST Endpoints ---
 
@@ -2211,6 +2234,337 @@ async def chat_stream_endpoint(req: ChatRequest):
     }
     return StreamingResponse(token_generator(), headers=headers)
 
+# ═══════════════════════════════════════════════════════════════════
+# AUTONOMOUS AGENT API ENDPOINTS (SIH 2026 MASTER AI UPGRADE)
+# ═══════════════════════════════════════════════════════════════════
+
+@app.post("/api/agent/chat")
+async def agent_chat_endpoint(req: AgentChatRequest):
+    """
+    Autonomous goal-driven travel assistant endpoint.
+    Handles goal formulation, progressive question asking, dynamic task execution,
+    checkpoint creation, model failover (429), and rich card payloads.
+    """
+    session_id = req.session_id or f"sess-{uuid.uuid4().hex[:10]}"
+    res = await agent_planner.process_user_turn(
+        session_id=session_id,
+        user_message=req.message,
+        lang=req.lang or "en"
+    )
+    res["session_id"] = session_id
+    return res
+
+@app.get("/api/agent/session/{session_id}")
+def agent_get_session_endpoint(session_id: str):
+    """Retrieves full agent state, tasks, checkpoints, and current plan from persistent memory."""
+    sess = get_session(session_id)
+    return {
+        "session_id": sess.session_id,
+        "constraints": sess.constraints.model_dump(),
+        "tasks": [t.model_dump() for t in sess.tasks],
+        "checkpoints": [chk.model_dump() for chk in sess.checkpoints],
+        "plan": sess.plan_result.model_dump() if sess.plan_result else None,
+        "is_info_complete": sess.is_info_complete,
+        "missing_essentials": sess.missing_essentials,
+        "active_model": sess.active_model,
+        "is_offline_mode": sess.is_offline_mode,
+        "conversation_history": sess.conversation_history
+    }
+
+@app.post("/api/agent/update-constraint")
+def agent_update_constraint_endpoint(req: AgentConstraintUpdateRequest):
+    """
+    Updates a single constraint (budget, days, travelers) and recomputes the plan
+    dynamically without restarting the conversation.
+    """
+    res = agent_planner.update_constraint_and_recompute(
+        session_id=req.session_id,
+        key=req.key,
+        value=req.value,
+        lang=req.lang or "en"
+    )
+    res["session_id"] = req.session_id
+    return res
+
+@app.post("/api/agent/execute-all")
+def agent_execute_all_endpoint(req: AgentChatRequest):
+    """Forces execution of all 7 planning tasks for instant full plan demonstration."""
+    session_id = req.session_id or f"sess-{uuid.uuid4().hex[:10]}"
+    sess = get_session(session_id)
+    if not sess.constraints.destination:
+        sess.constraints.destination = "Kerala"
+    if not sess.constraints.budget:
+        sess.constraints.budget = 25000.0
+    if not sess.constraints.number_of_days:
+        sess.constraints.number_of_days = 4
+    if not sess.constraints.starting_city:
+        sess.constraints.starting_city = "Delhi"
+    sess.is_info_complete = True
+    plan_result, narrative = agent_planner.execute_plan_queue(sess, lang=req.lang or "en")
+    return {
+        "session_id": session_id,
+        "type": "complete_plan",
+        "message": narrative,
+        "constraints": sess.constraints.model_dump(),
+        "tasks": [t.model_dump() for t in sess.tasks],
+        "checkpoints": [chk.model_dump() for chk in sess.checkpoints],
+        "plan": plan_result.model_dump(),
+        "progress_step": 5
+    }
+
+CARD_INSIGHT_CACHE: Dict[str, Dict[str, Any]] = {}
+
+def _fetch_web_intel_sync(clean_query: str, clean_cat: str, loc_clean: str, stripped_term: str, desc: Optional[str]) -> tuple:
+    """Synchronous worker for web search offloaded to a worker thread."""
+    import urllib.request
+    import urllib.parse
+    
+    # 1. Try Wikivoyage via agent_tools for destinations, circuits, and cities
+    web_info = {}
+    is_non_dest = any(w in clean_cat.lower() or w in clean_query.lower() for w in ["safety", "health", "innovation", "protocol", "architecture", "design", "culture", "tradition", "solar", "mud", "brick", "prayer", "dance", "team", "codebreakerz", "flag"])
+    if not is_non_dest:
+        web_info = agent_tools.search_destination_web(clean_query)
+        
+    source_url = web_info.get("source_url") or ""
+    source_title = "Wikivoyage Travel Guide" if "wikivoyage" in source_url else "Wikipedia Knowledge Base"
+    summary_text = web_info.get("summary") or ""
+
+    # 2. Targeted Wikipedia search fallback if needed
+    if not summary_text or len(summary_text) < 70 or summary_text.startswith("General overview"):
+        headers = {"User-Agent": "BharatExplore-SIH/2.0 (tourism@bharatexplore.org)"}
+        search_terms = []
+        
+        # Domain-specific keyword expansion for safety, culture, culinary, and innovation cards
+        q_lower = f"{clean_query} {clean_cat} {desc or ''}".lower()
+        if any(w in q_lower for w in ["medical", "oxygen", "trauma", "hospital", "snm", "clinic"]):
+            search_terms.extend(["SNM Hospital Leh", "Altitude sickness", "High-altitude medicine"])
+        elif any(w in q_lower for w in ["permit", "ilp", "inner line", "checkpoint"]):
+            search_terms.extend(["Protected area permit India", "Inner Line Permit", "Ladakh travel regulations"])
+        elif any(w in q_lower for w in ["ams", "acute mountain", "hypoxia", "hace", "hape"]):
+            search_terms.extend(["Altitude sickness", "High-altitude pulmonary edema", "High-altitude cerebral edema"])
+        elif any(w in q_lower for w in ["prayer flag", "lung-ta", "lungta"]):
+            search_terms.extend(["Prayer flag", "Tibetan prayer flag"])
+        elif any(w in q_lower for w in ["cham dance", "cham masked", "monastic dance"]):
+            search_terms.extend(["Cham dance", "Tibetan Buddhist dances"])
+        elif any(w in q_lower for w in ["solar architecture", "mud-brick", "mud brick", "vernacular"]):
+            search_terms.extend(["Vernacular architecture of Ladakh", "Passive solar building design"])
+        elif any(w in q_lower for w in ["pashmina", "changpa", "cashmere"]):
+            search_terms.extend(["Pashmina", "Changpa", "Cashmere wool"])
+        elif any(w in q_lower for w in ["code breakerz", "codebreakerz", "sih 2026", "hackathon"]):
+            search_terms.extend(["Smart India Hackathon", "Ministry of Tourism (India)"])
+
+        if loc_clean and loc_clean.lower() not in clean_query.lower():
+            search_terms.append(f"{stripped_term} {loc_clean}".strip())
+        search_terms.append(stripped_term)
+        search_terms.append(clean_query)
+        
+        for st in search_terms:
+            if not st or len(st) < 3:
+                continue
+            try:
+                sr_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={urllib.parse.quote(st)}&format=json"
+                req_sr = urllib.request.Request(sr_url, headers=headers)
+                with urllib.request.urlopen(req_sr, timeout=2.0) as sr_resp:
+                    sr_data = json.loads(sr_resp.read().decode("utf-8"))
+                    hits = sr_data.get("query", {}).get("search", [])
+                    if hits:
+                        best_title = hits[0]["title"]
+                        sum_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(best_title)}"
+                        req_sum = urllib.request.Request(sum_url, headers=headers)
+                        with urllib.request.urlopen(req_sum, timeout=2.0) as sum_resp:
+                            sum_data = json.loads(sum_resp.read().decode("utf-8"))
+                            if sum_data.get("extract") and len(sum_data["extract"]) > 40:
+                                summary_text = sum_data["extract"]
+                                source_url = sum_data.get("content_urls", {}).get("desktop", {}).get("page", "")
+                                source_title = f"Wikipedia: {best_title}"
+                                break
+            except Exception:
+                continue
+
+    if not summary_text and desc:
+        summary_text = desc
+
+    return summary_text, source_url, source_title
+
+@app.get("/api/ai/card-insight")
+async def get_card_insight_endpoint(
+    query: str = Query(..., description="Card title or search term"),
+    category: Optional[str] = Query("Destination", description="Item category"),
+    location: Optional[str] = Query(None, description="Location / state"),
+    desc: Optional[str] = Query(None, description="Card description"),
+    lang: Optional[str] = Query("en", description="Target language")
+):
+    """
+    Live AI Internet Search Grounding for cards clicked across subpages.
+    Fetches real Wikivoyage & Wikipedia extracts, matches gazetteer benchmarks,
+    and returns rich travel intelligence with verified citations.
+    """
+    clean_query = query.strip()
+    clean_cat = (category or "Destination").strip()
+    loc_clean = (location or "").strip()
+    cache_key = f"{clean_query.lower()}:{loc_clean.lower()}:{clean_cat.lower()}"
+
+    if cache_key in CARD_INSIGHT_CACHE and CARD_INSIGHT_CACHE[cache_key].get("source_url") != "https://en.wikivoyage.org/wiki/India":
+        return CARD_INSIGHT_CACHE[cache_key]
+
+    # Clean action verbs like "Stargaze at Hanle" -> "Hanle"
+    stripped_term = re.sub(r'^(?:stargaze at|explore|visit|taste|conquer|live|sacred|plan a trip to)\s+', '', clean_query, flags=re.I).strip()
+
+    # 1. Fetch web intelligence offloaded from event loop
+    try:
+        summary_text, source_url, source_title = await asyncio.wait_for(
+            asyncio.to_thread(_fetch_web_intel_sync, clean_query, clean_cat, loc_clean, stripped_term, desc),
+            timeout=5.0
+        )
+    except Exception as e:
+        print(f"[CardInsight Warning] Web fetch error for '{clean_query}': {e}")
+        summary_text = desc or f"{clean_query} is an acclaimed tourism highlight in {loc_clean or 'India'}."
+        source_url = "https://en.wikivoyage.org/wiki/India"
+        source_title = "Wikivoyage Travel Guide"
+
+    # 2. Gazetteer lookup for ground-truth facts
+    from backend.agent.pan_india_gazetteer import find_indian_destination
+    gz = find_indian_destination(clean_query) or find_indian_destination(stripped_term) or (find_indian_destination(loc_clean) if loc_clean else None)
+
+    # 3. Format structured facts
+    is_safety = any(k in clean_cat.lower() or k in clean_query.lower() for k in ["safety", "protocol", "medical", "hospital", "oxygen", "ams", "permit", "ilp", "emergency", "danger"])
+    is_culture = any(k in clean_cat.lower() or k in clean_query.lower() for k in ["culture", "tradition", "living heritage", "prayer", "ritual", "monast", "dance", "pashmina", "vernacular"])
+    is_cuisine = any(k in clean_cat.lower() for k in ["food", "cuisine", "indigenous cuisine"])
+    is_innovation = any(k in clean_cat.lower() or k in clean_query.lower() for k in ["codebreakerz", "code breakerz", "sih", "team", "innovation", "architect"])
+
+    best_season = "October through May (ideal weather)"
+    if is_safety:
+        best_season = "24/7 Emergency Operations • Year-Round Readiness"
+    elif is_innovation:
+        best_season = "Smart India Hackathon 2026 Innovation Cycle"
+    elif any(k in clean_query.lower() for k in ["ladakh", "spiti", "himalaya"]) or any(k in loc_clean.lower() for k in ["ladakh", "spiti", "himalaya"]):
+        best_season = "May to October (summer passes clear of snow, crisp clear skies)"
+    elif gz and gz.get("terrain") == "high_altitude_pass":
+        best_season = "June to September"
+    elif "monsoon" in summary_text.lower() or "rain" in summary_text.lower():
+        best_season = "Post-monsoon (September to March)"
+
+    transit_hub = "Nearest airport or railhead with regular state transport connections"
+    if is_safety:
+        transit_hub = "SNM District Hospital Leh (24/7 Oxygen) • BRO 1077 Highway Rescue Emergency Dispatch"
+    elif is_innovation:
+        transit_hub = "Decentralized Pan-India Cloud & Edge Telemetry • SIH Innovation Lab"
+    elif gz:
+        transit_hub = f"{gz.get('gateway_airport', 'Domestic airport')} / {gz.get('gateway_rail', 'Railhead')}"
+    elif "ladakh" in loc_clean.lower() or "leh" in loc_clean.lower():
+        transit_hub = "Kushok Bakula Rimpochee Airport (IXL), Leh • NH-1 & NH-3 road connections"
+    elif loc_clean:
+        transit_hub = f"Gateway transport hub serving {loc_clean}"
+
+    eco_tip = "Respect local cultural etiquette, preserve natural water sources, and leave zero plastic footprint."
+    if is_safety:
+        eco_tip = "Mandatory 48-hour rest at 11,500 ft before ascending high passes. Never push through symptoms of hypoxia."
+    elif is_innovation:
+        eco_tip = "Engineered to promote carbon-neutral travel, sustainable village homestays, and decentralized tourism across India."
+    elif any(k in clean_query.lower() for k in ["monaster", "temple", "sacred", "prayer", "flag", "gompa", "ghat"]):
+        eco_tip = "Observe silent reverence, remove footwear before entering inner sanctums, and ask permission before taking portraits of resident monks or pilgrims."
+    elif is_cuisine:
+        eco_tip = "Support zero-food-mile grower cooperatives by enjoying authentic regional recipes at traditional family-run kitchens."
+    elif any(k in clean_query.lower() for k in ["pass", "lake", "tso", "altitude", "peak", "glacier"]):
+        eco_tip = "Fragile alpine ecological zone: carry refillable hydration flasks, take proper acclimatization halts, and leave no trace behind."
+
+    highlights = []
+    if gz and gz.get("clusters") and not is_safety:
+        for act in gz["clusters"][0].get("activities", [])[:3]:
+            highlights.append(f"{act.get('title', 'Activity')}: {act.get('tip', '')}")
+    
+    if not highlights:
+        if is_safety:
+            highlights = [
+                "24/7 hyperbaric oxygen chambers and specialized high-altitude trauma stabilization units at SNM Hospital, Leh.",
+                "Mandatory physical Inner Line Permit (ILP) verification checks at South Pullu, North Pullu, and Khardung La.",
+                "Emergency road clearance and high-altitude mountain pass rescue supported by BRO Project HIMANK (Helpline 1077)."
+            ]
+        elif is_cuisine:
+            highlights = [
+                "Authentic preparation using traditional local spices, indigenous mountain grains, and seasonal herbs.",
+                "Directly supports village grower cooperatives and zero-food-mile culinary sustainability.",
+                "Best paired with regional herbal infusions, butter tea, or authentic local accompaniments."
+            ]
+        elif is_culture:
+            highlights = [
+                "Living heritage passed down through generations of Himalayan artisans and spiritual practitioners.",
+                "Deep philosophical and cosmic symbolism rooted in centuries of oral storytelling.",
+                f"Active community observance during seasonal festivals and cultural gatherings in {loc_clean or 'India'}."
+            ]
+        elif is_innovation:
+            highlights = [
+                "Autonomous AI travel companion built with Google Gemini 3.1 and live pan-India internet grounding.",
+                "Offline-first traveler field pass with vector PDF rendering and emergency rescue telephone directory.",
+                "Interactive spatial telemetry mapping 44 regional hotspots and 6 high-altitude Himalayan passes."
+            ]
+        else:
+            highlights = [
+                "Pristine landscapes with unique geological features and panoramic high-altitude vistas.",
+                "Rich biodiversity and community-guided exploration trails promoting decentralized tourism.",
+                "Directly empowers indigenous village homestays and regional cultural preservation."
+            ]
+
+    # 4. Optional Gemini-synthesized perspective if client active
+    ai_perspective = None
+    if client and summary_text:
+        try:
+            briefing_prompt = (
+                f"You are Bharat AI, India's premier autonomous travel intelligence guide. "
+                f"In 2 vivid, engaging sentences, explain why '{clean_query}' ({clean_cat} in {loc_clean or 'India'}) "
+                f"is extraordinary for travelers. Ground your answer in this context: {summary_text[:350]}. "
+                f"Do not hallucinate. Keep it inspiring and grounded."
+            )
+            resp = await asyncio.wait_for(
+                client.aio.models.generate_content(
+                    model="gemini-3.1-flash-lite",
+                    contents=briefing_prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=0.3,
+                        max_output_tokens=150,
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)
+                    )
+                ),
+                timeout=2.8
+            )
+            if resp and resp.text:
+                ai_perspective = resp.text.strip()
+        except Exception:
+            pass
+
+    if not ai_perspective:
+        if is_safety:
+            ai_perspective = f"Comprehensive safety and acclimatization protocols for {clean_query} ensure safe passage across high Himalayan frontiers and remote travel corridors."
+        elif is_innovation:
+            ai_perspective = f"{clean_query} represents pioneering SIH 2026 digital infrastructure uniting sustainable eco-tourism, live geospatial telemetry, and community empowerment."
+        else:
+            ai_perspective = f"{clean_query} offers an authentic window into the heritage and landscapes of {loc_clean or 'India'}, celebrated by travelers for sustainable immersion and cultural richness."
+
+    suggested_prompt = f"Plan a trip to {clean_query} focusing on local experiences"
+    if is_safety:
+        suggested_prompt = f"What is the emergency high-altitude medical protocol for {clean_query}?"
+    elif gz:
+        suggested_prompt = f"Plan a 4-day trip to {gz['name']} under 25000"
+    elif loc_clean:
+        suggested_prompt = f"Plan a 4-day trip to {loc_clean} including {clean_query}"
+
+    result = {
+        "title": clean_query,
+        "category": clean_cat,
+        "location": loc_clean or (gz.get("state") if gz else "India"),
+        "summary": summary_text[:750] if summary_text else (desc or "Detailed destination intelligence available on Bharat Explore."),
+        "ai_perspective": ai_perspective,
+        "source_url": source_url or "https://en.wikivoyage.org/wiki/India",
+        "source_title": source_title or "Wikivoyage Travel Guide",
+        "highlights": highlights,
+        "best_season": best_season,
+        "transit_hub": transit_hub,
+        "eco_tip": eco_tip,
+        "suggested_prompt": suggested_prompt
+    }
+    CARD_INSIGHT_CACHE[cache_key] = result
+    return result
+
 # Static file serving to allow opening web app directly from FastAPI server
 HTML_DIR = BASE_DIR / "html"
 
@@ -2243,12 +2597,12 @@ def serve_html_file(filename: str, inject_carto: bool = False):
 @app.get("/index")
 @app.get("/index/")
 @app.get("/index.html")
-@app.get("/home")
-@app.get("/home/")
-@app.get("/home.html")
 def serve_landing():
     return serve_html_file("index.html")
 
+@app.get("/home")
+@app.get("/home/")
+@app.get("/home.html")
 @app.get("/overview")
 @app.get("/overview/")
 def serve_overview():

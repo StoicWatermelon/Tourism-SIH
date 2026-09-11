@@ -84,7 +84,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ai.css">
@@ -230,56 +230,110 @@
       </div>
     </section>
 
-    <!-- Detailed Cultural Chronicle Cards -->
-    <section class="section" style="padding-top: 40px;">
+    <!-- Sonic Atmosphere of Bharat - Web Audio Himalayan Bell Player -->
+    <section class="section" style="padding-top: 20px; padding-bottom: 0;">
+      <div class="sonic-atmosphere-banner">
+        <div class="sonic-info">
+          <p class="eyebrow">✦ ACOUSTIC HERITAGE &amp; RESONANCE</p>
+          <h3>Sonic Atmosphere of the High Passes</h3>
+          <p>Experience the meditative acoustic frequency of high-altitude Himalayan monasteries. Tap to synthesize a real-time resonant 280 Hz Tibetan singing bowl chime with authentic harmonic overtones.</p>
+        </div>
+        <div class="sonic-controls">
+          <button class="chime-btn" onclick="playCultureBell(280)">
+            <span>🔔</span>
+            <span>Chime Tibetan Singing Bowl</span>
+          </button>
+          <div class="audio-soundwaves" title="Harmonic Resonance Active">
+            <span class="soundwave-bar"></span>
+            <span class="soundwave-bar"></span>
+            <span class="soundwave-bar"></span>
+            <span class="soundwave-bar"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed Cultural Chronicle Cards with Interactive Filtering & Search -->
+    <section class="section" style="padding-top: 30px;">
       <div class="section-head">
         <div>
-          <p class="eyebrow">DEEP ARCHIVES</p>
-          <h2>Cultural Pillars of the High Passes</h2>
+          <p class="eyebrow">PAN-INDIA LIVING ARCHIVES</p>
+          <h2>Cultural Pillars &amp; Indigenous Traditions</h2>
         </div>
-        <p>Grounded in authentic local oral histories, seasonal festivals, and architectural sustainable design.</p>
+        <p>Grounded in authentic local oral histories, seasonal rituals, bio-engineering, and architectural wisdom.</p>
       </div>
 
-      <div class="culture-deepdive-grid">
-        <!-- 1. Lung-Ta -->
-        <article class="culture-card">
-          <span class="card-badge">✦ Sacred Symbolism</span>
-          <h3>Lung-ta: Wind Horse Prayer Flags</h3>
-          <p>The 5 primary colors represent the 5 cosmic elements: Blue (Sky), White (Air/Wind), Red (Fire), Green (Water), and Yellow (Earth). Placed on high ridges so the mountain wind carries blessings across the cosmos.</p>
-          <div class="card-footer">
-            <small style="color: var(--accent); font-weight: 600;">Protocol: Always hang with reverence, never discard on soil.</small>
+      <!-- Interactive Toolbar: Real-time Search & Realm Filters -->
+      <div class="interactive-toolbar">
+        <div class="toolbar-top-row">
+          <div class="interactive-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="cultureSearchInput" class="interactive-search-input" placeholder="Search living traditions, tribal crafts, sacred rituals, dances...">
           </div>
-        </article>
+        </div>
 
-        <!-- 2. Cham Dances -->
-        <article class="culture-card">
-          <span class="card-badge">✦ Monastic Rituals</span>
-          <h3>Sacred Cham Masked Dances</h3>
-          <p>Performed in Tibetan Buddhist monasteries during annual festivals such as Hemis Tsechu and Gustor. Lamas don ornate silk robes and sacred deity masks to symbolize the victory of compassion over spiritual ignorance.</p>
-          <div class="card-footer">
-            <small style="color: var(--accent); font-weight: 600;">Key Festivals: Hemis, Thiksey Gustor, Chemrey Wangchok.</small>
-          </div>
-        </article>
+        <div class="interactive-pills-row">
+          <button class="interactive-pill culture-filter-pill active" data-cat="all">All Traditions (9)</button>
+          <button class="interactive-pill culture-filter-pill" data-cat="sacred">🛕 Sacred Rituals &amp; Gompas</button>
+          <button class="interactive-pill culture-filter-pill" data-cat="dance">🎭 Festivals &amp; Masked Dances</button>
+          <button class="interactive-pill culture-filter-pill" data-cat="architecture">🏛️ Vernacular Architecture</button>
+          <button class="interactive-pill culture-filter-pill" data-cat="crafts">🧵 Living Crafts &amp; Guilds</button>
+        </div>
+      </div>
 
-        <!-- 3. Vernacular Solar Architecture -->
-        <article class="culture-card">
-          <span class="card-badge">✦ Sustainable Design</span>
-          <h3>Mud-Brick Passive Solar Architecture</h3>
-          <p>Century-old Ladakhi homes use thick sun-dried mud bricks, timber frames, and southward-facing glass balconies. In sub-zero Himalayan winters (-25°C), thermal mass keeps interiors comfortably warm without burning fossil fuels.</p>
-          <div class="card-footer">
-            <small style="color: var(--accent); font-weight: 600;">Pioneered in: Alchi, Hemis Shukpachan, Turtuk.</small>
-          </div>
-        </article>
+      <!-- Dynamic Cards Container Rendered by JS -->
+      <div class="culture-deepdive-grid" id="cultureCardsGrid"></div>
+    </section>
 
-        <!-- 4. Pashmina Nomads -->
-        <article class="culture-card">
-          <span class="card-badge">✦ Grassroots Commerce</span>
-          <h3>Pashmina &amp; The Changpa Nomads</h3>
-          <p>The Changpa nomads graze Capra hircus goats at 15,000+ ft on the windswept Changthang plateau. The ultra-fine cashmere underdown (pashm) is spun and handwoven by women-led village guilds.</p>
-          <div class="card-footer">
-            <small style="color: var(--accent); font-weight: 600;">Certification: Look for authentic GI-tagged handloom pashmina.</small>
+    <!-- Sacred Kora & Monastery Etiquette Interactive Guide -->
+    <section class="section" style="padding-top: 10px; padding-bottom: 20px;">
+      <div class="kora-etiquette-section">
+        <div class="section-head" style="margin-bottom: 0;">
+          <div>
+            <p class="eyebrow" style="color: #0d9488;">SACRED KORA PROTOCOL</p>
+            <h3 style="font-family: var(--font-main); font-size: 24px; font-weight: 700; margin: 6px 0 10px;">Monastery &amp; Heritage Etiquette Guide</h3>
           </div>
-        </article>
+          <p>Essential cultural respect guidelines for exploring high-pass gompas, sacred stupas, and tribal sanctums.</p>
+        </div>
+
+        <div class="kora-grid">
+          <div class="kora-step-card active-kora" onclick="selectKoraStep(1)">
+            <div class="kora-num">1</div>
+            <h4>Clockwise Kora &amp; Stupas</h4>
+            <p>Always walk in a clockwise direction around monasteries, mani stone walls, and chortens. Spinning prayer wheels clockwise sends goodwill into the cosmos.</p>
+          </div>
+
+          <div class="kora-step-card" onclick="selectKoraStep(2)">
+            <div class="kora-num">2</div>
+            <h4>Dress Code &amp; Photography Consent</h4>
+            <p>Modest attire is mandatory (covered shoulders &amp; knees). Always ask prior permission before photographing lamas, monks, or sacred inner shrine deities.</p>
+          </div>
+
+          <div class="kora-step-card" onclick="selectKoraStep(3)">
+            <div class="kora-num">3</div>
+            <h4>Mani Stones &amp; Butter Lamps</h4>
+            <p>Never sit on or step over carved sacred Mani stones. When offering butter lamps, place your palms together in a respectful gesture of contemplation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cultural Discovery Quest - Interactive Mini Quiz -->
+    <section class="section" style="padding-top: 10px;">
+      <div class="culture-quiz-wrap">
+        <div class="quiz-header">
+          <div>
+            <p class="eyebrow" style="color: #fbbf24; margin-bottom: 4px;">HERITAGE LITERACY CHALLENGE</p>
+            <h3>Cultural Heritage Discovery Quest</h3>
+          </div>
+          <div class="quiz-score-badge" id="quizScoreValue">0 Pts</div>
+        </div>
+        <p style="font-size: 13.5px; color: #d1fae5; margin: 0 0 16px;">Test your knowledge of India's living cultural traditions. Answer correctly to earn points for your traveler dossier!</p>
+        
+        <div class="quiz-question-box" id="cultureQuizQuestionBox"></div>
       </div>
     </section>
 
@@ -518,5 +572,6 @@
   <script src="../js/field_pass.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/ai.js"></script>
+  <script src="../js/ai_card_insight.js"></script>
 </body>
 </html>

@@ -76,7 +76,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ai.css">
@@ -174,6 +174,30 @@
         <button class="circuit-pill" data-region="south-islands" data-i18n="circuit_south_islands">South & Islands</button>
       </div>
 
+      <!-- Interactive Theme & Search Toolbar -->
+      <div class="interactive-toolbar">
+        <div class="interactive-search-wrap">
+          <span class="interactive-search-icon">🔍</span>
+          <input type="search" id="portalSearchInput" class="interactive-search-input" placeholder="Search 20 corridors by name, state, mountain pass, or terrain..." aria-label="Search corridors">
+        </div>
+        <div class="interactive-pills-row">
+          <button class="interactive-pill portal-theme-pill active" data-theme="all">All Corridors</button>
+          <button class="interactive-pill portal-theme-pill" data-theme="himalayan">⛰️ Himalayan Passes</button>
+          <button class="interactive-pill portal-theme-pill" data-theme="spiritual">🛕 Sacred & Spiritual</button>
+          <button class="interactive-pill portal-theme-pill" data-theme="rainforest">🌿 Bio-Rainforest</button>
+          <button class="interactive-pill portal-theme-pill" data-theme="coastal">🌊 Coastal & Backwaters</button>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; margin-left: auto;">
+          <select id="portalSortSelect" class="interactive-sort-select" aria-label="Sort corridors">
+            <option value="default">Sort: Default Corridor Order</option>
+            <option value="alt-high">Elevation: Highest First (Himalayan)</option>
+            <option value="alt-low">Elevation: Coastal / Sea Level First</option>
+            <option value="name-az">Alphabetical: Corridor Name (A–Z)</option>
+          </select>
+          <button class="btn light" onclick="resetCircuitFilters()" style="padding: 7px 14px; font-size: 12px; height: 38px; white-space: nowrap;">Reset</button>
+        </div>
+      </div>
+
       <div class="circuits-grid" id="circuitsGrid"></div>
     </section>
 
@@ -183,6 +207,48 @@
       <h2 data-i18n="cta_title">Explore these corridors on the live state map</h2>
       <a href="map.html" class="btn primary">Open Interactive Map →</a>
     </section>
+
+    <!-- 3D Portal Corridor Dossier & Waypoints Modal -->
+    <div class="portal-dossier-modal" id="portalDossierModal" aria-hidden="true">
+      <div class="portal-dossier-content">
+        <button class="close" onclick="closePortalDossier()" data-close aria-label="Close modal" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">×</button>
+        <div style="margin-bottom: 16px;">
+          <span class="eyebrow" id="portalModalState" style="color: #34d399; font-size: 11.5px; letter-spacing: 0.08em; font-weight: 700;">REGIONAL CORRIDOR DOSSIER</span>
+          <h2 id="portalModalTitle" style="font-family: var(--font-main); font-size: 26px; color: #fff; margin: 6px 0;">Corridor Title</h2>
+          <p id="portalModalDesc" style="font-size: 13.5px; color: #cbd5e1; line-height: 1.6; margin: 0 0 16px;">Description of the corridor route and terrain.</p>
+        </div>
+
+        <div class="portal-telemetry-row">
+          <div class="portal-telemetry-card">
+            <small>Peak Altitude / Terrain</small>
+            <strong id="portalModalAlt">14,000+ ft</strong>
+          </div>
+          <div class="portal-telemetry-card">
+            <small>Estimated Elevation</small>
+            <strong id="portalModalElevation">14,200 ft</strong>
+          </div>
+          <div class="portal-telemetry-card">
+            <small>Prime Traveling Season</small>
+            <strong id="portalModalSeason" style="color: #fbbf24;">May–Oct</strong>
+          </div>
+        </div>
+
+        <div style="margin: 20px 0;">
+          <h4 style="font-family: var(--font-main); font-size: 14px; color: #fff; margin: 0 0 10px; display: flex; align-items: center; gap: 6px;">
+            <span>🗺️ Waypoint Trajectory Sequence:</span>
+          </h4>
+          <div class="portal-nodes-track" id="portalModalWaypoints">
+            <!-- Populated dynamically by openPortalDossier -->
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.12);">
+          <button class="btn primary" id="portalModalPlanBtn" style="padding: 10px 22px; font-size: 13.5px;">Plan Custom Itinerary →</button>
+          <button class="btn light" id="portalModalBookmarkBtn" style="padding: 10px 18px; font-size: 13.5px; background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.25);">♥ Save Corridor</button>
+          <button class="btn ghost" id="portalModalAIBtn" style="padding: 10px 18px; font-size: 13.5px; color: #34d399; border-color: rgba(52, 211, 153, 0.4);">✦ AI Intelligence Search ↗</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Institutional Site Footer -->
@@ -412,5 +478,6 @@
   <script src="../js/field_pass.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/ai.js"></script>
+  <script src="../js/ai_card_insight.js"></script>
 </body>
 </html>

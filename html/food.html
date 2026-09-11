@@ -91,7 +91,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ai.css">
@@ -188,6 +188,84 @@
         </div>
       </div>
 
+      <!-- Himalayan Superfood & Zero-Mile Carbon Calculator Widget -->
+      <div class="superfood-calc-wrap">
+        <div class="superfood-calc-header">
+          <span class="eyebrow" style="color: var(--emerald-pop); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;">INTERACTIVE CARBON & NUTRITION ENGINE</span>
+          <h3>Himalayan Superfood & Zero-Mile Impact Calculator</h3>
+          <p>Select indigenous high-altitude superfoods to calculate avoided transport emissions, nutrient density, and direct farmer guild margins.</p>
+        </div>
+
+        <div class="superfood-picker-grid">
+          <button class="superfood-btn selected" data-sf-id="tsampa" onclick="toggleSuperfood('tsampa')">
+            <span class="sf-icon">🌾</span>
+            <span class="sf-name">Tsampa Roasted Barley</span>
+            <span class="sf-origin">Changthang • 95% Guild</span>
+          </button>
+          <button class="superfood-btn selected" data-sf-id="seabuckthorn" onclick="toggleSuperfood('seabuckthorn')">
+            <span class="sf-icon">🫐</span>
+            <span class="sf-name">Wild Seabuckthorn</span>
+            <span class="sf-origin">Nubra Valley • 98% Guild</span>
+          </button>
+          <button class="superfood-btn" data-sf-id="chhurpi" onclick="toggleSuperfood('chhurpi')">
+            <span class="sf-icon">🧀</span>
+            <span class="sf-name">Yak Chhurpi Cheese</span>
+            <span class="sf-origin">Zanskar • 94% Guild</span>
+          </button>
+          <button class="superfood-btn" data-sf-id="saffron" onclick="toggleSuperfood('saffron')">
+            <span class="sf-icon">🌸</span>
+            <span class="sf-name">Pampore Saffron</span>
+            <span class="sf-origin">Kashmir • 96% Guild</span>
+          </button>
+          <button class="superfood-btn" data-sf-id="apricot" onclick="toggleSuperfood('apricot')">
+            <span class="sf-icon">🍑</span>
+            <span class="sf-name">Wild Apricot Kernel Oil</span>
+            <span class="sf-origin">Kargil • 92% Guild</span>
+          </button>
+          <button class="superfood-btn" data-sf-id="blackrice" onclick="toggleSuperfood('blackrice')">
+            <span class="sf-icon">🍚</span>
+            <span class="sf-name">Chak-Hao Black Rice</span>
+            <span class="sf-origin">Manipur • 93% Guild</span>
+          </button>
+        </div>
+
+        <div class="calc-results-panel">
+          <div class="calc-stat-item">
+            <strong id="calcCarbonSaved">8.0 kg</strong>
+            <small>Avoided Transport CO2e</small>
+          </div>
+          <div class="calc-stat-item">
+            <strong id="calcNutrientScore">96 / 100</strong>
+            <small>Nutrient & Bio-Active Density</small>
+          </div>
+          <div class="calc-stat-item">
+            <strong id="calcItemCount">2 Superfoods</strong>
+            <small>Selected Indigenous Crops</small>
+          </div>
+          <div class="calc-stat-item">
+            <strong style="color: #34d399;">96%</strong>
+            <small>Direct Farmer Cooperative Margin</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Dietary Preference & Search Toolbar -->
+      <div class="interactive-toolbar">
+        <div class="interactive-search-wrap">
+          <span class="interactive-search-icon">🔍</span>
+          <input type="search" id="foodSearchInput" class="interactive-search-input" placeholder="Search delicacies by dish, state, superfood, or spice..." aria-label="Search culinary specialties">
+        </div>
+        <div class="interactive-pills-row">
+          <button class="interactive-pill food-diet-pill active" data-diet="all">All Specialties</button>
+          <button class="interactive-pill food-diet-pill" data-diet="warming">🔥 High-Altitude Warming</button>
+          <button class="interactive-pill food-diet-pill" data-diet="plant">🌱 100% Plant-Based</button>
+          <button class="interactive-pill food-diet-pill" data-diet="probiotic">🌾 Probiotic & Fermented</button>
+          <button class="interactive-pill food-diet-pill" data-diet="sweet">🍯 Hearth Sweets</button>
+          <button class="interactive-pill food-diet-pill" data-diet="coastal">🌊 Coastal & Spice Coast</button>
+        </div>
+        <button class="btn light" onclick="resetFoodFilters()" style="padding: 7px 14px; font-size: 12px; height: 38px; margin-left: auto; white-space: nowrap;">Reset</button>
+      </div>
+
       <div class="food-grid" id="foodGrid"></div>
     </section>
 
@@ -197,6 +275,51 @@
       <h2 data-i18n="cta_title">Include local culinary stops in your itinerary</h2>
       <a href="planner.html" class="btn primary">Launch Smart Planner →</a>
     </section>
+
+    <!-- Food Recipe Secrets & Cooperative Provenance Modal -->
+    <div class="food-recipe-modal" id="foodRecipeModal" aria-hidden="true">
+      <div class="food-recipe-content">
+        <button class="close" onclick="closeFoodRecipeModal()" data-close aria-label="Close modal" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.12); color: #000; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">×</button>
+        
+        <div style="margin-bottom: 16px;">
+          <span class="eyebrow" id="recipeModalOrigin" style="color: var(--emerald-pop); font-size: 11px; font-weight: 700; letter-spacing: 0.06em;">ORIGIN & COOPERATIVE</span>
+          <h2 id="recipeModalTitle" style="font-family: var(--font-main); font-size: 26px; color: var(--ink); margin: 4px 0 8px;">Delicacy Title</h2>
+          <p id="recipeModalDesc" style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0;">Description of this indigenous culinary dish.</p>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 18px 0;">
+          <h4 style="font-family: var(--font-main); font-size: 14px; color: var(--ink); margin: 0 0 8px; display: flex; align-items: center; gap: 6px;">
+            <span>🧑‍🍳 Traditional Hearth Preparation Secret:</span>
+          </h4>
+          <p id="recipeModalPrep" style="font-size: 13.5px; color: #334155; line-height: 1.6; margin: 0;">Preparation secrets.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 18px 0;">
+          <div style="background: #f0fdf4; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px 14px;">
+            <small style="font-size: 10.5px; color: #047857; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px;">🤝 Local Cooperative</small>
+            <span id="recipeModalCoop" style="font-size: 12.5px; font-weight: 600; color: #065f46;">Village Farmers Cooperative</span>
+          </div>
+          <div style="background: #eff6ff; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px 14px;">
+            <small style="font-size: 10.5px; color: #1d4ed8; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px;">🍵 Perfect Pairing</small>
+            <span id="recipeModalPair" style="font-size: 12.5px; font-weight: 600; color: #1e40af;">Herbal mountain tea</span>
+          </div>
+          <div style="background: #fefce8; border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 10px; padding: 12px 14px;">
+            <small style="font-size: 10.5px; color: #a16207; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px;">🌿 Carbon Saved</small>
+            <span id="recipeModalCarbon" style="font-size: 12.5px; font-weight: 600; color: #854d0e;">1.2 kg CO2e</span>
+          </div>
+        </div>
+
+        <div style="margin: 18px 0;">
+          <h4 style="font-family: var(--font-main); font-size: 13.5px; color: var(--ink); margin: 0 0 6px;">💪 High-Altitude Bioactive Nutrition:</h4>
+          <p id="recipeModalNutrition" style="font-size: 13px; color: #64748b; margin: 0;">High polyphenol antioxidant density.</p>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid #e2e8f0;">
+          <button class="btn primary" id="recipeModalBookmarkBtn" style="padding: 9px 20px; font-size: 13px;">♥ Save to Food Stops</button>
+          <button class="btn light" onclick="closeFoodRecipeModal()" style="padding: 9px 18px; font-size: 13px;">Done</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Institutional Site Footer -->
@@ -426,5 +549,6 @@
   <script src="../js/field_pass.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/ai.js"></script>
+  <script src="../js/ai_card_insight.js"></script>
 </body>
 </html>

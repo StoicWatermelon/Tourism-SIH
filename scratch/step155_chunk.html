@@ -1,0 +1,90 @@
+    <!-- Autonomous Agent Split Section & Streaming Chatbot -->
+    <section class="split-section" id="ai" style="padding-top: 40px;">
+      <!-- Full-Width Agent Pipeline Tracker -->
+      <div style="grid-column: 1 / -1;">
+        <div class="agent-tracker-wrap" id="agentTrackerWrap">
+          <div class="agent-tracker-header">
+            <div class="agent-tracker-title">
+              <span>⚡ Autonomous Travel Planner Pipeline (Execution Queue)</span>
+            </div>
+            <div class="agent-checkpoint-pill" id="agentCheckpointPill">
+              <span class="checkpoint-icon">🛡️</span>
+              <span id="checkpointCountText">Checkpoints Ready • Active Model: Gemini 3.1 Flash Lite</span>
+            </div>
+          </div>
+          <div class="agent-steps-grid" id="agentStepsGrid">
+            <div class="agent-step-item active" id="step-1">
+              <div class="step-badge-icon">1</div>
+              <div class="step-info">
+                <span class="step-name">1. Info Gathering</span>
+                <span class="step-status" id="step1Status">Listening for intent...</span>
+              </div>
+            </div>
+            <div class="agent-step-item pending" id="step-2">
+              <div class="step-badge-icon">2</div>
+              <div class="step-info">
+                <span class="step-name">2. Flight Comparison</span>
+                <span class="step-status" id="step2Status">Queued</span>
+              </div>
+            </div>
+            <div class="agent-step-item pending" id="step-3">
+              <div class="step-badge-icon">3</div>
+              <div class="step-info">
+                <span class="step-name">3. Hotel Shortlist</span>
+                <span class="step-status" id="step3Status">Queued</span>
+              </div>
+            </div>
+            <div class="agent-step-item pending" id="step-4">
+              <div class="step-badge-icon">4</div>
+              <div class="step-info">
+                <span class="step-name">4. Clustered Itinerary</span>
+                <span class="step-status" id="step4Status">Queued</span>
+              </div>
+            </div>
+            <div class="agent-step-item pending" id="step-5">
+              <div class="step-badge-icon">5</div>
+              <div class="step-info">
+                <span class="step-name">5. Budget & Safety</span>
+                <span class="step-status" id="step5Status">Queued</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-copy">
+        <div class="ai-header-badge" data-i18n="ai_badge">✦ GOAL-DRIVEN AUTONOMOUS AGENT</div>
+        <p class="eyebrow" data-i18n="ai_eyebrow">BHARAT EXPEDITION AGENT</p>
+        <h2 data-i18n="ai_title">Talk to your autonomous travel planner.</h2>
+        <p data-i18n="ai_sub">State a simple goal like <i>"I have ₹25,000 for 4 days in Kerala"</i>. The agent decomposes your goal into multi-step tasks, compares flights, shortlists verified hotels, clusters daily sightseeing, balances budget, and prepares 24/7 medical safety protocols.</p>
+        
+        <div class="ai-suggestions">
+          <button data-goal="I don't want to plan anything. I have ₹25,000 for 4 days in Kerala." data-i18n="sug_kerala_goal">🌴 Kerala 4 Days (₹25k Goal)</button>
+          <button data-goal="Plan me a 5-day Kashmir trip under ₹35,000 from Delhi." data-i18n="sug_kashmir_goal">🏔️ Kashmir 5 Days (₹35k Goal)</button>
+          <button data-goal="Solo 5-day Ladakh expedition under ₹28,000 with high passes." data-i18n="sug_ladakh_goal">❄️ Ladakh High Passes (₹28k)</button>
+          <button data-goal="Royal Rajasthan & Jaipur 4-day heritage tour under ₹30,000." data-i18n="sug_jaipur_goal">🏰 Rajasthan Forts (₹30k)</button>
+          <button data-goal="Relaxing 4-day Goa coastal getaway for 2 under ₹32,000.">🌊 Goa Coastal Escape (₹32k)</button>
+          <button data-goal="Tell me about Kolkata & West Bengal heritage" data-i18n="sug_kolkata">Kolkata Heritage Q&A</button>
+        </div>
+      </div>
+
+      <div class="chat" role="region" aria-label="Bharat AI chat" style="height: 600px; max-height: 600px;">
+        <div class="chat-head">
+          <span class="ai-orb idle" id="aiOrb" aria-label="AI Status Indicator">✦</span>
+          <div>
+            <b data-i18n="ai_bot_title">BHARAT TRAVEL AGENT</b>
+            <small id="aiStatusText" data-i18n="ai_bot_status">Autonomous Planner • Active</small>
+          </div>
+          <span class="chat-model-tag" id="activeModelTag">Gemini 3.1 Flash Lite</span>
+        </div>
+        <div class="messages" id="messages">
+          <div class="msg bot">
+            Namaste! 🙏 I am your <b>Autonomous Travel Assistant</b> for all of Bharat. Tell me your travel goal (e.g. <i>"I don't want to plan anything. I have ₹25,000 for 4 days in Kerala"</i>), and I'll find cheapest flights, compare hotels, cluster daily sightseeing, balance your budget, and safeguard your trip with 24/7 emergency protocols!
+          </div>
+        </div>
+        <form class="chat-form" id="chatForm">
+          <input id="chatInput" placeholder="Enter your travel goal (e.g. ₹25,000 for 4 days in Kerala)..." autocomplete="off" aria-label="Chat input" data-i18n-placeholder="ai_input_placeholder">
+          <button type="submit" aria-label="Send message" data-i18n="ai_send">Plan →</button>
+        </form>
+      </div>
+    </section>
