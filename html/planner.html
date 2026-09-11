@@ -122,6 +122,7 @@
         <option value="hi">हिं</option>
         <option value="bn">বাং</option>
       </select>
+      <button id="themeToggleBtn" title="Toggle Day / Night Mode" aria-label="Toggle theme">☀️</button>
     </div>
   </header>
 
@@ -180,6 +181,17 @@
           <div class="planner-hero-title">
             <h3>Bharat AI Travel Planner</h3>
             <small>Autonomous • Pan-India • All 36 States & UTs</small>
+            <div class="planner-origin-bar" id="plannerOriginBar">
+              <span class="planner-origin-pin">📍</span>
+              <span class="planner-origin-label">Departing from:</span>
+              <span class="detected-origin-badge" id="detectedOriginBadge" title="Click to change your starting city">
+                <span class="origin-city-name">Detecting origin...</span>
+                <span class="origin-source-tag">GPS/IP</span>
+              </span>
+              <button type="button" class="change-origin-btn" onclick="const newCity = prompt('Enter your departure city (e.g. Kolkata, Mumbai, Delhi, Pune, Siliguri):'); if(newCity && window.setUserOriginCity) window.setUserOriginCity(newCity);" title="Change starting city">
+                ✏️ Change
+              </button>
+            </div>
           </div>
         </div>
 
@@ -265,40 +277,210 @@
           <form id="plannerForm" class="planner-form">
             <label>
               <span data-i18n="plan_lbl_dest">Destination</span>
-              <input id="planDestination" list="destinationList" type="text" value="Hampi" placeholder="Search or type ANY place in India (e.g. Hampi, Udaipur, Darjeeling)..." style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.15); background:#fff; font-size:14px; font-weight:600; color:#1d2d44;">
+              <input id="planDestination" list="destinationList" type="text" value="Hampi" placeholder="Search or type ANY place in India (e.g. Hampi, Udaipur, Darjeeling, Coochbehar, Thane)..." style="width:100%; padding:10px 12px; border-radius:8px;">
               <datalist id="destinationList">
-                <option value="Hampi">Hampi — Ancient Vijayanagara UNESCO Boulder Ruins (Karnataka)</option>
-                <option value="Coorg">Coorg (Kodagu) — Coffee Estates & Misty Falls (Karnataka)</option>
-                <option value="Gokarna">Gokarna — Crescent Beaches & Mahabaleshwar (Karnataka)</option>
-                <option value="Mysore">Mysore — Royal Wodeyar Palace & Silk Heritage (Karnataka)</option>
-                <option value="Udaipur">Udaipur — Lake Pichola & Royal Palaces (Rajasthan)</option>
-                <option value="Jaipur">Jaipur — Pink City & Amer Fort Heritage (Rajasthan)</option>
-                <option value="Jodhpur">Jodhpur — Blue City & Mehrangarh Citadel (Rajasthan)</option>
-                <option value="Jaisalmer">Jaisalmer — Golden Thar Dunes & Sonar Qila (Rajasthan)</option>
-                <option value="Darjeeling">Darjeeling — Kanchenjunga Sunrise & Tea Plantations (West Bengal)</option>
-                <option value="Rishikesh">Rishikesh — Yoga Capital & Ganga River Rafting (Uttarakhand)</option>
-                <option value="Amritsar">Amritsar — Golden Temple & Wagah Border (Punjab)</option>
-                <option value="Pachmarhi">Pachmarhi — Satpura Hill Canyons & Waterfalls (Madhya Pradesh)</option>
-                <option value="Khajuraho">Khajuraho — UNESCO Sandstone Temples & Gorges (Madhya Pradesh)</option>
-                <option value="Pondicherry">Pondicherry — French White Town & Auroville (Puducherry)</option>
-                <option value="Kodaikanal">Kodaikanal — Misty Star Lake & Pillar Rocks (Tamil Nadu)</option>
-                <option value="Varanasi">Varanasi — Sacred Ghats & Evening Ganga Aarti (Uttar Pradesh)</option>
-                <option value="Kerala">Kerala — Backwaters, Solar Ferries & Tea Trails</option>
-                <option value="Ladakh">Ladakh — High Himalayan Passes & Alpine Lakes</option>
+                <!-- Andhra Pradesh -->
+                <option value="Visakhapatnam">Visakhapatnam (Vizag) — Coastal City & Araku Valley Gateway (Andhra Pradesh)</option>
+                <option value="Tirupati">Tirupati — Tirumala Temple & Talakona Waterfalls (Andhra Pradesh)</option>
+                <option value="Araku Valley">Araku Valley — Tribal Coffee & Borra Caves (Andhra Pradesh)</option>
+                <option value="Lepakshi">Lepakshi — Hanging Pillar Temple & Mural Heritage (Andhra Pradesh)</option>
+                <!-- Arunachal Pradesh -->
+                <option value="Tawang">Tawang — War Memorial & Sela Pass Monastery (Arunachal Pradesh)</option>
+                <option value="Ziro Valley">Ziro Valley — Apatani Tribal Homestays (Arunachal Pradesh)</option>
+                <option value="Bomdila">Bomdila — Misty Buddhist Gompas (Arunachal Pradesh)</option>
+                <option value="Mechuka">Mechuka — Remote Himalayan Valley (Arunachal Pradesh)</option>
+                <!-- Assam -->
+                <option value="Kaziranga">Kaziranga — One-Horned Rhino National Park (Assam)</option>
+                <option value="Majuli">Majuli — World's Largest River Island (Assam)</option>
+                <option value="Sivasagar">Sivasagar — Ahom Kingdom Ruins (Assam)</option>
+                <option value="Haflong">Haflong — Dima Hasao Hill Station (Assam)</option>
+                <option value="Manas">Manas — UNESCO Tiger Reserve (Assam)</option>
+                <!-- Bihar -->
+                <option value="Bodh Gaya">Bodh Gaya — Mahabodhi UNESCO Temple (Bihar)</option>
+                <option value="Nalanda">Nalanda — Ancient University Ruins (Bihar)</option>
+                <option value="Rajgir">Rajgir — Hot Springs & Vishwa Shanti Stupa (Bihar)</option>
+                <option value="Vaishali">Vaishali — Birthplace of Democracy (Bihar)</option>
+                <!-- Chhattisgarh -->
+                <option value="Bastar">Bastar — Chitrakote Falls & Tribal Culture (Chhattisgarh)</option>
+                <option value="Jagdalpur">Jagdalpur — Dandakaranya Forest & Bastar Palace (Chhattisgarh)</option>
+                <option value="Sirpur">Sirpur — Ancient Buddhist Heritage (Chhattisgarh)</option>
+                <!-- Goa -->
                 <option value="Goa">Goa — Coastal Beaches & Portuguese Heritage</option>
+                <option value="Panaji">Panaji — Fontainhas Latin Quarter (Goa)</option>
+                <option value="Old Goa">Old Goa — Basilica of Bom Jesus UNESCO (Goa)</option>
+                <option value="Ponda">Ponda — Spice Plantations & Temples (Goa)</option>
+                <option value="Agonda">Agonda — Secluded Turtle Nesting Beach (Goa)</option>
+                <!-- Gujarat -->
+                <option value="Kutch">Rann of Kutch — White Salt Desert & Handicrafts (Gujarat)</option>
+                <option value="Gir">Gir Forest — Asiatic Lion Safari (Gujarat)</option>
+                <option value="Dholavira">Dholavira — Harappan UNESCO Ruins (Gujarat)</option>
+                <option value="Dwarka">Dwarka — Sacred Dwarkadheesh Temple (Gujarat)</option>
+                <option value="Ahmedabad">Ahmedabad — Heritage Walk & Sabarmati Ashram (Gujarat)</option>
+                <option value="Saputara">Saputara — Only Hill Station in Gujarat</option>
+                <option value="Palitana">Palitana — 900 Jain Temples on Shatrunjaya Hill (Gujarat)</option>
+                <!-- Haryana -->
+                <option value="Kurukshetra">Kurukshetra — Mahabharata Battlefield & Brahma Sarovar (Haryana)</option>
+                <option value="Morni Hills">Morni Hills — Haryana's Only Hill Station</option>
+                <!-- Himachal Pradesh -->
+                <option value="Spiti Valley">Spiti Valley — Cold Desert & Key Gompa (Himachal Pradesh)</option>
+                <option value="Manali">Manali — Solang Valley & Rohtang Pass (Himachal Pradesh)</option>
+                <option value="Dharamshala">Dharamshala — Dalai Lama's Seat & McLeod Ganj (Himachal Pradesh)</option>
+                <option value="Khajjiar">Khajjiar — Mini Switzerland of India (Himachal Pradesh)</option>
+                <option value="Kinnaur">Kinnaur — Apple Orchards & Kinner Kailash (Himachal Pradesh)</option>
+                <option value="Shimla">Shimla — Colonial Hill Station & Mall Road (Himachal Pradesh)</option>
+                <option value="Chamba">Chamba — Ancient Temples & Ravi Valley (Himachal Pradesh)</option>
+                <option value="Dalhousie">Dalhousie — Khajjiar Meadows & Scottish Architecture (Himachal Pradesh)</option>
+                <!-- Jharkhand -->
+                <option value="Ranchi">Ranchi — Hundru Falls & Dasam Falls (Jharkhand)</option>
+                <option value="Netarhat">Netarhat — Queen of Chotanagpur Plateau (Jharkhand)</option>
+                <option value="Rajmahal">Rajmahal — Fossilized Forest & Ganges Viewpoint (Jharkhand)</option>
+                <!-- Karnataka -->
+                <option value="Hampi">Hampi — Vijayanagara UNESCO Boulder Ruins (Karnataka)</option>
+                <option value="Coorg">Coorg (Kodagu) — Coffee Estates & Misty Falls (Karnataka)</option>
+                <option value="Mysore">Mysore — Royal Wadiyar Palace & Silk Heritage (Karnataka)</option>
+                <option value="Chikmagalur">Chikmagalur — Coffee Trails & Mullayanagiri Peak (Karnataka)</option>
+                <option value="Gokarna">Gokarna — Crescent Beaches & Mahabaleshwar Temple (Karnataka)</option>
+                <option value="Badami">Badami — Chalukya Cave Temples & Agastya Lake (Karnataka)</option>
+                <option value="Pattadakal">Pattadakal — UNESCO Chalukya Temple Complex (Karnataka)</option>
+                <option value="Udupi">Udupi — Sri Krishna Temple & Coastal Cuisine (Karnataka)</option>
+                <option value="Kabini">Kabini — Backwater Wildlife Jeep Safari (Karnataka)</option>
+                <!-- Kerala -->
+                <option value="Kerala">Kerala — Backwaters, Solar Ferries & Tea Trails</option>
+                <option value="Alleppey">Alleppey (Alappuzha) — Houseboat Backwater Cruise (Kerala)</option>
+                <option value="Munnar">Munnar — Tea Plantations & Eravikulam Park (Kerala)</option>
+                <option value="Wayanad">Wayanad — Tribal Homestays & Chembra Peak (Kerala)</option>
+                <option value="Thekkady">Thekkady — Periyar Tiger Reserve Boat Safari (Kerala)</option>
+                <option value="Kovalam">Kovalam — Lighthouse Beach & Ayurveda Retreats (Kerala)</option>
+                <option value="Thrissur">Thrissur — Cultural Capital & Pooram Festival (Kerala)</option>
+                <option value="Kannur">Kannur — Theyyam Rituals & Lace Weaving (Kerala)</option>
+                <!-- Ladakh (UT) -->
+                <option value="Ladakh">Ladakh — High Himalayan Passes & Alpine Lakes</option>
+                <option value="Leh">Leh — Monastery Capital & Pangong Gateway (Ladakh)</option>
+                <option value="Pangong Tso">Pangong Tso — High Altitude Turquoise Lake (Ladakh)</option>
+                <option value="Nubra Valley">Nubra Valley — Bactrian Camels & Siachen Viewpoint (Ladakh)</option>
+                <option value="Tso Moriri">Tso Moriri — Flamingo Lake at 4,500m (Ladakh)</option>
+                <option value="Hanle">Hanle — Dark Sky Observatory & Changthang (Ladakh)</option>
+                <option value="Turtuk">Turtuk — Balti Village at Last Indian Settlement (Ladakh)</option>
+                <!-- Lakshadweep (UT) -->
+                <option value="Lakshadweep">Lakshadweep — Coral Lagoon Atoll Islands</option>
+                <option value="Agatti">Agatti — Turquoise Lagoon & Coral Reef Snorkelling (Lakshadweep)</option>
+                <!-- Madhya Pradesh -->
+                <option value="Khajuraho">Khajuraho — UNESCO Sandstone Temples (Madhya Pradesh)</option>
+                <option value="Pachmarhi">Pachmarhi — Satpura Biosphere & Bee Falls (Madhya Pradesh)</option>
+                <option value="Orchha">Orchha — Bundela Cenotaphs & Betwa River (Madhya Pradesh)</option>
+                <option value="Mandu">Mandu — Afghan Ruins & Monsoon Magic (Madhya Pradesh)</option>
+                <option value="Bandhavgarh">Bandhavgarh — Highest Tiger Density Reserve (Madhya Pradesh)</option>
+                <option value="Kanha">Kanha — Royal Bengal Tiger Corridor (Madhya Pradesh)</option>
+                <option value="Jabalpur">Jabalpur — Marble Rocks & Dhuandhar Falls (Madhya Pradesh)</option>
+                <option value="Pench">Pench — Jungle Book Inspiration National Park (Madhya Pradesh)</option>
+                <!-- Maharashtra -->
+                <option value="Thane">Thane — Yeoor Hills & Upvan Lake (Maharashtra)</option>
+                <option value="Palghar">Palghar — Tribal Coast & Kelva Beach (Maharashtra)</option>
+                <option value="Ratnagiri">Ratnagiri — Alphonso Mango Coast & Jaigad Fort (Maharashtra)</option>
+                <option value="Aurangabad">Aurangabad — Ajanta & Ellora UNESCO Caves (Maharashtra)</option>
+                <option value="Lonavala">Lonavala — Karla Caves & Monsoon Waterfalls (Maharashtra)</option>
+                <option value="Mahabaleshwar">Mahabaleshwar — Strawberry Hill Station & Krishna Origin (Maharashtra)</option>
+                <option value="Kolhapur">Kolhapur — Mahalakshmi Temple & Wrestling (Maharashtra)</option>
+                <option value="Matheran">Matheran — No-Vehicle Hill Station (Maharashtra)</option>
+                <option value="Nashik">Nashik — Wine Trail & Trimbakeshwar Jyotirlinga (Maharashtra)</option>
+                <option value="Konkan">Konkan Coast — Forts, Beaches & Cashew Farms (Maharashtra)</option>
+                <!-- Manipur -->
+                <option value="Loktak Lake">Loktak Lake — Floating Phumdis & Sangai Deer (Manipur)</option>
+                <option value="Ukhrul">Ukhrul — Shirui Lily & Tangkhul Tribal Heritage (Manipur)</option>
+                <!-- Meghalaya -->
                 <option value="Meghalaya">Meghalaya — Living Root Bridges & Crystal Rivers</option>
+                <option value="Cherrapunji">Cherrapunji — Wettest Place & Double Decker Root Bridge (Meghalaya)</option>
+                <option value="Mawlynnong">Mawlynnong — Asia's Cleanest Village (Meghalaya)</option>
+                <option value="Dawki">Dawki — Crystal Clear Umngot River (Meghalaya)</option>
+                <option value="Nongpoh">Nongpoh — Gateway Hills & Pine Forests (Meghalaya)</option>
+                <!-- Mizoram -->
+                <option value="Phawngpui">Phawngpui — Blue Mountain & Mizo Folk Trail (Mizoram)</option>
+                <option value="Champhai">Champhai — Myanmar Border & Rice Wine Country (Mizoram)</option>
+                <!-- Nagaland -->
+                <option value="Kohima">Kohima — WWII Cemetery & Hornbill Festival (Nagaland)</option>
+                <option value="Dzukou Valley">Dzukou Valley — Seasonal Wildflower Trek (Nagaland)</option>
+                <option value="Mon">Mon — Konyak Headhunter Tribal Villages (Nagaland)</option>
+                <!-- Odisha -->
+                <option value="Puri">Puri — Jagannath Temple & Blue Flag Beach (Odisha)</option>
+                <option value="Konark">Konark — Sun Temple UNESCO Chariot Wheel (Odisha)</option>
+                <option value="Bhubaneswar">Bhubaneswar — Temple City & Dhauli Peace Stupa (Odisha)</option>
+                <option value="Chilika Lake">Chilika Lake — Asia's Largest Brackish Lagoon & Irrawaddy Dolphins (Odisha)</option>
+                <option value="Simlipal">Simlipal — Elephant & Tiger Biosphere Reserve (Odisha)</option>
+                <!-- Puducherry (UT) -->
+                <option value="Pondicherry">Pondicherry — French White Town & Auroville (Puducherry)</option>
+                <!-- Punjab -->
+                <option value="Amritsar">Amritsar — Golden Temple & Wagah Border (Punjab)</option>
+                <option value="Anandpur Sahib">Anandpur Sahib — Khalsa Heritage Museum (Punjab)</option>
+                <!-- Rajasthan -->
+                <option value="Udaipur">Udaipur — Lake Pichola & City Palace (Rajasthan)</option>
+                <option value="Jaipur">Jaipur — Pink City & Amer Fort (Rajasthan)</option>
+                <option value="Jodhpur">Jodhpur — Blue City & Mehrangarh (Rajasthan)</option>
+                <option value="Jaisalmer">Jaisalmer — Golden Thar Dunes & Sonar Qila (Rajasthan)</option>
+                <option value="Pushkar">Pushkar — Sacred Brahma Lake & Camel Fair (Rajasthan)</option>
+                <option value="Bundi">Bundi — Stepwells & Taragarh Fort (Rajasthan)</option>
+                <option value="Kumbhalgarh">Kumbhalgarh — Great Wall of India Fort (Rajasthan)</option>
+                <option value="Ranthambore">Ranthambore — Tiger Safari & Mughal Ruins (Rajasthan)</option>
+                <option value="Mandawa">Mandawa — Shekhawati Painted Haveli Trail (Rajasthan)</option>
+                <!-- Sikkim -->
                 <option value="Sikkim">Sikkim — Gangtok & Alpine Monasteries</option>
-                <option value="Spiti Valley">Spiti Valley — Cold Desert & Key Gompa (Himachal)</option>
-                <option value="Manali">Manali — Pine Valleys & Solang Adventure (Himachal)</option>
-                <option value="Puri">Puri — Golden Blue Flag Beach & Jagannath Shrine (Odisha)</option>
-                <option value="Andaman">Andaman Islands — Coral Reefs & Radhanagar Beach</option>
-                <option value="Kutch">Rann of Kutch — White Salt Desert (Gujarat)</option>
-                <option value="Kaziranga">Kaziranga — One-Horned Rhino Safari (Assam)</option>
-                <option value="Ziro Valley">Ziro Valley — Apatani Tribal Homestays (Arunachal)</option>
+                <option value="Gangtok">Gangtok — Rumtek Monastery & Nathula Pass (Sikkim)</option>
+                <option value="Pelling">Pelling — Khangchendzonga Sunrise Views (Sikkim)</option>
+                <option value="Ravangla">Ravangla — Buddha Park & Tea Trails (Sikkim)</option>
+                <option value="Yuksom">Yuksom — First Capital & Kanchenjunga Base Trek (Sikkim)</option>
+                <!-- Tamil Nadu -->
+                <option value="Kodaikanal">Kodaikanal — Star Lake & Pillar Rocks (Tamil Nadu)</option>
+                <option value="Ooty">Ooty (Udhagamandalam) — Nilgiri Toy Train & Botanical Garden (Tamil Nadu)</option>
+                <option value="Madurai">Madurai — Meenakshi Amman Temple & Flower Market (Tamil Nadu)</option>
+                <option value="Rameswaram">Rameswaram — Pamban Bridge & Ramanathaswamy Temple (Tamil Nadu)</option>
+                <option value="Thanjavur">Thanjavur — Brihadeeswarar UNESCO Temple & Bronze Art (Tamil Nadu)</option>
+                <option value="Mamallapuram">Mamallapuram — Shore Temple & Stone Carvings UNESCO (Tamil Nadu)</option>
+                <option value="Chettinad">Chettinad — Palace Mansions & Spice Cuisine (Tamil Nadu)</option>
+                <option value="Yercaud">Yercaud — Coffee & Orange Hill Station (Tamil Nadu)</option>
+                <!-- Telangana -->
+                <option value="Warangal">Warangal — Kakatiya Thousand Pillar Temple (Telangana)</option>
+                <option value="Nagarjunasagar">Nagarjunasagar — Buddhist Stupa Island & Dam (Telangana/AP)</option>
+                <option value="Medak">Medak — Gothic Cathedral & Medieval Fort (Telangana)</option>
+                <!-- Tripura -->
+                <option value="Agartala">Agartala — Ujjayanta Palace & Neermahal Water Palace (Tripura)</option>
+                <option value="Unakoti">Unakoti — Megalithic Rock Carvings (Tripura)</option>
+                <!-- Uttar Pradesh -->
+                <option value="Varanasi">Varanasi — Sacred Ghats & Evening Ganga Aarti (Uttar Pradesh)</option>
+                <option value="Agra">Agra — Taj Mahal, Agra Fort & Fatehpur Sikri UNESCO (Uttar Pradesh)</option>
+                <option value="Lucknow">Lucknow — Nawabi Cuisine & Bara Imambara (Uttar Pradesh)</option>
+                <option value="Mathura">Mathura — Krishna Janmabhoomi & Vrindavan (Uttar Pradesh)</option>
+                <option value="Ayodhya">Ayodhya — Ram Janmabhoomi & Sarayu Ghats (Uttar Pradesh)</option>
+                <option value="Allahabad">Prayagraj (Allahabad) — Triveni Sangam & Kumbh Mela (Uttar Pradesh)</option>
+                <option value="Chitrakoot">Chitrakoot — Ramayana Forest & Kamadgiri Parikrama (Uttar Pradesh)</option>
+                <option value="Dudhwa">Dudhwa — Terai Tiger Reserve (Uttar Pradesh)</option>
+                <!-- Uttarakhand -->
+                <option value="Rishikesh">Rishikesh — Yoga Capital & Ganga River Rafting (Uttarakhand)</option>
+                <option value="Haridwar">Haridwar — Har Ki Pauri Ganga Aarti (Uttarakhand)</option>
+                <option value="Mussoorie">Mussoorie — Queen of Hills & Kempty Falls (Uttarakhand)</option>
+                <option value="Nainital">Nainital — Naini Lake & Snowview (Uttarakhand)</option>
+                <option value="Chopta">Chopta — Mini Switzerland & Tungnath Trek (Uttarakhand)</option>
+                <option value="Munsiyari">Munsiyari — Milam Glacier & Panchachuli Views (Uttarakhand)</option>
+                <option value="Lansdowne">Lansdowne — Garhwal Rifles & Quiet Hill Town (Uttarakhand)</option>
+                <option value="Valley of Flowers">Valley of Flowers — UNESCO Himalayan Wildflowers (Uttarakhand)</option>
+                <option value="Jim Corbett">Jim Corbett — India's Oldest Tiger Reserve (Uttarakhand)</option>
+                <!-- West Bengal -->
+                <option value="Darjeeling">Darjeeling — Kanchenjunga Sunrise & Tea Estates (West Bengal)</option>
+                <option value="Kalimpong">Kalimpong — Orchid Hill & Silk Road Town (West Bengal)</option>
+                <option value="Coochbehar">Coochbehar — Royal Koch Dynasty Palace (West Bengal)</option>
+                <option value="Dooars">Dooars — Elephant Grassland & Tea Garden Safari (West Bengal)</option>
+                <option value="Sundarbans">Sundarbans — UNESCO Mangrove Tiger Delta (West Bengal)</option>
+                <option value="Murshidabad">Murshidabad — Nawabi Palaces & Silk Heritage (West Bengal)</option>
+                <option value="Bishnupur">Bishnupur — Terracotta Temple Cluster (West Bengal)</option>
+                <!-- Andaman & Nicobar (UT) -->
+                <option value="Andaman">Andaman Islands — Radhanagar Beach & Coral Reefs</option>
+                <option value="Havelock Island">Havelock Island — Radhanagar Beach & Elephant Beach (Andaman)</option>
+                <option value="Neil Island">Neil Island — Coral Reef Snorkelling (Andaman)</option>
+                <!-- Chandigarh (UT) -->
+                <option value="Chandigarh">Chandigarh — Le Corbusier City & Rock Garden</option>
+                <!-- Delhi (NCT) -->
+                <option value="Delhi">Delhi — Qutb Minar, Red Fort & Chandni Chowk</option>
+                <option value="Old Delhi">Old Delhi — Mughal Monuments & Spice Market (Delhi)</option>
+                <!-- Jammu & Kashmir (UT) -->
                 <option value="Kashmir">Kashmir — Dal Lake Houseboats & Gulmarg Gondola</option>
-                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                <option value="Uttarakhand">Uttarakhand</option>
-                <option value="Rajasthan">Rajasthan</option>
                 <option value="Tamil Nadu">Tamil Nadu</option>
                 <option value="Maharashtra">Maharashtra</option>
                 <option value="Gujarat">Gujarat</option>

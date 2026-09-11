@@ -74,11 +74,24 @@ PAN_INDIA_DESTINATIONS_MAP = {
     "mizoram": ["mizoram", "aizawl", "reiek", "champhai", "vantawng", "मिजोरम", "आइजोल", "মিজোরাম", "আইজল"],
     "tripura": ["tripura", "agartala", "ujjayanta", "neermahal", "unakoti", "त्रिपुरा", "अगरतला", "ত্রিপুরা", "আগরতলা"],
 
-    # ─── High-Volume Iconic Travel Hubs ───
+    # ─── High-Volume Iconic Travel Hubs & Specific Districts ───
     "kashmir": ["kashmir", "srinagar", "gulmarg", "pahalgam", "sonamarg", "dal lake", "কাশ্মীর", "कश्मीर"],
     "jaipur": ["jaipur", "pink city", "amber fort", "जयपुर", "জয়পুর"],
     "varanasi": ["varanasi", "kashi", "banaras", "वाराणसी", "বারাণসী"],
     "kolkata": ["kolkata", "calcutta", "howrah", "কলকাতা", "कोलकाता"],
+    "coochbehar": ["coochbehar", "cooch behar", "coochbihar", "koch bihar", "kochbihar", "কোচবিহার", "कूचबिहार"],
+    "thane": ["thane", "thana", "ठाणे", "yeoor", "upvan", "talao pali", "kopineshwar"],
+    "pune": ["pune", "poona", "पुणे", "shaniwar wada", "sinhagad"],
+    "murshidabad": ["murshidabad", "hazarduari", "berhampore", "মুর্শিদাবাদ", "মর্শিদাবাদ", "मुर्शिदाबाद"],
+    "sundarbans": ["sundarbans", "sundarban", "সুন্দরবন", "सुंदरवन", "sajnekhali", "dobanki"],
+    "lonavala": ["lonavala", "khandala", "लोनावला", "खंडाला", "karla caves", "bhushi dam", "tiger point"],
+    "kolhapur": ["kolhapur", "कोल्हापुर", "কোলাপুর", "mahalakshmi temple", "panhala", "rankala"],
+    "nashik": ["nashik", "nasik", "नासिक", "नाशिक", "trimbakeshwar", "sula vineyards", "panchavati"],
+    "agra": ["agra", "taj mahal", "आगरा", "আগ্রা", "fatehpur sikri", "mehtab bagh"],
+    "mathura": ["mathura", "vrindavan", "मथुरा", "वृंदावन", "মথুরা", "বৃন্দাবন", "banke bihari", "barsana", "govardhan"],
+    "shimla": ["shimla", "simla", "शिमला", "শিমলা", "mall road", "kufri", "jakhoo"],
+    "alleppey": ["alleppey", "alappuzha", "आलप्पुझा", "আলেপ্পি", "vembanad", "marari"],
+    "munnar": ["munnar", "मुन्नार", "মুন্নার", "eravikulam", "mattupetty", "anamudi"],
 
     # ─── North & Himalayas ───
     "himachal pradesh": ["himachal", "manali", "shimla", "dharamshala", "spiti", "kasol", "dalhousie", "kullu", "rohtang", "atal tunnel", "हिमाचल", "मनाली", "शिमला", "धर्मशाला", "হিমাচল", "মানালি", "শিমলা"],
@@ -712,6 +725,71 @@ REGIONAL_FOOD_SPECIALTIES: Dict[str, List[Dict[str, str]]] = {
         {"name": "Kolkata Biryani with Aloo & Egg", "desc": "Aromatic saffron basmati rice slow-cooked with succulent meat, egg, and iconic slow-braised potato."},
         {"name": "Machher Jhol & Shorshe Ilish", "desc": "Tender freshwater fish curry with kalonji, or Hilsa fish steamed in potent mustard-poppy paste."},
         {"name": "Warm Rosogolla & Mishti Doi", "desc": "Spongy cottage cheese balls soaked in warm light syrup and creamy caramelized sweet curd."}
+    ],
+    "coochbehar": [
+        {"name": "Shorshe Ilish & Bhetki Paturi", "desc": "Fresh river Hilsa steamed in freshly ground mustard-poppy paste with fragrant Gobindobhog rice."},
+        {"name": "Royal Chhanar Jilapi & Bhapa Sandesh", "desc": "Cooch Behar's signature sweet confection made from fresh cottage cheese fried and steeped in light syrup."},
+        {"name": "Koch-Rajbongshi Sidol Chutney & Bora", "desc": "Indigenous North Bengal fermented fish specialty seasoned with fiery green chilies and mountain greens."}
+    ],
+    "thane": [
+        {"name": "Legendary Mamledar Misal Pav", "desc": "Iconic Naupada sprout curry topped with fiery rassa, crisp farsan, chopped onions, and fresh pav."},
+        {"name": "Crispy Kothimbir Vadi & Thalipeeth", "desc": "Traditional fresh coriander leaf fritters and multi-grain spiced flatbread with homemade white butter."},
+        {"name": "Agri-Koli Coastal Seafood Thali", "desc": "Thane creek and coastal Surmai fry, Tisrya (clams) masala, and bhakri prepared with authentic Koli spices."}
+    ],
+    "pune": [
+        {"name": "Kattar Puneri Misal Pav & Bakarwadi", "desc": "Spicy sprout curry with fresh pav and crisp savory spiral rolls from Chitale Bandhu."},
+        {"name": "Pithla Bhakri with Thecha", "desc": "Rustic gram flour porridge with hot jowar/bajra flatbread and fiery green chili-garlic paste."},
+        {"name": "Sujata Mastani", "desc": "Pune's signature thick mango milkshake topped with rich ice cream and dry fruits."}
+    ],
+    "murshidabad": [
+        {"name": "Murshidabadi Chhanabora", "desc": "Famous dark caramelized cottage cheese delicacy steeped in cardamom syrup."},
+        {"name": "Nawabi Shahi Dum Biryani", "desc": "Awadhi-Bengali heritage rice with slow-simmered tender meat and whole spices."},
+        {"name": "Fresh Bhagirathi Katla Posto", "desc": "Fresh river carp cooked in fragrant stone-ground poppy seed paste."}
+    ],
+    "sundarbans": [
+        {"name": "Sundarbans Wild Mangrove Honey & Pitha", "desc": "Wild organic multifloral mangrove nectar drizzled over fresh steamed rice pitha."},
+        {"name": "Fresh Estuary Hilsa & Tiger Prawn Malai Curry", "desc": "Tender river delta prawns and hilsa cooked in fresh coconut cream."},
+        {"name": "Bhetki Macher Tel Jhal", "desc": "Delicately spiced mangrove barramundi simmered with mustard and nigella seeds."}
+    ],
+    "lonavala": [
+        {"name": "Lonavala Crushed Peanut & Sesame Chikki", "desc": "Famous brittle sweet confection made with golden roasted peanuts and jaggery."},
+        {"name": "Maharashtrian Batata Vada & Pav", "desc": "Crispy spiced potato fritter encased in chickpea batter, served with dry garlic chutney."},
+        {"name": "Steaming Masala Chai with Chocolate Walnut Fudge", "desc": "Rich artisan walnut fudge paired with ginger-cardamom cutting chai."}
+    ],
+    "kolhapur": [
+        {"name": "Kolhapuri Misal Pav", "desc": "Legendary fiery red rassa misal with sprouted lentils, crunchy farsan, onion, and lemon."},
+        {"name": "Tambda & Pandhra Rassa", "desc": "Traditional Kolhapuri red spicy broth and soothing white coconut-mutton soup."},
+        {"name": "Kolhapuri Mutton Sukka & Bhakri", "desc": "Slow-roasted tender meat in roasted coconut-onion paste with jowar bhakri."}
+    ],
+    "nashik": [
+        {"name": "Nashik Misal Pav", "desc": "Famous green and black gravy misal served with puffed batata farsan and soft pav."},
+        {"name": "Khandeshi Shev Bhaji", "desc": "Crisp spiced chickpea noodles cooked in a pungent black garam masala gravy."},
+        {"name": "Table Grapes & Vineyard Pairings", "desc": "Locally harvested fresh grapes, artisanal goat cheese, and vineyard appetizers."}
+    ],
+    "agra": [
+        {"name": "Agra Petha & Angoori Petha", "desc": "Translucent candied ash gourd sweet, flavoured with saffron, rosewater, and pistachio."},
+        {"name": "Bedmi Puri with Aloo Sabzi", "desc": "Crispy deep-fried urad dal stuffed puris with spicy potato curry and fenugreek chutney."},
+        {"name": "Mughlai Shahi Paneer & Sheermal", "desc": "Rich saffron gravy paired with saffron-tinted sweet yeast flatbread."}
+    ],
+    "mathura": [
+        {"name": "Mathura ke Special Pede", "desc": "Iconic caramelized golden-brown mawa (milk solid) fudge dusted with powdered sugar."},
+        {"name": "Kachori & Dubki Wale Aloo", "desc": "Thin runny spicy potato broth served with hot crisp dal kachoris at Vishram Ghat."},
+        {"name": "Makhan Mishri & Rabri Lassi", "desc": "Chilled clay-pot sweet lassi topped with thick clotted cream and white butter."}
+    ],
+    "shimla": [
+        {"name": "Himachali Chana Madra", "desc": "Chickpeas slow-cooked in a rich yogurt and cardamom gravy with pure desi ghee."},
+        {"name": "Siddu with Ghee & Dal", "desc": "Traditional steamed wheat flour yeast bread stuffed with spiced crushed walnuts and poppy seeds."},
+        {"name": "Tudkiya Bhath", "desc": "Traditional Pahadi spiced rice cooked with lentils, potatoes, and garlic curd."}
+    ],
+    "alleppey": [
+        {"name": "Karimeen Pollichathu", "desc": "Fresh pearl spot fish marinated in shallots, ginger, and chilies, wrapped in banana leaf and pan-grilled."},
+        {"name": "Kerala Backwater Duck Roast", "desc": "Kuttanad duck simmered in rich coconut milk and whole peppercorns."},
+        {"name": "Kallappam with Vegetable Stew", "desc": "Soft coconut pancakes served with mild aromatic vegetable stew."}
+    ],
+    "munnar": [
+        {"name": "Munnar Cardamom Tea & Steamed Puttu", "desc": "Freshly plucked highland tea paired with layered steamed rice flour and grated coconut cylinders."},
+        {"name": "Appam with Coconut Milk Stew", "desc": "Lacy fermented rice crepes with fragrant coconut vegetable stew."},
+        {"name": "Malabar Parotta with Pepper Roast", "desc": "Flaky layered parotta with spiced pepper roast."}
     ],
     "odisha": [
         {"name": "Chhena Poda", "desc": "India's original baked cottage cheese cake caramelized with cardamom and cashew nuts."},

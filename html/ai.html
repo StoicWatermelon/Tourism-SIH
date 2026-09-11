@@ -82,7 +82,7 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ai.css">
 </head>
-<body>
+<body class="ai-page">
   <a class="skip-link" href="#main">Skip to main content</a>
 
   <!-- Refined Institutional Glassmorphic Navbar -->
@@ -120,6 +120,7 @@
         <option value="hi">हिं</option>
         <option value="bn">বাং</option>
       </select>
+      <button id="themeToggleBtn" title="Toggle Day / Night Mode" aria-label="Toggle theme">☀️</button>
     </div>
   </header>
 
@@ -156,114 +157,184 @@
       </div>
     </section>
 
-    <!-- AI Split Section & Streaming Chatbot -->
-    <section class="split-section" id="ai" style="padding-top: 50px;">
-      <div class="ai-copy">
-        <div class="ai-header-badge" data-i18n="ai_badge">✦ POWERED BY GEMINI 3.1 FLASH LITE</div>
-        <p class="eyebrow" data-i18n="ai_eyebrow">BHARAT AI ASSISTANT</p>
-        <h2 data-i18n="ai_title">Your intelligent pan-India travel companion.</h2>
-        <p data-i18n="ai_sub">Real-time conversational intelligence for all of Bharat — from Kolkata's heritage to Rajasthan's forts, Kerala's backwaters, and Himalayan mountain passes.</p>
+    <!-- Dedicated Native AI Travel Workspace Console -->
+    <section class="ai-console-section" id="ai">
+      <div class="ai-console-workspace">
         
-        <!-- Trip Planning Tip Banner -->
-        <div class="ai-planning-tip-banner" id="aiPlanningTipBanner" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:linear-gradient(135deg, rgba(16,44,33,0.88), rgba(27,67,50,0.85)); border:1px solid rgba(82,183,136,0.3); border-radius:12px; padding:12px 16px; margin:16px 0; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-          <div style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#d8f3dc; line-height:1.4;">
-            <span style="font-size:18px; flex-shrink:0;">🗺️</span>
-            <div>
-              <strong style="color:#74c69d;">Autonomous Trip Planner Available:</strong> Need full itineraries, flights, and hotels?
-              <a href="planner.html" style="color:#95d5b2; font-weight:700; text-decoration:underline; margin-left:4px;">Open Expedition Planner →</a>
+        <!-- Left Companion Control Panel & Discovery Hub -->
+        <aside class="ai-console-sidebar" aria-label="AI Travel Tools & Discovery">
+          
+          <!-- Quick Travel Tools Card -->
+          <div class="ai-sidebar-card">
+            <div class="ai-sidebar-title">
+              <span>🧭</span> EXPEDITION SUITE
+            </div>
+            <div class="ai-mode-links">
+              <a href="planner.html" class="ai-mode-link">
+                <span>🗺️ Smart Autonomous Planner</span>
+                <span>→</span>
+              </a>
+              <a href="javascript:void(0)" onclick="const modal=document.getElementById('fieldKitModal'); if(modal) modal.classList.add('active');" class="ai-mode-link">
+                <span>🛡️ Offline Danger &amp; Field Pass</span>
+                <span>📄</span>
+              </a>
+              <a href="circuits.html" class="ai-mode-link">
+                <span>🛕 3D Heritage Portals</span>
+                <span>↗</span>
+              </a>
+              <a href="food.html" class="ai-mode-link">
+                <span>🍲 Zero-Mile Cuisine &amp; Recipes</span>
+                <span>↗</span>
+              </a>
             </div>
           </div>
-          <button onclick="document.getElementById('aiPlanningTipBanner').style.display='none'" style="background:none; border:none; color:rgba(216,243,220,0.6); font-size:16px; cursor:pointer; padding:0 4px;" title="Dismiss">&times;</button>
-        </div>
 
-        <div class="ai-suggestions">
-          <a href="planner.html" class="planner-shortcut-pill" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #2d6a4f, #52b788); color:#fff; border:1px solid rgba(82,183,136,0.4); border-radius:999px; padding:6px 14px; font-size:12px; font-weight:700; text-decoration:none; box-shadow:0 2px 8px rgba(45,106,79,0.3);">🗺️ Full Trip Planner →</a>
-          <button data-question="Tell me about Kolkata & West Bengal heritage" data-i18n="sug_kolkata">Kolkata Heritage</button>
-          <button data-question="What are the must-visit places in Jaipur & Rajasthan?" data-i18n="sug_jaipur">Jaipur Highlights</button>
-          <button data-question="What should I pack for high-altitude passes like Khardung La?" data-i18n="sug_pack">High-Pass Packing</button>
-          <button data-question="What is the mandatory acclimatization protocol for Leh?" data-i18n="sug_acclimat">48-Hr Acclimatization</button>
-          <button data-question="Explain the responsible travel rules for visiting Pangong Tso Lake.">Pangong Eco Rules</button>
-          <button data-question="What are the best village homestays in Nubra Valley and Turtuk?">Nubra Homestays</button>
-          <button data-question="What are the top cultural festivals in Ladakh throughout the year?">Ladakh Festivals</button>
-        </div>
-
-        <!-- Pan-India Region Tabs & State Chips Explorer (Integrated smoothly as quick inquiry chips) -->
-        <div class="state-explorer-hub" style="margin-top: 20px;">
-          <div style="font-size: 11.5px; font-weight: 700; color: #74c69d; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
-            ✨ Quick Inquire Across All 36 States &amp; UTs:
-          </div>
-          <div class="state-region-tabs" id="stateRegionTabs">
-            <button class="region-tab active" data-region="all">All 36</button>
-            <button class="region-tab" data-region="northeast">North East</button>
-            <button class="region-tab" data-region="north">North &amp; Himalayas</button>
-            <button class="region-tab" data-region="west">West &amp; Central</button>
-            <button class="region-tab" data-region="east">East</button>
-            <button class="region-tab" data-region="south">South &amp; Islands</button>
-          </div>
-
-          <div class="state-chips-scroll" id="stateChipsScroll">
-            <!-- Populated dynamically by js/ai.js -->
-          </div>
-        </div>
-      </div>
-
-      <div class="chat" id="chatWindow" role="region" aria-label="Bharat AI chat">
-        <div class="chat-head">
-          <span class="ai-orb idle" id="aiOrb" aria-label="AI Status Indicator">✦</span>
-          <div>
-            <b data-i18n="ai_bot_title">BHARAT AI</b>
-            <small id="aiStatusText" data-i18n="ai_bot_status">Bharat AI • Active</small>
-          </div>
-          <span class="chat-model-tag">Gemini 3.1 Flash Lite</span>
-          <div class="chat-header-actions">
-            <button type="button" class="chat-head-btn" id="chatExpandBtn" title="Toggle Fullscreen Console" aria-label="Toggle Fullscreen Console" onclick="window.toggleFullscreenChat && toggleFullscreenChat()">⛶</button>
-            <button type="button" class="chat-head-btn" id="chatClearBtn" title="Reset Chat to Instructions" aria-label="Reset Chat" onclick="window.resetChatConsole && resetChatConsole()">🔄</button>
-          </div>
-        </div>
-        <div class="messages" id="messages">
-          <div class="msg bot instruction-msg" id="botWelcomeMsg">
-            <div class="bot-welcome-header">
-              <span class="bot-welcome-badge">✦ BHARAT AI TOURISM INTELLIGENCE CONSOLE</span>
-              <h3 style="margin: 8px 0 4px; font-size: 16.5px; color: #1b4332; font-weight: 800;">Namaste! 🙏 I am Bharat AI</h3>
-              <p style="margin: 0; color: #40916c; font-size: 12.5px; font-weight: 600;">Your Autonomous India Travel Agent • Powered by Gemini 3.1 &amp; Live Pan-India Knowledge</p>
+          <!-- Detected Trip Departure Origin Card -->
+          <div class="ai-sidebar-card">
+            <div class="ai-sidebar-title">
+              <span>📍</span> TRIP DEPARTURE ORIGIN
             </div>
-
-            <div style="margin: 12px 0; border-top: 1px solid rgba(45, 106, 79, 0.15);"></div>
-
-            <div class="instruction-section">
-              <div style="font-weight: 700; color: #1b4332; font-size: 13px; margin-bottom: 6px;">📖 How to Use Bharat AI (Detailed Capabilities):</div>
-              <ul style="margin: 0 0 12px 18px; padding: 0; font-size: 12.5px; line-height: 1.65; color: #2d3748;">
-                <li><strong>🎯 1-Sentence Goal Planning:</strong> Type your travel goal naturally (e.g. <em>"I have ₹25,000 for 4 days in Kerala for 2 people"</em>). Bharat AI computes complete flights, certified homestays, day-by-day itineraries, and cost breakdowns.</li>
-                <li><strong>🏔️ High-Pass Telemetry &amp; AMS Safety:</strong> Check real-time pass clearances (Khardung La, Chang La, Rohtang) and mandatory 48-hour acclimatization medical protocols for Ladakh &amp; Spiti.</li>
-                <li><strong>🌿 Eco-Tourism &amp; Village Homestays:</strong> Discover certified green stays, EV charging corridors, and carbon-neutral trails in Sikkim, Meghalaya, and Himachal.</li>
-                <li><strong>🏛️ Heritage Across All 36 States &amp; UTs:</strong> Explore living traditions, temple architecture, local festivals, and authentic culinary specialties from Kolkata to Kashmir.</li>
-                <li><strong>🛡️ Offline Traveler Field Kit:</strong> Headed into remote no-network mountain passes? Click <strong>Offline Pass</strong> in the top navbar to download your emergency PDF dossier.</li>
-              </ul>
-            </div>
-
-            <div style="background: rgba(82, 183, 136, 0.1); border: 1px solid rgba(82, 183, 136, 0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;">
-              <div style="font-weight: 700; color: #1b4332; font-size: 11.5px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em;">
-                ✨ Quick-Start Prompts (Click Any to Run Immediately):
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:4px 0;">
+              <div class="detected-origin-badge" id="sidebarOriginBadge" style="font-size:12px;">
+                <span class="origin-city-name">Detecting...</span>
+                <span class="origin-source-tag">GPS/IP</span>
               </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 7px;">
-                <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan me 4 days in Kerala backwaters under ₹25,000 for 2 people')">🌊 Plan Kerala (4D • ₹25k)</button>
-                <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What is the mandatory 48-hr acclimatization protocol for Leh Ladakh?')">🏔️ Ladakh AMS Safety Rules</button>
-                <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What are the must-visit heritage sites and food in Kolkata?')">🏛️ Kolkata Heritage &amp; Food</button>
-                <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan a 3-day beach weekend in Goa under ₹18,000')">🏖️ Goa Weekend (3D • ₹18k)</button>
-                <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Tell me about living root bridges and eco-homestays in Meghalaya')">🌿 Meghalaya Eco Trails</button>
-                <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What should I pack for high-altitude passes like Khardung La?')">🎒 High-Pass Packing Guide</button>
-              </div>
+              <button type="button" class="change-origin-btn" onclick="const newCity = prompt('Enter departure city (e.g. Kolkata, Mumbai, Delhi, Siliguri):'); if(newCity && window.setUserOriginCity) window.setUserOriginCity(newCity);" style="font-size:11px; padding:4px 8px;">
+                ✏️ Change
+              </button>
             </div>
-
-            <p style="margin: 0; font-size: 11.5px; color: #718096; line-height: 1.4;">
-              💡 <em>Tip: You can ask questions in English, Hindi, or Bengali. Press the <strong>⛶</strong> button in the top right to expand this console to fullscreen.</em>
+            <p style="font-size:11px; color:var(--muted); margin:6px 0 0; line-height:1.4;">
+              All itineraries and flights automatically originate from your verified location.
             </p>
           </div>
+
+          <!-- Pan-India Region Tabs & State Chips Explorer -->
+          <div class="ai-sidebar-card">
+            <div class="ai-sidebar-title">
+              <span>✨</span> INQUIRE BY STATE (ALL 36)
+            </div>
+            <div class="state-region-tabs" id="stateRegionTabs">
+              <button class="region-tab active" data-region="all">All</button>
+              <button class="region-tab" data-region="northeast">NE</button>
+              <button class="region-tab" data-region="north">North</button>
+              <button class="region-tab" data-region="west">West</button>
+              <button class="region-tab" data-region="east">East</button>
+              <button class="region-tab" data-region="south">South</button>
+            </div>
+            <div class="state-chips-scroll" id="stateChipsScroll" style="max-height: 180px; overflow-y: auto; padding-right: 4px;">
+              <!-- Populated dynamically by js/ai.js -->
+            </div>
+          </div>
+
+          <!-- Thematic Fast Starters Card -->
+          <div class="ai-sidebar-card">
+            <div class="ai-sidebar-title">
+              <span>💡</span> THEMATIC INTELLIGENCE
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button class="ai-mode-link" style="text-align:left; cursor:pointer; width:100%; border:none; background:rgba(82,183,136,0.08);" onclick="window.askAI && askAI('What is the mandatory 48-hr acclimatization protocol for Leh Ladakh?')">
+                <span>🏔️ 48-Hr Leh Acclimatization</span>
+                <span>➤</span>
+              </button>
+              <button class="ai-mode-link" style="text-align:left; cursor:pointer; width:100%; border:none; background:rgba(82,183,136,0.08);" onclick="window.askAI && askAI('What should I pack for high-altitude passes like Khardung La?')">
+                <span>🎒 High-Pass Packing Guide</span>
+                <span>➤</span>
+              </button>
+              <button class="ai-mode-link" style="text-align:left; cursor:pointer; width:100%; border:none; background:rgba(82,183,136,0.08);" onclick="window.askAI && askAI('Explain the responsible travel rules for visiting Pangong Tso Lake.')">
+                <span>🌿 Pangong Leave-No-Trace</span>
+                <span>➤</span>
+              </button>
+              <button class="ai-mode-link" style="text-align:left; cursor:pointer; width:100%; border:none; background:rgba(82,183,136,0.08);" onclick="window.askAI && askAI('Tell me about Cooch Behar Rajbari palace, Madan Mohan Bari, and local food')">
+                <span>👑 Cooch Behar Heritage</span>
+                <span>➤</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Dedicated Native Chat Canvas -->
+        <div class="ai-console-main">
+          <div class="chat chat-native-page" id="chatWindow" role="region" aria-label="Bharat AI chat">
+            <div class="chat-head">
+              <span class="ai-orb idle" id="aiOrb" aria-label="AI Status Indicator">✦</span>
+              <div>
+                <b data-i18n="ai_bot_title">BHARAT AI</b>
+                <small id="aiStatusText" data-i18n="ai_bot_status">Active • Live Telemetry Online</small>
+              </div>
+              <span class="chat-model-tag">Gemini 3.1 Flash Lite</span>
+              <div class="chat-origin-chip" id="chatOriginChip" title="Your detected trip origin">
+                📍 <span class="detected-origin-badge" id="detectedOriginBadge">
+                  <span class="origin-city-name">Detecting origin...</span>
+                </span>
+              </div>
+              <div class="chat-header-actions">
+                <button type="button" class="chat-head-btn" id="chatExpandBtn" title="Toggle Fullscreen Console" aria-label="Toggle Fullscreen Console" onclick="window.toggleFullscreenChat && toggleFullscreenChat()">⛶</button>
+                <button type="button" class="chat-head-btn" id="chatClearBtn" title="Reset Chat to Instructions" aria-label="Reset Chat" onclick="window.resetChatConsole && resetChatConsole()">🔄</button>
+              </div>
+            </div>
+
+            <div class="messages" id="messages">
+              <div class="msg bot instruction-msg" id="botWelcomeMsg">
+                <div class="bot-welcome-header">
+                  <span class="bot-welcome-badge">✦ BHARAT AI TOURISM INTELLIGENCE CONSOLE</span>
+                  <h3 class="welcome-heading">Namaste! 🙏 I am Bharat AI</h3>
+                  <p class="welcome-sub">Your Autonomous India Travel Agent • Powered by Gemini 3.1 &amp; Live Pan-India Knowledge</p>
+                </div>
+
+                <div class="welcome-divider"></div>
+
+                <div class="instruction-section">
+                  <div class="instruction-title">📖 How to Use Bharat AI (Detailed Capabilities):</div>
+                  <ul class="instruction-list">
+                    <li><strong>🎯 1-Sentence Goal Planning:</strong> Type your travel goal naturally (e.g. <em>"I have ₹25,000 for 4 days in Kerala for 2 people"</em>). Bharat AI computes complete flights, certified homestays, day-by-day itineraries, and cost breakdowns directly here.</li>
+                    <li><strong>📍 Dynamic Auto-Origin:</strong> Trips automatically depart from your detected GPS or IP location, never assuming Delhi by default.</li>
+                    <li><strong>🏔️ High-Pass Telemetry &amp; AMS Safety:</strong> Check real-time pass clearances (Khardung La, Chang La, Rohtang) and mandatory 48-hour acclimatization medical protocols for Ladakh &amp; Spiti.</li>
+                    <li><strong>🌿 Eco-Tourism &amp; Village Homestays:</strong> Discover certified green stays, EV charging corridors, and carbon-neutral trails in Sikkim, Meghalaya, and Himachal.</li>
+                    <li><strong>🏛️ Heritage Across All 36 States &amp; UTs + Cities:</strong> Explore regional culture from Cooch Behar and Thane to Kolkata, Jaipur, and Kashmir.</li>
+                    <li><strong>🛡️ Offline Traveler Field Kit:</strong> Headed into remote mountain passes? Click <strong>Offline Pass</strong> in the top navbar to download your emergency PDF dossier.</li>
+                  </ul>
+                </div>
+
+                <div class="quick-prompts-box">
+                  <div class="quick-prompts-label">
+                    ✨ Quick-Start Prompts (Click Any to Run Immediately):
+                  </div>
+                  <div class="quick-prompts-grid">
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan me 4 days in Kerala backwaters under ₹25,000 for 2 people')">🌊 Plan Kerala (4D • ₹25k)</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Tell me about Cooch Behar Rajbari palace, Madan Mohan Bari, and local food')">👑 Cooch Behar Heritage</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What are the best places to visit in Thane like Upvan Lake and Yeoor Hills?')">🌿 Thane City &amp; Nature</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What is the mandatory 48-hr acclimatization protocol for Leh Ladakh?')">🏔️ Ladakh AMS Safety</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What are the must-visit heritage sites and food in Kolkata?')">🏛️ Kolkata Heritage &amp; Food</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan a 3-day beach weekend in Goa under ₹18,000')">🏖️ Goa Weekend (3D • ₹18k)</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Tell me about living root bridges and eco-homestays in Meghalaya')">🌿 Meghalaya Eco Trails</button>
+                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What should I pack for high-altitude passes like Khardung La?')">🎒 High-Pass Packing</button>
+                  </div>
+                </div>
+
+                <p class="welcome-tip">
+                  💡 <em>Tip: You can ask questions in English, Hindi, or Bengali, or tap the microphone 🎤 for voice input. Press <strong>⛶</strong> in the top right to expand this console to fullscreen.</em>
+                </p>
+              </div>
+            </div>
+
+            <!-- Fast Quick Suggestion Strip above input -->
+            <div class="ai-quick-strip" id="aiQuickStrip">
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Plan 4 days in Kerala backwaters under ₹25,000')">🌊 Kerala 4D</button>
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Tell me about Kolkata heritage and food')">🏛️ Kolkata</button>
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Jaipur highlights and forts')">🏰 Jaipur</button>
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Goa 3-day beach weekend under ₹18,000')">🏖️ Goa Weekend</button>
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Ladakh high passes and 48-hour acclimatization')">🏔️ Ladakh AMS</button>
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Cooch Behar Rajbari palace and local food')">👑 Cooch Behar</button>
+              <button type="button" class="ai-quick-chip" onclick="window.askAI && askAI('Meghalaya living root bridges and eco homestays')">🌿 Meghalaya</button>
+            </div>
+
+            <form class="chat-form" id="chatForm">
+              <input id="chatInput" placeholder="Ask Bharat AI about destinations, routes, food, culture..." autocomplete="off" aria-label="Chat input" data-i18n-placeholder="ai_input_placeholder">
+              <button type="button" class="chat-mic-btn" id="chatMicBtn" title="Voice Input" onclick="window.toggleSpeechInput && toggleSpeechInput('chatInput', 'chatMicBtn')">🎤</button>
+              <button type="submit" aria-label="Send message" data-i18n="ai_send">Send →</button>
+            </form>
+          </div>
         </div>
-        <form class="chat-form" id="chatForm">
-          <input id="chatInput" placeholder="Ask Bharat AI about destinations, routes, food, culture..." autocomplete="off" aria-label="Chat input" data-i18n-placeholder="ai_input_placeholder">
-          <button type="submit" aria-label="Send message" data-i18n="ai_send">Send →</button>
-        </form>
       </div>
     </section>
 

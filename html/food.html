@@ -134,6 +134,7 @@
         <option value="hi">हिं</option>
         <option value="bn">বাং</option>
       </select>
+      <button id="themeToggleBtn" title="Toggle Day / Night Mode" aria-label="Toggle theme">☀️</button>
     </div>
   </header>
 
@@ -249,6 +250,65 @@
         </div>
       </div>
 
+      <!-- Indigenous Farm-to-Table Ingredients Showcase (From assets/images/) -->
+      <div class="cuisine-showcase-wrap">
+        <div class="cuisine-showcase-header">
+          <span class="eyebrow">INDIGENOUS FARM-TO-TABLE HARVEST</span>
+          <h3>Pure Zero-Mile Regional Harvests</h3>
+          <p>Click any authentic ingredient to discover the delicacies crafted by local village farming cooperatives.</p>
+        </div>
+
+        <div class="cuisine-showcase-grid">
+          <div class="cuisine-ingredient-card" onclick="renderFood({ search: 'Kahwa' })" title="Filter by Saffron & Mountain Herbs">
+            <div class="cuisine-ingredient-img" style="background-image: url('/assets/images/kahwa.png');"></div>
+            <div class="cuisine-ingredient-info">
+              <h5>Pampore Saffron</h5>
+              <small>Kashmir • 96% Guild</small>
+            </div>
+          </div>
+
+          <div class="cuisine-ingredient-card" onclick="renderFood({ search: 'Gutke' })" title="Filter by Himalayan Potatoes">
+            <div class="cuisine-ingredient-img" style="background-image: url('/assets/images/alookegutke.png');"></div>
+            <div class="cuisine-ingredient-info">
+              <h5>Mountain Red Potatoes</h5>
+              <small>Uttarakhand • 97% Guild</small>
+            </div>
+          </div>
+
+          <div class="cuisine-ingredient-card" onclick="renderFood({ search: 'Appam' })" title="Filter by Toddy Fermented Batter">
+            <div class="cuisine-ingredient-img" style="background-image: url('/assets/images/appam.png');"></div>
+            <div class="cuisine-ingredient-info">
+              <h5>Fermented Rice & Toddy</h5>
+              <small>Kerala • 94% Guild</small>
+            </div>
+          </div>
+
+          <div class="cuisine-ingredient-card" onclick="renderFood({ search: 'Dham' })" title="Filter by Satvik Temple Madra">
+            <div class="cuisine-ingredient-img" style="background-image: url('/assets/images/dham.png');"></div>
+            <div class="cuisine-ingredient-info">
+              <h5>Slow-Cooked Madra</h5>
+              <small>Himachal • 93% Guild</small>
+            </div>
+          </div>
+
+          <div class="cuisine-ingredient-card" onclick="renderFood({ search: 'Churma' })" title="Filter by Wood-fired Baati">
+            <div class="cuisine-ingredient-img" style="background-image: url('/assets/images/dalbaatichurma.png');"></div>
+            <div class="cuisine-ingredient-info">
+              <h5>Desi Cow Ghee & Baati</h5>
+              <small>Rajasthan • 92% Guild</small>
+            </div>
+          </div>
+
+          <div class="cuisine-ingredient-card" onclick="renderFood({ search: 'Dhokla' })" title="Filter by Steamed Gram Cakes">
+            <div class="cuisine-ingredient-img" style="background-image: url('/assets/images/dhokla.png');"></div>
+            <div class="cuisine-ingredient-info">
+              <h5>Heirloom Gram Flour</h5>
+              <small>Gujarat • 91% Guild</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Interactive Dietary Preference & Search Toolbar -->
       <div class="interactive-toolbar">
         <div class="interactive-search-wrap">
@@ -279,44 +339,45 @@
     <!-- Food Recipe Secrets & Cooperative Provenance Modal -->
     <div class="food-recipe-modal" id="foodRecipeModal" aria-hidden="true">
       <div class="food-recipe-content">
-        <button class="close" onclick="closeFoodRecipeModal()" data-close aria-label="Close modal" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.12); color: #000; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">×</button>
+        <button class="food-recipe-close" onclick="closeFoodRecipeModal()" data-close aria-label="Close modal">×</button>
         
-        <div style="margin-bottom: 16px;">
-          <span class="eyebrow" id="recipeModalOrigin" style="color: var(--emerald-pop); font-size: 11px; font-weight: 700; letter-spacing: 0.06em;">ORIGIN & COOPERATIVE</span>
-          <h2 id="recipeModalTitle" style="font-family: var(--font-main); font-size: 26px; color: var(--ink); margin: 4px 0 8px;">Delicacy Title</h2>
-          <p id="recipeModalDesc" style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0;">Description of this indigenous culinary dish.</p>
+        <div class="recipe-modal-header">
+          <span class="eyebrow" id="recipeModalOrigin">ORIGIN &amp; COOPERATIVE</span>
+          <h2 id="recipeModalTitle">Delicacy Title</h2>
+          <p id="recipeModalDesc">Description of this indigenous culinary dish.</p>
         </div>
 
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 18px 0;">
-          <h4 style="font-family: var(--font-main); font-size: 14px; color: var(--ink); margin: 0 0 8px; display: flex; align-items: center; gap: 6px;">
+        <div class="recipe-prep-card">
+          <h4 class="recipe-prep-title">
             <span>🧑‍🍳 Traditional Hearth Preparation Secret:</span>
           </h4>
-          <p id="recipeModalPrep" style="font-size: 13.5px; color: #334155; line-height: 1.6; margin: 0;">Preparation secrets.</p>
+          <p id="recipeModalPrep">Preparation secrets.</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 18px 0;">
-          <div style="background: #f0fdf4; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px 14px;">
-            <small style="font-size: 10.5px; color: #047857; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px;">🤝 Local Cooperative</small>
-            <span id="recipeModalCoop" style="font-size: 12.5px; font-weight: 600; color: #065f46;">Village Farmers Cooperative</span>
+        <div class="recipe-stat-grid">
+          <div class="recipe-stat-card recipe-stat-coop">
+            <small class="recipe-stat-label">🤝 Local Cooperative</small>
+            <span id="recipeModalCoop" class="recipe-stat-val">Village Farmers Cooperative</span>
           </div>
-          <div style="background: #eff6ff; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px 14px;">
-            <small style="font-size: 10.5px; color: #1d4ed8; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px;">🍵 Perfect Pairing</small>
-            <span id="recipeModalPair" style="font-size: 12.5px; font-weight: 600; color: #1e40af;">Herbal mountain tea</span>
+          <div class="recipe-stat-card recipe-stat-pair">
+            <small class="recipe-stat-label">🍵 Perfect Pairing</small>
+            <span id="recipeModalPair" class="recipe-stat-val">Herbal mountain tea</span>
           </div>
-          <div style="background: #fefce8; border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 10px; padding: 12px 14px;">
-            <small style="font-size: 10.5px; color: #a16207; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px;">🌿 Carbon Saved</small>
-            <span id="recipeModalCarbon" style="font-size: 12.5px; font-weight: 600; color: #854d0e;">1.2 kg CO2e</span>
+          <div class="recipe-stat-card recipe-stat-carbon">
+            <small class="recipe-stat-label">🌿 Carbon Saved</small>
+            <span id="recipeModalCarbon" class="recipe-stat-val">1.2 kg CO2e</span>
           </div>
         </div>
 
-        <div style="margin: 18px 0;">
-          <h4 style="font-family: var(--font-main); font-size: 13.5px; color: var(--ink); margin: 0 0 6px;">💪 High-Altitude Bioactive Nutrition:</h4>
-          <p id="recipeModalNutrition" style="font-size: 13px; color: #64748b; margin: 0;">High polyphenol antioxidant density.</p>
+        <div class="recipe-nutrition-box">
+          <h4 class="recipe-nutrition-title">💪 High-Altitude Bioactive Nutrition:</h4>
+          <p id="recipeModalNutrition">High polyphenol antioxidant density.</p>
         </div>
 
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid #e2e8f0;">
-          <button class="btn primary" id="recipeModalBookmarkBtn" style="padding: 9px 20px; font-size: 13px;">♥ Save to Food Stops</button>
-          <button class="btn light" onclick="closeFoodRecipeModal()" style="padding: 9px 18px; font-size: 13px;">Done</button>
+        <div class="recipe-modal-footer">
+          <button class="btn primary" id="recipeModalBookmarkBtn">♥ Save to Food Stops</button>
+          <button class="btn ghost recipe-ai-guide-btn" id="recipeModalAIBtn">✦ Ask AI Culinary Guide ↗</button>
+          <button class="btn light recipe-modal-done-btn" onclick="closeFoodRecipeModal()">Done</button>
         </div>
       </div>
     </div>

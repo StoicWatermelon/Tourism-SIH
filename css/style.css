@@ -3773,57 +3773,91 @@ body.modal-open {
 /* Culture Cards Grid Enhancement */
 .culture-deepdive-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 26px;
   margin-top: 24px;
 }
 
 .culture-card {
   background: #ffffff;
   border-radius: var(--radius);
-  padding: 28px;
-  border: 1px solid rgba(13, 148, 136, 0.14);
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.05);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(13, 148, 136, 0.16);
+  box-shadow: 0 10px 30px -6px rgba(15, 23, 42, 0.06);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .culture-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 38px -8px rgba(13, 148, 136, 0.15);
-  border-color: rgba(13, 148, 136, 0.35);
+  box-shadow: 0 22px 45px -8px rgba(13, 148, 136, 0.18);
+  border-color: rgba(13, 148, 136, 0.4);
   z-index: 10;
 }
 
-.culture-card-top {
+.culture-card-img-wrap {
+  height: 190px;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 8px;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-.culture-card .card-badge {
+.culture-card-img-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 23, 17, 0.35) 0%, rgba(7, 23, 17, 0.75) 100%);
+  pointer-events: none;
+}
+
+.culture-card-img-wrap .card-badge,
+.culture-card-img-wrap .culture-region-tag {
+  position: relative;
+  z-index: 2;
+}
+
+.culture-card-img-wrap .card-badge {
   font-family: var(--font-main);
   font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #0d9488;
-  background: #f0fdf4;
+  color: #fbbf24;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(13, 148, 136, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-.culture-region-tag {
+.culture-card-img-wrap .culture-region-tag {
   font-size: 11px;
-  font-weight: 600;
-  color: #64748b;
+  font-weight: 700;
+  color: #f1f5f9;
+  background: rgba(6, 23, 18, 0.65);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.culture-card-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .culture-card h3 {
@@ -3881,6 +3915,98 @@ body.modal-open {
   background: #0d9488;
   color: #ffffff;
   border-color: #0d9488;
+}
+
+.culture-quick-tag {
+  background: rgba(13, 148, 136, 0.1);
+  border: 1.5px solid rgba(13, 148, 136, 0.35);
+  color: var(--accent);
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.culture-quick-tag:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
+}
+
+.culture-quick-tag.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent-light);
+}
+
+/* Zero-Mile Cuisine Ingredients Showcase */
+.cuisine-showcase-wrap {
+  margin: 30px 0;
+  background: #ffffff;
+  border-radius: var(--radius);
+  padding: 28px 5vw;
+  border: 1px solid rgba(13, 148, 136, 0.16);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.cuisine-showcase-header {
+  margin-bottom: 18px;
+}
+
+.cuisine-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.cuisine-ingredient-card {
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.22s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.cuisine-ingredient-card:hover {
+  transform: translateY(-3px);
+  border-color: #0d9488;
+  box-shadow: 0 10px 20px rgba(13, 148, 136, 0.1);
+}
+
+.cuisine-ingredient-img {
+  height: 110px;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.cuisine-ingredient-info {
+  padding: 10px 12px 12px;
+}
+
+.cuisine-ingredient-info h5 {
+  margin: 0 0 4px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.cuisine-ingredient-info small {
+  font-size: 11px;
+  color: #0f766e;
+  font-weight: 600;
+  display: block;
 }
 
 /* Sacred Kora Interactive Etiquette Section */
@@ -4354,4 +4480,1011 @@ body.modal-open {
 .food-recipe-modal.active .food-recipe-content {
   transform: translateY(0);
 }
+
+.food-recipe-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--ink);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.food-recipe-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.recipe-modal-header {
+  margin-bottom: 16px;
+}
+.recipe-modal-header .eyebrow {
+  color: var(--emerald-pop);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+#recipeModalTitle {
+  font-family: var(--font-main);
+  font-size: 26px;
+  color: var(--ink);
+  margin: 4px 0 8px;
+}
+#recipeModalDesc {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.recipe-prep-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 18px 0;
+}
+.recipe-prep-title {
+  font-family: var(--font-main);
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#recipeModalPrep {
+  font-size: 13.5px;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.recipe-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+.recipe-stat-card {
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.recipe-stat-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 3px;
+}
+.recipe-stat-val {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.recipe-stat-coop {
+  background: #f0fdf4;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.recipe-stat-coop .recipe-stat-label { color: #047857; }
+.recipe-stat-coop .recipe-stat-val { color: #065f46; }
+
+.recipe-stat-pair {
+  background: #eff6ff;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.recipe-stat-pair .recipe-stat-label { color: #1d4ed8; }
+.recipe-stat-pair .recipe-stat-val { color: #1e40af; }
+
+.recipe-stat-carbon {
+  background: #fefce8;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+.recipe-stat-carbon .recipe-stat-label { color: #a16207; }
+.recipe-stat-carbon .recipe-stat-val { color: #854d0e; }
+
+.recipe-nutrition-box {
+  margin: 18px 0;
+}
+.recipe-nutrition-title {
+  font-family: var(--font-main);
+  font-size: 13.5px;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+#recipeModalNutrition {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.recipe-modal-footer {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+.recipe-ai-guide-btn {
+  padding: 9px 18px;
+  font-size: 13px;
+  color: #0d9488;
+  border-color: rgba(13, 148, 136, 0.4);
+}
+.recipe-ai-guide-btn:hover {
+  background: rgba(13, 148, 136, 0.15);
+  color: #0f766e;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DAY / NIGHT MODE TOGGLE
+   Toggle via [data-theme="dark"] on <html>.
+   All existing glassmorphic & gradient styles are preserved.
+   ═══════════════════════════════════════════════════════ */
+
+/* The toggle button in the navbar */
+#themeToggleBtn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#themeToggleBtn:hover {
+  transform: rotate(20deg) scale(1.12);
+}
+
+/* ---- DARK MODE VARIABLES ---- */
+[data-theme="dark"] {
+  --ink: #e2eff5;
+  --ink-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --muted-light: #64748b;
+  --paper: #0d1a14;
+  --paper-warm: #0f2219;
+  --cream: #0a1810;
+  --cream-card: #122318;
+  --white: #122318;
+  --line: rgba(52, 211, 153, 0.14);
+  --depth-sm: 0 4px 14px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --depth-md: 0 14px 34px -6px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Body background in dark mode */
+[data-theme="dark"] body {
+  background: radial-gradient(ellipse at 20% 0%, #0a1c14 0%, #060f0b 50%, #030807 100%);
+  color: var(--ink);
+}
+
+/* General white backgrounds → dark cards */
+[data-theme="dark"] .quick-search,
+[data-theme="dark"] .food-recipe-content,
+[data-theme="dark"] .cuisine-showcase-wrap,
+[data-theme="dark"] .economy-direct-banner,
+[data-theme="dark"] .interactive-toolbar,
+[data-theme="dark"] .superfood-calc-wrap {
+  background: #0f2219 !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .quick-search h2,
+[data-theme="dark"] .section h2,
+[data-theme="dark"] .section-head h2 {
+  color: var(--ink);
+}
+
+/* Cards */
+[data-theme="dark"] .dest-card,
+[data-theme="dark"] .circuit-card,
+[data-theme="dark"] .culture-card,
+[data-theme="dark"] .kora-step-card {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.18);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .dest-card h3,
+[data-theme="dark"] .culture-card h3,
+[data-theme="dark"] .kora-step-card h4 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .dest-card p,
+[data-theme="dark"] .culture-card p,
+[data-theme="dark"] .kora-step-card p {
+  color: var(--muted);
+}
+
+/* Culture section light panel → dark */
+[data-theme="dark"] .culture-copy {
+  background: linear-gradient(135deg, #0f2219 0%, #0a1a12 100%) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .culture-copy h2,
+[data-theme="dark"] .culture-copy p {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .culture-quick-tag {
+  background: rgba(13, 148, 136, 0.18);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: var(--green-mint);
+}
+
+[data-theme="dark"] .culture-quick-tag:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* Buttons */
+[data-theme="dark"] .btn.light {
+  background: #1a3328;
+  color: var(--ink);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+[data-theme="dark"] .btn.light:hover {
+  background: #1f3d31;
+}
+
+/* Interactive pills */
+[data-theme="dark"] .interactive-pill,
+[data-theme="dark"] .circuit-pill {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .interactive-pill.active,
+[data-theme="dark"] .circuit-pill.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent-light);
+}
+
+/* Search inputs */
+[data-theme="dark"] .interactive-search-input,
+[data-theme="dark"] #modalSearch,
+[data-theme="dark"] .search-box input {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .interactive-search-wrap,
+[data-theme="dark"] .search-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+/* Modals */
+[data-theme="dark"] .modal-card {
+  background: #0d1e17;
+  color: var(--ink);
+  border: 1px solid rgba(52, 211, 153, 0.18);
+}
+
+[data-theme="dark"] .modal-card h2 {
+  color: var(--ink);
+}
+
+/* Drawer */
+[data-theme="dark"] .drawer-panel {
+  background: #0b1a13;
+  color: var(--ink);
+  border-left: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+[data-theme="dark"] .drawer-header h2 {
+  color: var(--ink);
+}
+
+/* Footer */
+[data-theme="dark"] .site-footer {
+  background: #040d09;
+  border-top-color: rgba(52, 211, 153, 0.12);
+}
+
+[data-theme="dark"] .footer-desc,
+[data-theme="dark"] .footer-copyright,
+[data-theme="dark"] .footer-sub-copyright {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .footer-nav-col h4 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .footer-nav-col a {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .footer-nav-col a:hover {
+  color: var(--green-mint);
+}
+
+/* Superfood calculator */
+[data-theme="dark"] .superfood-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(52, 211, 153, 0.2);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .superfood-btn.selected {
+  background: rgba(13, 148, 136, 0.22);
+  border-color: var(--accent);
+}
+
+/* Cuisine ingredient cards */
+[data-theme="dark"] .cuisine-ingredient-card {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.15);
+}
+
+[data-theme="dark"] .cuisine-ingredient-info h5 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .cuisine-ingredient-info small {
+  color: var(--muted);
+}
+
+/* Section eyebrow text */
+[data-theme="dark"] .eyebrow {
+  color: var(--accent-light);
+}
+
+/* Smooth transition on all elements */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body,
+body *:not(.bg-video):not(.ambient-depth-mesh):not(.ambient-video-backdrop) {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Don't slow down animations with the blanket transition */
+body *:not(.bg-video):not(.ambient-depth-mesh) {
+  animation-fill-mode: both;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE EXTENDED — MAP PAGE (map.css classes)
+   ═══════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .map-section {
+  background: linear-gradient(180deg, #08150f 0%, #050d09 100%);
+}
+
+[data-theme="dark"] .map-filter-pill {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(52, 211, 153, 0.2);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .map-filter-pill:hover {
+  background: rgba(52, 211, 153, 0.12);
+}
+
+[data-theme="dark"] .map-filter-pill.active {
+  background: var(--accent);
+  border-color: var(--accent-light);
+  color: #fff;
+}
+
+[data-theme="dark"] .map-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(52, 211, 153, 0.2);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .map-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+[data-theme="dark"] .map-toggle-btn.active {
+  background: var(--accent);
+  border-color: var(--accent-light);
+  color: #fff;
+}
+
+[data-theme="dark"] .map-floating-reset {
+  background: #1a3328;
+  border-color: rgba(52, 211, 153, 0.2);
+  color: var(--ink);
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE EXTENDED — AI / PLANNER PAGE (ai.css classes)
+   ═══════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .chat {
+  background: #0a1810 !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+}
+
+[data-theme="dark"] .chat-head {
+  background: #0f2219 !important;
+  border-bottom-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .msg.bot,
+[data-theme="dark"] .floating-chat-messages .msg.bot {
+  background: #0f2219 !important;
+  color: var(--ink) !important;
+  border-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .chat-form,
+[data-theme="dark"] .floating-chat-form {
+  background: #0a1810 !important;
+  border-top-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .chat-form input,
+[data-theme="dark"] .floating-chat-form input {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--ink) !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+[data-theme="dark"] .planner-form {
+  background: #0a1810 !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .planner-form label,
+[data-theme="dark"] .planner-form h3,
+[data-theme="dark"] .planner-form p {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .planner-form label select,
+[data-theme="dark"] .planner-form input,
+[data-theme="dark"] .planner-form select,
+[data-theme="dark"] .planner-form textarea {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--ink) !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+[data-theme="dark"] .agent-card {
+  background: #0f2219 !important;
+  border-color: rgba(52, 211, 153, 0.15) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .agent-card h3,
+[data-theme="dark"] .agent-card h4 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .agent-card p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .itinerary-day-box {
+  background: #0f2219 !important;
+  border-color: rgba(52, 211, 153, 0.15) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .itinerary-day-box h4,
+[data-theme="dark"] .itinerary-day-box h5 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .flight-option-item {
+  background: #0d1e17 !important;
+  border-color: rgba(52, 211, 153, 0.12) !important;
+}
+
+[data-theme="dark"] .flight-option-item.recommended {
+  background: rgba(13, 148, 136, 0.12) !important;
+}
+
+[data-theme="dark"] .hotel-item {
+  background: #0d1e17 !important;
+  border-color: rgba(52, 211, 153, 0.12) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .hotel-item.recommended {
+  background: rgba(13, 148, 136, 0.12) !important;
+}
+
+[data-theme="dark"] .hotel-item h4,
+[data-theme="dark"] .hotel-item p {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .day-price-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .stat-box {
+  background: #0f2219 !important;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .emergency-card-box {
+  background: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+[data-theme="dark"] .agent-action-chip {
+  background: rgba(13, 148, 136, 0.12) !important;
+  color: var(--green-mint);
+  border-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+/* Floating chat widget */
+[data-theme="dark"] .floating-chat-widget {
+  background: #0a1810 !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+[data-theme="dark"] .floating-chat-header {
+  background: #0f2219 !important;
+  border-bottom-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .floating-suggestions-scroll {
+  background: #0a1810 !important;
+}
+
+[data-theme="dark"] .floating-sug-btn {
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: var(--ink) !important;
+  border-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .floating-sug-btn:hover {
+  background: rgba(13, 148, 136, 0.18) !important;
+  color: var(--green-mint) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE EXTENDED — STYLE.CSS REMAINING WHITES
+   ═══════════════════════════════════════════════════════ */
+
+/* Category filter pills */
+[data-theme="dark"] .category {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .category.active,
+[data-theme="dark"] .category:hover {
+  background: rgba(13, 148, 136, 0.2);
+  border-color: var(--accent);
+  color: var(--green-mint);
+}
+
+/* Search result cards */
+[data-theme="dark"] .result-card {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .result-card h3,
+[data-theme="dark"] .result-card h4 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .result-card p {
+  color: var(--muted);
+}
+
+/* Emotion row / AI suggestion buttons */
+[data-theme="dark"] .emotion-row button,
+[data-theme="dark"] .ai-suggestions button {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .emotion-row button:hover,
+[data-theme="dark"] .ai-suggestions button:hover {
+  background: rgba(13, 148, 136, 0.18);
+  border-color: var(--accent);
+  color: var(--green-mint);
+}
+
+/* Responsible travel pills */
+[data-theme="dark"] .resp-pill {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+/* Eco toggle buttons */
+[data-theme="dark"] .eco-toggle-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .eco-toggle-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent-light);
+}
+
+/* Modal input */
+[data-theme="dark"] .modal-card > input {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+/* Field kit cards */
+[data-theme="dark"] .field-kit-card {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .field-kit-card h3 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .field-kit-card li {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .field-kit-card li b {
+  color: var(--ink);
+}
+
+/* Pass preview banner */
+[data-theme="dark"] .pass-preview-icon {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Field kit promo banner */
+[data-theme="dark"] .field-kit-promo {
+  background: rgba(13, 148, 136, 0.08);
+  border-color: rgba(52, 211, 153, 0.15);
+}
+
+/* Drawer items */
+[data-theme="dark"] .drawer-item {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.12);
+  color: var(--ink);
+}
+
+/* Interactive search & sort */
+[data-theme="dark"] .interactive-search-input {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .interactive-sort-select {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+/* Interactive pills (extended — covers hover) */
+[data-theme="dark"] .interactive-pill:hover {
+  background: rgba(13, 148, 136, 0.15);
+  color: var(--green-mint);
+}
+
+/* Kora etiquette section & cards */
+[data-theme="dark"] .kora-etiquette-section {
+  background: #0a1810;
+  border-color: rgba(52, 211, 153, 0.15);
+}
+
+[data-theme="dark"] .kora-step-card {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .kora-step-card:hover {
+  background: rgba(13, 148, 136, 0.12);
+}
+
+/* Superfood buttons */
+[data-theme="dark"] .superfood-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(52, 211, 153, 0.18);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .superfood-btn:hover {
+  background: rgba(13, 148, 136, 0.15);
+}
+
+/* Responsible page sections */
+[data-theme="dark"] .responsible-copy {
+  background: linear-gradient(135deg, #0f2219 0%, #0a1a12 100%);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .responsible-copy h2,
+[data-theme="dark"] .responsible-copy p {
+  color: var(--ink);
+}
+
+/* General headings in sections */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] p {
+  color: var(--muted);
+}
+
+/* Select dropdowns globally */
+[data-theme="dark"] select {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+[data-theme="dark"] select option {
+  background: #0a1810;
+  color: var(--ink);
+}
+
+/* Code elements */
+[data-theme="dark"] code {
+  background: rgba(52, 211, 153, 0.1);
+  color: var(--green-mint);
+}
+
+/* Field kit list items */
+[data-theme="dark"] .kit-list li {
+  color: var(--muted);
+  border-bottom-color: rgba(52, 211, 153, 0.1);
+}
+
+/* Final CTA sections — already dark, ensure text contrast */
+[data-theme="dark"] .final-cta {
+  background: linear-gradient(135deg, #040d09 0%, #030807 100%);
+}
+
+[data-theme="dark"] .final-cta h2 {
+  color: #fff;
+}
+
+/* Decongestion / eco score bars */
+[data-theme="dark"] .eco-score-fill {
+  background: var(--accent) !important;
+}
+
+/* Toast */
+[data-theme="dark"] .toast {
+  background: #0f2219;
+  color: var(--ink);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+/* Auth page forms */
+[data-theme="dark"] .auth-card {
+  background: #0f2219;
+  border-color: rgba(52, 211, 153, 0.18);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .auth-card input {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CUISINE RECIPE MODAL & FOOD COMPONENTS (DARK MODE)
+   ═══════════════════════════════════════════════════════ */
+[data-theme="dark"] .food-recipe-content {
+  background: #0c1e16 !important;
+  border: 1px solid rgba(52, 211, 153, 0.25) !important;
+  color: #e2eff5 !important;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="dark"] .food-recipe-close {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .food-recipe-close:hover {
+  background: rgba(239, 68, 68, 0.3) !important;
+  border-color: #ef4444 !important;
+  color: #ff8080 !important;
+}
+
+[data-theme="dark"] #recipeModalTitle {
+  color: #e2eff5 !important;
+}
+
+[data-theme="dark"] #recipeModalDesc {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .recipe-prep-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+[data-theme="dark"] .recipe-prep-title {
+  color: #e2eff5 !important;
+}
+
+[data-theme="dark"] #recipeModalPrep {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .recipe-stat-coop {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+[data-theme="dark"] .recipe-stat-coop .recipe-stat-label { color: #34d399 !important; }
+[data-theme="dark"] .recipe-stat-coop .recipe-stat-val { color: #6ee7b7 !important; }
+
+[data-theme="dark"] .recipe-stat-pair {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+[data-theme="dark"] .recipe-stat-pair .recipe-stat-label { color: #60a5fa !important; }
+[data-theme="dark"] .recipe-stat-pair .recipe-stat-val { color: #93c5fd !important; }
+
+[data-theme="dark"] .recipe-stat-carbon {
+  background: rgba(234, 179, 8, 0.12) !important;
+  border-color: rgba(234, 179, 8, 0.3) !important;
+}
+[data-theme="dark"] .recipe-stat-carbon .recipe-stat-label { color: #facc15 !important; }
+[data-theme="dark"] .recipe-stat-carbon .recipe-stat-val { color: #fde047 !important; }
+
+[data-theme="dark"] .recipe-nutrition-title {
+  color: #e2eff5 !important;
+}
+
+[data-theme="dark"] #recipeModalNutrition {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] #recipeModalCoop {
+  color: #6ee7b7 !important;
+}
+
+[data-theme="dark"] #recipeModalPair {
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] #recipeModalCarbon {
+  color: #fde047 !important;
+}
+
+[data-theme="dark"] .recipe-modal-footer {
+  border-top-color: rgba(52, 211, 153, 0.18) !important;
+}
+
+[data-theme="dark"] .recipe-ai-guide-btn {
+  color: #5eead4 !important;
+  border-color: rgba(94, 234, 212, 0.4) !important;
+  background: rgba(13, 148, 136, 0.15) !important;
+}
+[data-theme="dark"] .recipe-ai-guide-btn:hover {
+  background: rgba(13, 148, 136, 0.3) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(94, 234, 212, 0.7) !important;
+}
+
+[data-theme="dark"] .recipe-modal-done-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #e2eff5 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Superfood Calculator Dark Mode Text Legibility */
+[data-theme="dark"] .superfood-calc-header h3 {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .superfood-calc-header p {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .superfood-btn {
+  background: #142a20 !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+}
+[data-theme="dark"] .superfood-btn .sf-name {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .superfood-btn .sf-origin {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .superfood-btn:hover {
+  background: #1a382b !important;
+  border-color: #34d399 !important;
+}
+[data-theme="dark"] .superfood-btn.selected {
+  background: rgba(16, 185, 129, 0.22) !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .superfood-btn.selected .sf-name {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .superfood-btn.selected .sf-origin {
+  color: #a7f3d0 !important;
+}
+
+/* Cuisine Showcase & Harvest Grid Dark Mode */
+[data-theme="dark"] .cuisine-showcase-header h3 {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .cuisine-showcase-header p {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .cuisine-ingredient-card {
+  background: #142a20 !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+}
+[data-theme="dark"] .cuisine-ingredient-card:hover {
+  border-color: #34d399 !important;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4) !important;
+}
+[data-theme="dark"] .cuisine-ingredient-info h5 {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .cuisine-ingredient-info small {
+  color: #34d399 !important;
+}
+
+/* Food Empty State */
+.food-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: var(--radius);
+  border: 1px dashed rgba(13, 148, 136, 0.3);
+}
+
+[data-theme="dark"] .food-empty-state {
+  background: #0f2219 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .food-empty-state h3 {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .food-empty-state p {
+  color: #94a3b8 !important;
+}
+
+
 

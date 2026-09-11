@@ -4,6 +4,14 @@
  * Clean, flat modern UI with institutional glassmorphism & sustainable tourism engines
  */
 
+// ── Apply saved theme immediately to prevent flash of wrong theme ──
+(function() {
+  const saved = localStorage.getItem("bharatExploreTheme");
+  if (saved === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+})();
+
 // Curated destinations dataset featuring decongestion & offbeat corridors
 const localDestinations = [
   {
@@ -630,7 +638,7 @@ const foods = [
     desc: "Crisp multi-layered tandoori flatbread stuffed with spiced potatoes, served with slow-cooked pindi chole.",
     tags: ["Locally Sourced", "Zero Food Miles", "Community Cooperative"],
     revenueShare: "95% Direct Farmer Revenue",
-    img: "assets/images/AmritsariKulcha.png"
+    img: "/assets/images/AmritsariKulcha.png"
   },
   {
     name: "Dal Baati Churma",
@@ -638,7 +646,7 @@ const foods = [
     desc: "Wood-fired baked baatis drenched in pure desi ghee, paired with five-lentil panchmel dal and sweet churma.",
     tags: ["Traditional Recipe", "Zero Food Miles", "Heritage Kitchens"],
     revenueShare: "92% Direct Community Revenue",
-    img: "assets/images/dalbaatichurma.png"
+    img: "/assets/images/dalbaatichurma.png"
   },
   {
     name: "Kashmiri Kahwa",
@@ -646,7 +654,7 @@ const foods = [
     desc: "Gentle green tea infused with whole saffron strands, green cardamom pods, cinnamon bark, and slivered almonds.",
     tags: ["High Altitude", "Zero Food Miles", "Artisan Harvested"],
     revenueShare: "96% Direct Grower Revenue",
-    img: "assets/images/kahwa.png"
+    img: "/assets/images/kahwa.png"
   },
   {
     name: "Kerala Appam with Stew",
@@ -654,7 +662,7 @@ const foods = [
     desc: "Soft fermented rice batter hoppers with fluffy lace edges, served with aromatic coconut milk vegetable stew.",
     tags: ["Zero Food Miles", "Organic Coconut", "Women's Cooperative"],
     revenueShare: "94% Direct Community Revenue",
-    img: "assets/images/appam.png"
+    img: "/assets/images/appam.png"
   },
   {
     name: "Khaman Dhokla",
@@ -662,7 +670,7 @@ const foods = [
     desc: "Steamed fluffy gram flour cakes tempered with mustard seeds, curry leaves, and green chillies.",
     tags: ["Locally Sourced", "Zero Food Miles", "Heritage Recipe"],
     revenueShare: "91% Direct Community Revenue",
-    img: "assets/images/dhokla.png"
+    img: "/assets/images/dhokla.png"
   },
   {
     name: "Hyderabadi Dum Biryani",
@@ -670,7 +678,7 @@ const foods = [
     desc: "Fragrant aged basmati rice cooked in sealed handis with saffron, mint, fried shallots, and royal spice potpourri.",
     tags: ["Slow Food", "Community Cooperative"],
     revenueShare: "89% Direct Community Revenue",
-    img: "assets/images/biryani.png"
+    img: "/assets/images/biryani.png"
   },
   {
     name: "Traditional Bebinca",
@@ -678,7 +686,7 @@ const foods = [
     desc: "Indo-Portuguese seven-layered coconut milk and egg pudding delicately baked on gentle hearth embers.",
     tags: ["Heritage Bakeries", "Artisan Recipe"],
     revenueShare: "93% Direct Bakery Revenue",
-    img: "assets/images/bebinca.png"
+    img: "/assets/images/bebinca.png"
   },
   {
     name: "Crisp Masala Dosa",
@@ -686,7 +694,7 @@ const foods = [
     desc: "Fermented rice and black lentil crepe roasted golden with butter, filled with spiced potato masala and fresh coconut chutney.",
     tags: ["Zero Food Miles", "Community Sourced"],
     revenueShare: "90% Direct Community Revenue",
-    img: "assets/images/dosa.png"
+    img: "/assets/images/dosa.png"
   },
   {
     name: "Goan Coastal Fish Curry",
@@ -694,7 +702,7 @@ const foods = [
     desc: "Fresh catch simmered in rich Kashmiri chilli and tangy kokum coconut gravy, honoring sustainable coastal fisheries.",
     tags: ["Sustainable Catch", "Zero Food Miles", "Fisherfolk Cooperative"],
     revenueShare: "95% Direct Fisherfolk Revenue",
-    img: "assets/images/fishcurry.png"
+    img: "/assets/images/fishcurry.png"
   },
   {
     name: "Aloo ke Gutke",
@@ -702,7 +710,7 @@ const foods = [
     desc: "Kumaoni mountain potatoes stir-fried in fragrant mustard oil with wild Himalayan jumboo herb and red chillies.",
     tags: ["Mountain Foraged", "Zero Food Miles", "Village Organic"],
     revenueShare: "97% Direct Homestay Revenue",
-    img: "assets/images/alookegutke.png"
+    img: "/assets/images/alookegutke.png"
   },
   {
     name: "Himachali Dham",
@@ -710,7 +718,7 @@ const foods = [
     desc: "Traditional satvik festive feast cooked in brass pots by Botis, featuring Madra, Mah ki Dal, and Khatta.",
     tags: ["Ancient Feast", "Zero Food Miles", "Solar Kitchens"],
     revenueShare: "93% Direct Community Revenue",
-    img: "assets/images/dham.png"
+    img: "/assets/images/dham.png"
   },
   {
     name: "Chhena Poda",
@@ -718,7 +726,167 @@ const foods = [
     desc: "Baked cottage cheese confection wrapped in sal leaves and caramelized slowly over charcoal embers.",
     tags: ["Dairy Cooperative", "Zero Food Miles"],
     revenueShare: "94% Direct Dairy Farmer Revenue",
-    img: "assets/images/chhenapoda.png"
+    img: "/assets/images/chhenapoda.png"
+  },
+  {
+    name: "Bhutte ka Kees",
+    origin: "Madhya Pradesh",
+    desc: "Fresh sweet corn grated and simmered in spiced milk with mustard seeds, coconut, and green chillies.",
+    tags: ["Zero Food Miles", "Malwa Heritage", "Farm Fresh"],
+    revenueShare: "95% Direct Farmer Revenue",
+    img: "/assets/images/bhuttekakees.png"
+  },
+  {
+    name: "Bisi Bele Bhath",
+    origin: "Karnataka",
+    desc: "Traditional hot lentil rice preparation slow-cooked with tamarind, nutmeg, marathi moggu, and pure ghee.",
+    tags: ["Zero Food Miles", "Heritage Kitchens", "Probiotic Pulse"],
+    revenueShare: "93% Direct Farmer Revenue",
+    img: "/assets/images/bisibelebhath.png"
+  },
+  {
+    name: "Jharkhandi Dhuska & Ghugni",
+    origin: "Jharkhand",
+    desc: "Golden fried rice and chana dal batter cakes paired with rustic kala chana curry and spicy tomato chutney.",
+    tags: ["Tribal Kitchens", "Zero Food Miles", "Community Sourced"],
+    revenueShare: "96% Direct Tribal Revenue",
+    img: "/assets/images/dhuska.png"
+  },
+  {
+    name: "Melt-in-Mouth Kebabs",
+    origin: "Uttar Pradesh",
+    desc: "Aromatic slow-smoked galouti kebabs infused with 16 royal spices, served with fresh mint and roomali roti.",
+    tags: ["Slow Food", "Heritage Recipe", "Artisan Kitchens"],
+    revenueShare: "91% Direct Kitchen Revenue",
+    img: "/assets/images/kebabs.png"
+  },
+  {
+    name: "Shahi Hyderabadi Haleem",
+    origin: "Telangana",
+    desc: "Slow-pounded wheat, barley, and lentils simmered overnight with pure ghee, rose petals, and fried cashew.",
+    tags: ["Slow Food", "GI Tagged", "Heritage Guild"],
+    revenueShare: "90% Direct Artisan Revenue",
+    img: "/assets/images/haleem.png"
+  },
+  {
+    name: "Pahadi Kafuli",
+    origin: "Uttarakhand",
+    desc: "Nutritious thick green gravy of mountain spinach and fenugreek leaves slow-cooked in traditional iron pots.",
+    tags: ["Mountain Foraged", "Iron Rich", "Homestay Organic"],
+    revenueShare: "98% Direct Homestay Revenue",
+    img: "/assets/images/kafuli.png"
+  },
+  {
+    name: "Assamese Khar",
+    origin: "Assam",
+    desc: "Ancestral alkaline broth prepared by filtering water through sun-dried banana peel ashes, with raw papaya.",
+    tags: ["Ancestral Alkaline", "Zero Food Miles", "Wild Foraged"],
+    revenueShare: "96% Direct Grower Revenue",
+    img: "/assets/images/khar.png"
+  },
+  {
+    name: "Khasi Jadoh",
+    origin: "Meghalaya",
+    desc: "Fragrant red hill rice cooked with indigenous wild mountain herbs, bay leaves, ginger, and black sesame.",
+    tags: ["Indigenous Red Rice", "Zero Food Miles", "Women's Guild"],
+    revenueShare: "95% Direct Farmer Revenue",
+    img: "/assets/images/jadoh.png"
+  },
+  {
+    name: "Manipuri Eromba",
+    origin: "Manipur",
+    desc: "Boiled mountain vegetables mashed with fiery King Chilli (U-Morok), wild herbs, and fermented local fish.",
+    tags: ["Probiotic", "Wild Harvest", "Zero Preservatives"],
+    revenueShare: "97% Direct Homestay Revenue",
+    img: "/assets/images/eromba.png"
+  },
+  {
+    name: "Naga Axone Stew",
+    origin: "Nagaland",
+    desc: "Naturally fermented organic soybeans stewed with smoked chillies, wild herbs, and bamboo shoot broth.",
+    tags: ["Fermented Superfood", "Tribal Organic", "Zero Food Miles"],
+    revenueShare: "96% Direct Tribal Revenue",
+    img: "/assets/images/axone.png"
+  },
+  {
+    name: "Mizo Bai Broth",
+    origin: "Mizoram",
+    desc: "Steamed organic mustard greens and bamboo shoots cooked with local soda and fermented pork/mushrooms.",
+    tags: ["Alkaline", "Zero Oil", "Organic Garden"],
+    revenueShare: "95% Direct Grower Revenue",
+    img: "/assets/images/bai.png"
+  },
+  {
+    name: "Tripuri Chakhwi",
+    origin: "Tripura",
+    desc: "Traditional alkaline bamboo shoot preparation slow-cooked with jackfruit seeds and wild mountain leaves.",
+    tags: ["Forest Foraged", "Zero Food Miles", "Indigenous Recipe"],
+    revenueShare: "97% Direct Tribal Revenue",
+    img: "/assets/images/chakhwi.png"
+  },
+  {
+    name: "Haryanvi Bajra Khichdi",
+    origin: "Haryana",
+    desc: "Nutrient-dense winter pearl millet and yellow lentils cooked on slow embers, served with fresh hand-churned white butter.",
+    tags: ["Millets Superfood", "Zero Food Miles", "Farmer Cooperative"],
+    revenueShare: "94% Direct Farmer Revenue",
+    img: "/assets/images/bajrakhicdi.png"
+  },
+  {
+    name: "Andhra Gongura Pachadi",
+    origin: "Andhra Pradesh",
+    desc: "Tangy red sorrel leaves ground in stone mortars with roasted red chillies, garlic, and cold-pressed sesame oil.",
+    tags: ["Iron Rich", "Heritage Recipe", "Farmer Cooperative"],
+    revenueShare: "93% Direct Farmer Revenue",
+    img: "/assets/images/gongura.png"
+  },
+  {
+    name: "Thukpa",
+    origin: "Ladakh",
+    desc: "Hearty noodle soup with vegetables and meat, a staple of high-altitude comfort.",
+    tags: ["High Altitude", "Warm Soup", "Community Kitchen"],
+    revenueShare: "95% Direct Farmer Revenue",
+    img: "/assets/images/thukpa.png"
+  },
+  {
+    name: "Skyu",
+    origin: "Ladakh",
+    desc: "Thick wheat flour dumplings simmered in broth, enjoyed during winter festivals.",
+    tags: ["Winter Warmth", "Traditional", "Handmade"],
+    revenueShare: "94% Direct Farmer Revenue",
+    img: "/assets/images/skyu.png"
+  },
+  {
+    name: "Butter Tea (Gur Gur)",
+    origin: "Ladakh",
+    desc: "Salted butter tea brewed with yak tea leaves, energizing for trekkers.",
+    tags: ["Energy Boost", "Cultural", "High Altitude"],
+    revenueShare: "96% Direct Farmer Revenue",
+    img: "/assets/images/gurgurtea.png"
+  },
+  {
+    name: "Tingmo",
+    origin: "Ladakh",
+    desc: "Steamed fluffy wheat buns served with soups and stews.",
+    tags: ["Steamed Bread", "Soft", "Companion Dish"],
+    revenueShare: "93% Direct Farmer Revenue",
+    img: "/assets/images/tingmo.png"
+  },
+  {
+    name: "Momos",
+    origin: "Sikkim",
+    desc: "Steamed dumplings filled with vegetables or meat, a Himalayan street snack.",
+    tags: ["Dumpling", "Snack", "Popular"],
+    revenueShare: "92% Direct Farmer Revenue",
+    img: "/assets/images/momos.png"
+  },
+  {
+    name: "Tsampa",
+    origin: "Tibet",
+    desc: "Roasted barley flour mixed with tea butter, a high-energy staple.",
+    tags: ["Barley", "Energy", "Portable"],
+    revenueShare: "95% Direct Farmer Revenue",
+    img: "/assets/images/tsampa.png"
   }
 ];
 
@@ -1356,10 +1524,10 @@ function renderFood(opts = {}) {
 
   if (filtered.length === 0) {
     grid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #ffffff; border-radius: var(--radius); border: 1px dashed rgba(13, 148, 136, 0.3);">
+      <div class="food-empty-state">
         <p style="font-size: 28px; margin: 0 0 10px;">🍲</p>
         <h3 style="font-family: var(--font-main); font-size: 18px; color: var(--ink); margin: 0 0 6px;">No culinary specialties found</h3>
-        <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px;">Try clearing your flavor search or view all delicacies.</p>
+        <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 16px;">Try clearing your flavor search or view all delicacies.</p>
         <button class="btn light" onclick="resetFoodFilters()">Reset Dietary Filters</button>
       </div>
     `;
@@ -1452,7 +1620,7 @@ function openFoodRecipeModal(event, foodName) {
   const bookmarkBtn = $("#recipeModalBookmarkBtn");
   if (bookmarkBtn) {
     bookmarkBtn.onclick = () => {
-      saveDestination(`food_${f.name.toLowerCase().replace(/\\s+/g, '_')}`, {
+      saveDestination(`food_${f.name.toLowerCase().replace(/\s+/g, '_')}`, {
         name: `${f.name} Dining Stop`,
         location: f.origin,
         budget: 650,
@@ -1460,6 +1628,13 @@ function openFoodRecipeModal(event, foodName) {
         altitude: "Culinary"
       });
       toast(`Saved ${f.name} to your Expedition Dining List! ♥`);
+    };
+  }
+
+  const aiBtn = $("#recipeModalAIBtn");
+  if (aiBtn) {
+    aiBtn.onclick = () => {
+      openRecipeAIInsight(f.name);
     };
   }
 
@@ -1541,6 +1716,7 @@ const culturalTraditions = [
     region: "Himalayas • Ladakh",
     badge: "✦ Sacred Symbolism",
     title: "Lung-ta: Wind Horse Prayer Flags",
+    img: "/assets/images/tawang.png",
     desc: "The 5 primary colors represent the 5 cosmic elements: Blue (Sky), White (Air/Wind), Red (Fire), Green (Water), and Yellow (Earth). Placed on mountain ridges so the wind carries compassionate blessings across the cosmos.",
     protocol: "Always hang with reverence; never discard on soil",
     aiQuery: "Prayer flag Lung ta Ladakh"
@@ -1551,6 +1727,7 @@ const culturalTraditions = [
     region: "Ladakh • Spiti • Sikkim",
     badge: "✦ Monastic Rituals",
     title: "Sacred Cham Masked Dances",
+    img: "/assets/images/dharamshala.png",
     desc: "Performed in Buddhist monasteries during annual festivals such as Hemis Tsechu and Gustor. Lamas don ornate silk brocades and sacred deity masks symbolizing the triumph of wisdom over spiritual ignorance.",
     protocol: "Silent reverence; observe photography restrictions in sanctum",
     aiQuery: "Cham dance Tibetan Buddhist monastery"
@@ -1561,6 +1738,7 @@ const culturalTraditions = [
     region: "Ladakh • Zanskar",
     badge: "✦ Vernacular Design",
     title: "Mud-Brick Passive Solar Architecture",
+    img: "/assets/images/srinagar.jpg",
     desc: "Century-old Ladakhi rammed-earth and sun-dried mud bricks with southward-facing timber balconies. In -25°C Himalayan winters, thermal mass stores heat during the day without consuming fossil fuels.",
     protocol: "Eco-Heritage: Preserved by local artisan stone masons",
     aiQuery: "Vernacular architecture of Ladakh passive solar"
@@ -1571,6 +1749,7 @@ const culturalTraditions = [
     region: "Changthang Plateau",
     badge: "✦ Grassroots Guild",
     title: "Pashmina & Changpa Nomads",
+    img: "/assets/images/gulmarg.png",
     desc: "The semi-nomadic Changpa graze Capra hircus goats at 15,000+ ft. The ultra-fine underfleece (pashm) is spun on traditional handlooms into authentic GI-tagged pashmina shawls by women's cooperatives.",
     protocol: "Verify genuine Ladakh GI tag; support direct loom prices",
     aiQuery: "Changpa pashmina nomads Changthang"
@@ -1581,6 +1760,7 @@ const culturalTraditions = [
     region: "Meghalaya • Khasi Hills",
     badge: "✦ Bio-Engineering",
     title: "Jingkieng Jri: Living Root Bridges",
+    img: "/assets/images/cherrapunji.png",
     desc: "Centuries-old suspension bridges trained across torrential rainforest rivers using aerial roots of Ficus elastica trees by Khasi and Jaintia tribal communities. Unlike concrete, these living bridges grow stronger with age.",
     protocol: "Walk bare-foot or soft-soled; never damage live root shoots",
     aiQuery: "Living root bridges Cherrapunji Meghalaya"
@@ -1591,6 +1771,7 @@ const culturalTraditions = [
     region: "Chhattisgarh • Bastar",
     badge: "✦ Ancient Metallurgy",
     title: "Bastar Dhokra Lost-Wax Casting",
+    img: "/assets/images/bastar.png",
     desc: "An unbroken 4,000-year metallurgic tradition descending directly from the Indus Valley Civilization's 'Dancing Girl'. Uses beeswax coils, river clay molds, and recycled scrap brass to create spiritual totems.",
     protocol: "Purchase directly from Bastar tribal artisan panchayats",
     aiQuery: "Dhokra lost wax casting Bastar Chhattisgarh"
@@ -1601,6 +1782,7 @@ const culturalTraditions = [
     region: "Rajasthan • Thar Desert",
     badge: "✦ UNESCO Intangible",
     title: "Kalbelia Nomadic Songs & Serpent Dance",
+    img: "/assets/images/jaisalmer.png",
     desc: "A mesmerizing rhythmic dance of nomadic desert communities once renowned as snake-charmers. Performed to the drone of the poongi gourd instrument with flowing black swirling skirts embroidered with mirrors.",
     protocol: "Support authentic nomadic folk performers at Jaisalmer",
     aiQuery: "Kalbelia dance Rajasthan UNESCO"
@@ -1611,6 +1793,7 @@ const culturalTraditions = [
     region: "Kerala • Malabar",
     badge: "✦ Sacred Invocation",
     title: "Theyyam: Living Deity Shrines",
+    img: "/assets/images/kochi.png",
     desc: "An archaic ritualistic performance art of northern Kerala where performers invoke divine ancestors in sacred groves (Kavu). Intricate face-painting and monumental headdresses (Mudi) transcend caste barriers.",
     protocol: "Respect sacred grove sanctum; avoid flash photography",
     aiQuery: "Theyyam ritual dance Kerala sacred groves"
@@ -1621,9 +1804,65 @@ const culturalTraditions = [
     region: "Manipur • Imphal Valley",
     badge: "✦ UNESCO Heritage",
     title: "Manipuri Nat Sankirtana & Raas Leela",
+    img: "/assets/images/imphal.png",
     desc: "A devotional temple art blending Vaishnavite lyrical drama, classical cymbals (Kartal), and drum beats (Pung Cholom) with lyrical circular movements in hand-embroidered Kumil skirts.",
     protocol: "Maintain prayerful quietude in temple mandapam",
     aiQuery: "Manipuri Sankirtana classical dance"
+  },
+  {
+    id: "konark",
+    category: "architecture",
+    region: "Odisha • Puri Coast",
+    badge: "✦ Sun Temple Marvel",
+    title: "Konark Stone Chariot & Classical Odissi",
+    img: "/assets/images/konark.png",
+    desc: "Monumental 13th-century Sun Temple carved as a cosmic chariot with 24 colossal stone wheels. The temple mandapas inspired classical Odissi dance postures celebrating cosmic rhythms.",
+    protocol: "Protect fragile carved chlorite reliefs; walk on marked wooden walkways",
+    aiQuery: "Konark Sun Temple architecture Odissi classical dance"
+  },
+  {
+    id: "hampi",
+    category: "sacred",
+    region: "Karnataka • Tungabhadra",
+    badge: "✦ UNESCO Sanctuary",
+    title: "Hampi Stone Chariot & Vijayanagara Heritage",
+    img: "/assets/images/hampi.png",
+    desc: "Spiritual granite sanctuaries overlooking the rocky Tungabhadra river. Musical pillars, chariot shrines, and active Virupaksha worship have continued unbroken for over six centuries.",
+    protocol: "Observe sacred temple protocols at Virupaksha shrine",
+    aiQuery: "Hampi Vijayanagara temple architecture stone chariot"
+  },
+  {
+    id: "ajanta",
+    category: "sacred",
+    region: "Maharashtra • Sahyadri",
+    badge: "✦ Rock-Cut Sanctuaries",
+    title: "Ajanta & Ellora Monolithic Kailash",
+    img: "/assets/images/agantaandellora.png",
+    desc: "Kailash Temple carved top-down from a single basalt cliff face by Rashtrakuta artisans, alongside ancient Buddhist cave chaityas preserving 2,000-year-old fresco murals.",
+    protocol: "No flash photography inside painting-lined cave sanctums",
+    aiQuery: "Ajanta Ellora caves Kailash temple monolithic architecture"
+  },
+  {
+    id: "anandpur",
+    category: "crafts",
+    region: "Punjab • Shivalik Foothills",
+    badge: "✦ Martial Arts & Valor",
+    title: "Hola Mohalla & Gatka Martial Traditions",
+    img: "/assets/images/anandpursahib.png",
+    desc: "A vibrant living tradition founded in 1701 by Guru Gobind Singh Ji, featuring equestrian sports, poetry recitations, community langar feasting, and the Gatka martial art.",
+    protocol: "Cover head with cloth and remove shoes inside Anandpur Sahib",
+    aiQuery: "Hola Mohalla Anandpur Sahib Gatka martial art Sikh heritage"
+  },
+  {
+    id: "auroville",
+    category: "architecture",
+    region: "Tamil Nadu • Coromandel",
+    badge: "✦ Universal Sanctuary",
+    title: "Auroville Matrimandir & Bioclimatic Design",
+    img: "/assets/images/auroville.png",
+    desc: "An international spiritual township dedicated to human unity. The golden sphere of the Matrimandir houses a silent crystal meditation chamber illuminated by directed solar beams.",
+    protocol: "Pre-book silence concentration passes; maintain complete quiet",
+    aiQuery: "Auroville Matrimandir sustainable architecture integral yoga"
   }
 ];
 
@@ -1644,8 +1883,8 @@ function renderCultureCards(cat = "all", search = "") {
   if (search && search.trim()) {
     const q = search.toLowerCase().trim();
     filtered = filtered.filter(item => 
-      item.title.toLowerCase().includes(q) ||
-      item.region.toLowerCase().includes(q) ||
+      item.title.toLowerCase().includes(q) || 
+      item.region.toLowerCase().includes(q) || 
       item.desc.toLowerCase().includes(q) ||
       item.protocol.toLowerCase().includes(q)
     );
@@ -1665,15 +1904,17 @@ function renderCultureCards(cat = "all", search = "") {
 
   grid.innerHTML = filtered.map(item => `
     <article class="culture-card" onclick="openCultureInsight(event, '${item.title}', '${item.region}', '${item.aiQuery}')">
-      <div class="culture-card-top">
+      <div class="culture-card-img-wrap" style="background-image: url('${item.img}');">
         <span class="card-badge">${item.badge}</span>
         <span class="culture-region-tag">${item.region}</span>
       </div>
-      <h3>${item.title}</h3>
-      <p>${item.desc}</p>
-      <div class="card-footer">
-        <span class="culture-protocol-pill">🌿 ${item.protocol}</span>
-        <button class="culture-explore-btn" onclick="openCultureInsight(event, '${item.title}', '${item.region}', '${item.aiQuery}')">Explore Story ↗</button>
+      <div class="culture-card-body">
+        <h3>${item.title}</h3>
+        <p>${item.desc}</p>
+        <div class="card-footer">
+          <span class="culture-protocol-pill" title="Ethical Travel Protocol">🌿 ${item.protocol}</span>
+          <button class="culture-explore-btn" onclick="openCultureInsight(event, '${item.title}', '${item.region}', '${item.aiQuery}')">Explore Story ↗</button>
+        </div>
       </div>
     </article>
   `).join("");
@@ -1688,6 +1929,34 @@ function resetCultureFilters() {
   renderCultureCards();
 }
 
+function quickFilterCulture(keyword) {
+  const searchInput = $("#cultureSearchInput");
+  if (searchInput) {
+    searchInput.value = keyword;
+  }
+  $$(".culture-filter-pill").forEach(p => p.classList.remove("active"));
+  renderCultureCards("all", keyword);
+  const grid = $("#cultureCardsGrid");
+  if (grid) {
+    grid.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  toast(`Filtered living traditions: "${keyword}"`);
+}
+
+function exploreCultureAI() {
+  if (typeof window.openAICardInsight === "function") {
+    window.openAICardInsight({
+      title: "Living Heritage & Sacred Traditions of Ladakh",
+      location: "Ladakh & Western Himalayas",
+      category: "Living Traditions",
+      desc: "Immerse in ancient Gompa rituals, sacred Cham dances, mud-brick solar architectural wisdom, and nomadic Changpa Pashmina weaving.",
+      query: "Ladakh Buddhist culture monasteries Cham dance Losar prayer flags"
+    });
+  } else {
+    window.location.href = "ai.html?q=" + encodeURIComponent("Tell me about Buddhist monasteries, sacred Cham dance, and living traditions of Ladakh");
+  }
+}
+
 function openCultureInsight(event, title, region, query) {
   if (event) event.stopPropagation();
   if (typeof window.openAICardInsight === "function") {
@@ -1700,6 +1969,23 @@ function openCultureInsight(event, title, region, query) {
     });
   } else {
     toast(`Exploring cultural storylines for: ${title}`);
+  }
+}
+
+function openRecipeAIInsight(foodName) {
+  closeFoodRecipeModal();
+  const f = foods.find(x => x.name === foodName) || { name: foodName, origin: "India", desc: "" };
+  if (typeof window.openAICardInsight === "function") {
+    window.openAICardInsight({
+      title: `${f.name} Culinary Heritage`,
+      category: "Indigenous Cuisine",
+      location: f.origin,
+      desc: f.desc,
+      img: f.img,
+      query: `${f.name} traditional preparation heirloom ingredients history ${f.origin}`
+    });
+  } else {
+    toast(`Exploring AI insights for ${f.name}`);
   }
 }
 
@@ -1941,16 +2227,24 @@ function updateSavedCount() {
   if (drawerCount) drawerCount.textContent = saved.length;
 }
 
-function saveDestination(id) {
+function saveDestination(id, extraData) {
   let saved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
-  const dest = activeDestinations.find(d => d.id === id);
+  let customItems = JSON.parse(localStorage.getItem("bharatCustomSaved") || "{}");
+
+  if (extraData) {
+    customItems[id] = extraData;
+    localStorage.setItem("bharatCustomSaved", JSON.stringify(customItems));
+  }
+
   if (!saved.includes(id)) {
     saved.push(id);
     localStorage.setItem("bharatSaved", JSON.stringify(saved));
     syncSavedToBackend(saved);
-    // Pillar 3: Award eco points for saving offbeat/eco-dispersion destinations
+    const dest = activeDestinations.find(d => d.id === id);
     if (dest && dest.isOffbeat) {
       updateResponsibleScore(10, `Eco-Dispersion gem saved: ${dest.name}!`);
+    } else if (extraData && extraData.name) {
+      updateResponsibleScore(5, `Saved ${extraData.name} to My Journey!`);
     } else {
       toast("Saved to My Journey ♥");
     }
@@ -1963,8 +2257,11 @@ function saveDestination(id) {
 
 function removeSavedDestination(id) {
   let saved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
+  let customItems = JSON.parse(localStorage.getItem("bharatCustomSaved") || "{}");
   saved = saved.filter(x => x !== id);
+  delete customItems[id];
   localStorage.setItem("bharatSaved", JSON.stringify(saved));
+  localStorage.setItem("bharatCustomSaved", JSON.stringify(customItems));
   syncSavedToBackend(saved);
   updateSavedCount();
   renderJourneyDrawer();
@@ -1977,7 +2274,26 @@ function renderJourneyDrawer() {
   if (!container) return;
 
   const savedIds = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
-  const savedItems = activeDestinations.filter(d => savedIds.includes(d.id));
+  const customItems = JSON.parse(localStorage.getItem("bharatCustomSaved") || "{}");
+
+  const savedItems = savedIds.map(id => {
+    let item = activeDestinations.find(d => d.id === id);
+    if (item) return item;
+    if (customItems[id]) {
+      return { id, ...customItems[id] };
+    }
+    // Check in foods
+    const f = foods.find(x => `food_${x.name.toLowerCase().replace(/\s+/g, '_')}` === id || x.name === id);
+    if (f) {
+      return { id, name: f.name, location: f.origin, img: f.img, budget: 650, communityBenefit: f.revenueShare };
+    }
+    // Check in regionalCircuits
+    const c = regionalCircuits.find(x => x.id === id);
+    if (c) {
+      return { id, name: c.name, location: c.state, img: c.img, budget: 4500, communityBenefit: "3D Regional Corridor" };
+    }
+    return null;
+  }).filter(Boolean);
 
   if (!savedItems.length) {
     const emptyMsg = (window.i18n && typeof window.i18n.t === "function") 
@@ -2003,7 +2319,7 @@ function renderJourneyDrawer() {
 
     return `
       <div class="drawer-item">
-        <img src="${item.img}" alt="${itemName}">
+        <img src="${item.img}" alt="${itemName}" style="object-fit:cover;">
         <div class="drawer-item-info">
           <h4>${itemName}</h4>
           <p>📍 ${item.location} • ₹${(item.budget || 3500).toLocaleString()}</p>
@@ -2462,11 +2778,7 @@ async function init() {
   const cultureBtn = $("#cultureBtn");
   if (cultureBtn) {
     cultureBtn.onclick = () => {
-      if (typeof window.askAI === "function") {
-        window.askAI("Tell me about the Buddhist culture, monasteries, Losar festival, and traditional attire of Ladakh.");
-      }
-      const aiSec = $("#ai");
-      if (aiSec) aiSec.scrollIntoView({ behavior: "smooth" });
+      exploreCultureAI();
     };
   }
 
@@ -2540,6 +2852,37 @@ async function init() {
     initAmbientParticles();
     initExperienceCard3D();
   });
+
+  // ── Theme Toggle ───────────────────────────────────────
+  initThemeToggle();
+}
+
+// ═══════════════════════════════════════════════════════
+//  DAY / NIGHT MODE TOGGLE
+// ═══════════════════════════════════════════════════════
+
+function initThemeToggle() {
+  const btn = document.getElementById("themeToggleBtn");
+  if (!btn) return;
+
+  // Apply saved preference immediately (before paint)
+  const saved = localStorage.getItem("bharatExploreTheme") || "light";
+  applyTheme(saved, btn);
+
+  btn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    const next = current === "dark" ? "light" : "dark";
+    applyTheme(next, btn);
+    localStorage.setItem("bharatExploreTheme", next);
+  });
+}
+
+function applyTheme(theme, btn) {
+  document.documentElement.setAttribute("data-theme", theme);
+  if (btn) {
+    btn.textContent = theme === "dark" ? "🌙" : "☀️";
+    btn.title = theme === "dark" ? "Switch to Day Mode" : "Switch to Night Mode";
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2668,3 +3011,7 @@ window.openFoodRecipeModal = openFoodRecipeModal;
 window.closeFoodRecipeModal = closeFoodRecipeModal;
 window.resetFoodFilters = resetFoodFilters;
 window.toggleSuperfood = toggleSuperfood;
+window.exploreCultureAI = exploreCultureAI;
+window.quickFilterCulture = quickFilterCulture;
+window.openRecipeAIInsight = openRecipeAIInsight;
+

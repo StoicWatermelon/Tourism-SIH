@@ -14,11 +14,96 @@
   const updateResponsibleScore = (...args) => (window.updateResponsibleScore ? window.updateResponsibleScore(...args) : null);
   const AI_API_ORIGIN = window.location.protocol.startsWith("http") ? "" : "http://127.0.0.1:8000";
 
+  // Dynamic user origin location tracking (GPS / IP address)
+  let detectedUserOrigin = null;
+
+  async function getUserDetectedOrigin() {
+    if (detectedUserOrigin) return detectedUserOrigin;
+    const cached = sessionStorage.getItem("bharat_user_origin_city");
+    if (cached && cached.trim()) {
+      detectedUserOrigin = cached.trim();
+      updateOriginBadges(detectedUserOrigin, "Saved");
+      return detectedUserOrigin;
+    }
+
+    try {
+      const res = await fetch(`${AI_API_ORIGIN}/api/geo/locate`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.city) {
+          detectedUserOrigin = data.city;
+          sessionStorage.setItem("bharat_user_origin_city", detectedUserOrigin);
+          updateOriginBadges(detectedUserOrigin, data.source === "gps" ? "GPS" : "IP");
+          return detectedUserOrigin;
+        }
+      }
+    } catch (e) {
+      console.warn("[Geo Locate Error]:", e);
+    }
+
+    detectedUserOrigin = "Kolkata";
+    sessionStorage.setItem("bharat_user_origin_city", detectedUserOrigin);
+    updateOriginBadges(detectedUserOrigin, "Default");
+    return detectedUserOrigin;
+  }
+
+  function tryGpsOriginDetection() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        try {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const res = await fetch(`${AI_API_ORIGIN}/api/geo/locate?lat=${lat}&lon=${lon}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.city) {
+              detectedUserOrigin = data.city;
+              sessionStorage.setItem("bharat_user_origin_city", detectedUserOrigin);
+              updateOriginBadges(detectedUserOrigin, "GPS");
+            }
+          }
+        } catch (err) {
+          console.warn("[GPS reverse locate error]:", err);
+        }
+      },
+      err => {},
+      { timeout: 8000, maximumAge: 300000 }
+    );
+  }
+
+  function updateOriginBadges(city, source) {
+    const badges = document.querySelectorAll(".detected-origin-badge, #detectedOriginBadge");
+    badges.forEach(b => {
+      b.innerHTML = `<span class="origin-city-name">${city}</span> <span class="origin-source-tag">${source || "Auto"}</span>`;
+    });
+    const originInputs = document.querySelectorAll("#planOriginInput, .plan-origin-input");
+    originInputs.forEach(inp => {
+      if (!inp.value || inp.dataset.autoFilled === "true") {
+        inp.value = city;
+        inp.dataset.autoFilled = "true";
+      }
+    });
+  }
+
+  function setUserOriginCity(city) {
+    if (!city || !city.trim()) return;
+    detectedUserOrigin = city.trim();
+    sessionStorage.setItem("bharat_user_origin_city", detectedUserOrigin);
+    updateOriginBadges(detectedUserOrigin, "Manual");
+  }
+
+  window.getUserDetectedOrigin = getUserDetectedOrigin;
+  window.setUserOriginCity = setUserOriginCity;
+  window.tryGpsOriginDetection = tryGpsOriginDetection;
+
   // Active conversational state tracking
   let activeDestination = null;
   const chatHistory = [];
 
   // Destination keywords
+  const COOCHBEHAR_KW = ["coochbehar", "cooch behar", "coochbihar", "koch bihar", "kochbihar", "কোচবিহার", "कूचबिहार", "madan mohan bari", "rasikbil", "victor jubilee palace", "sagar dighi", "baneswar"];
+  const THANE_KW = ["thane", "thana", "ठाणे", "yeoor", "upvan", "talao pali", "masunda", "kopineshwar", "mamledar"];
   const KOLKATA_KW = ["kolkata", "calcutta", "howrah", "bengal", "victoria memorial", "dakshineswar", "hooghly", "park street", "college street", "কলকাতা", "হাওড়া", "বাংলা", "ভিক্টোরিয়া", "দক্ষিণেশ্বর", "कोलकाता", "कलकत्ता"];
   const JAIPUR_KW = ["jaipur", "rajasthan", "pink city", "amber fort", "hawa mahal", "jantar mantar", "chokhi dhani", "जयपुर", "राजस्थान", "জয়পুর", "রাজস্থান"];
   const KERALA_KW = ["kerala", "alleppey", "alappuzha", "munnar", "kochi", "cochin", "backwater", "wayanad", "केरल", "কেরল", "আলেপ্পি", "মুন্নার"];
@@ -28,6 +113,8 @@
 
   function detectDestination(text) {
     const t = (text || "").toLowerCase();
+    if (COOCHBEHAR_KW.some(k => t.includes(k))) return "coochbehar";
+    if (THANE_KW.some(k => t.includes(k))) return "thane";
     if (KOLKATA_KW.some(k => t.includes(k))) return "kolkata";
     if (JAIPUR_KW.some(k => t.includes(k))) return "jaipur";
     if (KERALA_KW.some(k => t.includes(k))) return "kerala";
@@ -88,6 +175,52 @@
   // ═══════════════════════════════════════════════════════
 
   const DESTINATION_FALLBACKS = {
+    coochbehar: {
+      en: {
+        overview: "**Coochbehar (West Bengal) — The Royal Heritage City of the Koch Dynasty:**\n\n• **Royal & Architectural Wonders:** Cooch Behar Royal Palace (Victor Jubilee Palace, built in 1887 under Maharaja Nripendra Narayan, classical Italian Renaissance brick palace modeled on Buckingham Palace), historic Madan Mohan Bari (1889 temple dedicated to Lord Krishna, home to the legendary Ras Mela celebration), and tranquil Sagar Dighi lake promenade.\n• **Wildlife & Archaeology:** Rasikbil Wetland & Bird Sanctuary (175-hectare sanctuary for migratory waterfowl, deer park, and python rescue centre), Gosanimari archaeological excavation mound (ancient 11th-15th century capital of the Kamtapur Kingdom), and sacred Baneswar Shiva Temple (temple pond sanctifying rare endangered Black Softshell Turtles locally known as Mohan).\n• **Zero-Mile Authentic Flavors:** Shorshe Ilish & Bhetki Paturi with aromatic Gobindobhog rice, traditional Koch-Rajbongshi Sidol fish chutney & crispy Bora, and royal Chhanar Jilapi & Bhapa Sandesh.\n• **Eco-Transit:** Zero-emission battery e-rickshaws (Totos) connect the entire palace and lake heritage corridor cleanly.\n• **Best Season:** October through March — pleasant winter weather and the vibrant historic Ras Mela festival (Nov–Dec).",
+        food: "**Coochbehar's Royal Koch & Bengali Gastronomy:**\n\n• **Royal Sweet Confections:** Iconic Chhanar Jilapi (fresh cottage cheese fried into coils and dipped in light cardamom syrup), warm spongy Rasgullas, and Bhapa Sandesh.\n• **Koch-Rajbongshi Specialties:** Traditional Sidol fish chutney (fermented freshwater fish with aromatic mountain chilies), crispy lentil Bora, and seasonal leafy greens (Pelka).\n• **Authentic Bengali Feast:** Steaming Gobindobhog rice with Shorshe Ilish (Hilsa fish in pungent mustard gravy), tender Bhetki Paturi steamed in banana leaves, and Radhaballabhi with spiced chana dal for breakfast.",
+        pack: "**Packing Guide for Coochbehar & North Bengal:**\n\n• **Clothing:** Breathable light cottons for daytime; during winter (Nov–Feb), pack light sweaters and shawls as North Bengal evenings are cool (10–15°C).\n• **Footwear:** Comfortable walking shoes for exploring extensive royal palace grounds, temple complexes, and lakeside promenades.\n• **Binoculars & Camera:** High zoom lens or compact binoculars are essential for birdwatching at Rasikbil Bird Sanctuary.\n• **Eco Practice:** Carry a reusable bottle. Support local artisans by purchasing authentic handwoven Shitalpati cane mats.",
+        budget: "**Coochbehar Travel Budget Guide (Per Person):**\n\n• **Budget Backpacker (₹1,200–1,800/day):** Clean central lodges, authentic Bengali dhabas (₹100–180/meal), and local Toto e-rickshaws (₹15–30 per ride).\n• **Mid-Range Traveler (₹2,500–4,500/day):** Heritage-inspired hotels near Sagar Dighi or Palace, guided museum tours, and hired day cabs for Rasikbil.\n• **Eco-Explorer:** Homestays in Rasikbil forest village directly supporting rural fishing and farming families.",
+        safety: "**Coochbehar Travel Safety & Emergency Helplines:**\n\n• **Medical Facilities:** Cooch Behar Government Medical College & Hospital (Apex 24/7 Trauma Care, Ph: 03582-222222) and MJN District Hospital.\n• **Police & Helplines:** Cooch Behar Kotwali Police Station (Ph: 112 / 03582-222300). National Tourist Helpline: 1363.\n• **Local Etiquette:** Dress respectfully when entering temples like Madan Mohan Bari and Baneswar Shiva temple. Do not disturb the sacred turtles in the temple pond."
+      },
+      hi: {
+        overview: "**कूचबिहार (पश्चिम बंगाल) — कोच राजवंश की ऐतिहासिक शाही नगरी:**\n\n• **प्रमुख शाही धरोहर:** कूचबिहार राजमहल (विक्टर जुबली पैलेस, 1887 में बकिंघम पैलेस की तर्ज पर निर्मित इटैलियन पुनर्जागरण शैली का भव्य महल), ऐतिहासिक मदन मोहन बाड़ी (प्रसिद्ध रास मेला स्थल) और सागर दिघी हेरिटेज झील।\n• **वन्यजीव और पुरातत्व:** रसिकबिल वेटलैंड पक्षी अभयारण्य (प्रवासी जलपक्षियों के लिए प्रसिद्ध), गोसानीमारी पुरातत्व स्थल (कामतापुर साम्राज्य की 11वीं सदी की राजधानी) और बानेश्वर शिव मंदिर (जहाँ दुर्लभ काले कछुओं 'मोहन' को पवित्र माना जाता है)।\n• **स्थानीय स्वाद:** सरसों इलिश, भेटकी पातुरी, पारंपरिक कोच-राजबंशी सिदोल चटनी और प्रसिद्ध छाना की जलेबी (छानार जिलापी)।\n• **सर्वोत्तम समय:** अक्टूबर से मार्च — सुखद मौसम और ऐतिहासिक रास मेला उत्सव।",
+        food: "**कूचबिहार के प्रामाणिक व्यंजन एवं खानपान:**\n\n• **प्रसिद्ध मिठाइयां:** पारंपरिक छानार जिलापी (छेना की जलेबी), भापा संदेश और रसगुल्ले।\n• **राजबंशी व्यंजन:** सिदोल चटनी, कुरकुरा बोरा और पेल्का (पारंपरिक पत्तेदार साग)।\n• **बंगाली थाली:** गोविंदभोग चावल के साथ सरसों इलिश मछली और केला पत्ता भेटकी पातुरी।",
+        pack: "**कूचबिहार यात्रा पैकिंग सूची:** हल्के सूती कपड़े; सर्दियों (दिसंबर-जनवरी) के लिए हल्की जैकेट; रसिकबिल में पक्षी दर्शन के लिए दूरबीन।",
+        budget: "**कूचबिहार यात्रा बजट:** ₹1,200–1,800/दिन (बजट); ₹2,500–4,500/दिन (मध्यम श्रेणी)।",
+        safety: "**सुरक्षा एवं हेल्पलाइन:** कूचबिहार मेडिकल कॉलेज अस्पताल (आपातकालीन: 03582-222222)। पुलिस: 112। राष्ट्रीय पर्यटक हेल्पलाइन: 1363।"
+      },
+      bn: {
+        overview: "**কোচবিহার (পশ্চিমবঙ্গ) — কোচ রাজবংশের ঐতিহাসিক রাজকীয় শহর:**\n\n• **ঐতিহাসিক ও রাজকীয় স্থাপত্য:** কোচবিহার রাজবাড়ি (ভিক্টর জুবিলি প্যালেস, মহারাজা নৃপেন্দ্র নারায়ণের আমলে ১৮৮৭ সালে বাকিংহাম প্যালেসের আদলে নির্মিত ইতালীয় রেনেসাঁ স্থাপত্যের অনন্য নিদর্শন), ঐতিহ্যবাহী মদন মোহন বাড়ি (বিখ্যাত রাস মেলার পুণ্যভূমি) এবং মনোরম সাগর দিঘি প্রমোদচত্বর।\n• **বন্যপ্রাণী ও প্রত্নতত্ত্ব:** রসিকবিল জলাভূমি ও পক্ষী অভয়ারণ্য (১৭৫ হেক্টর প্রাকৃতিক হ্রদ, পরিযায়ী পাখির স্বর্গরাজ্য, হরিণ পার্ক), প্রাচীন কামতাপুর সাম্রাজ্যের গোসানিমারী প্রত্নতাত্ত্বিক খনন ঢিবি এবং বাণেশ্বর শিবমন্দির (পুকুরে সংরক্ষিত বিরল প্রজাতির বোস্তামী কালো কচ্ছপ বা 'মোহন')।\n• **খাঁটি খাদ্যসংস্কৃতি:** সুগন্ধি গোবিন্দভোগ চাল ও সর্ষে ইলিশ, কলাপাতায় ভাপা ভেটকি পাতুরি, ঐতিহ্যবাহী কোচ-রাজবংশী সিদল ভর্তা ও বড়া, এবং বিশ্বখ্যাত ছানার জিলিপি ও কাঁচাগোল্লা।\n• **পরিবেশবান্ধব যাতায়াত:** দূষণমুক্ত ব্যাটারিচালিত টোটো রিকশা সমগ্র হেরিটেজ চত্বরকে সুন্দরভাবে সংযুক্ত করে।\n• **ভ্রমণের সেরা সময়:** অক্টোবর থেকে মার্চ — আনন্দময় শীতকালীন আবহাওয়া ও শতাব্দীপ্রাচীন ঐতিহ্যবাহী রাসমেলা।",
+        food: "**কোচবিহারের ঐতিহ্যবাহী খাদ্যসংস্কৃতি ও সেরা খাবারের স্বাদ:**\n\n• **রাজকীয় মিষ্টি:** অপূর্ব স্বাদের ছানার জিলিপি (তাজা ছানার প্যাঁচানো মিষ্টি), খাঁটি ক্ষীরের কাঁচাগোল্লা ও ভাপা সন্দেশ।\n• **কোচ-রাজবংশী ঘরোয়া স্বাদ:** ঐতিহ্যবাহী শুঁটকি ও সিদল ভর্তা, মুচমুচে ডালের বড়া এবং পুষ্টিকর পেলকা শাকের ঝোল।\n• **বাঙালি রাজকীয় ভোজ:** গরম ভাতের সাথে সর্ষে ইলিশ, খাঁটি ঘি, ভেটকি পাতুরি এবং সকালে রাধাবল্লভী ও আলুর দম।",
+        pack: "**কোচবিহার ভ্রমণের প্যাকিং তালিকা:** আরামদায়ক সুতির জামাকাপড়; শীতকালে (ডিসেম্বর-ফেব্রুয়ারি) হালকা চাদর বা সোয়েটার; রসিকবিল পাখির ছবি তোলার জন্য ভালো ক্যামেরা বা বাইনোকুলার।",
+        budget: "**কোচবিহার ভ্রমণ বাজেট (জনপ্রতি):** ১,২০০–১,৮০০ টাকা/দিন (বাজেট); ২,৫০০–৪,৫০০ টাকা/দিন (মিড-রেঞ্জ)। স্থানীয় টোটো ভাড়া খুবই সাশ্রয়ী।",
+        safety: "**কোচবিহার নিরাপত্তা ও জরুরি যোগাযোগ:** কোচবিহার গভর্নমেন্ট মেডিকেল কলেজ ও হাসপাতাল (জরুরি: ০৩৫৮২-২২২২২২)। পুলিশ: ১১২। জাতীয় পর্যটক হেল্পলাইন: ১৩৬৩।"
+      }
+    },
+    thane: {
+      en: {
+        overview: "**Thane (Maharashtra) — The Green City of Lakes & Rainforest Foothills:**\n\n• **Historic & Scenic Highlights:** Masunda Lake (Talao Pali — heart of the city with pedal boating and sunset promenades), Upvan Lake (nestled right against the forested Yeoor foothills, host to the annual Sanskriti Arts Festival), 810 AD Kopineshwar Temple (ancient Shilahara dynasty shrine with Maharashtra's largest Shivalinga), and St. John the Baptist Church (Portuguese heritage established in 1582).\n• **Rainforest & Eco Trails:** Yeoor Hills (lush green buffer zone of Sanjay Gandhi National Park, home to leopards, 70+ bird species, butterflies, and indigenous Adivasi hamlets), Gaimukh Waterfront, and historic Ghodbunder Fort overlooking the Ulhas river estuary.\n• **Iconic Zero-Mile Flavors:** World-famous Mamledar Misal Pav, crispy Kothimbir Vadi, multi-grain Thalipeeth with white butter, and fresh Agri-Koli seafood thali.\n• **Transit:** Thane Railway Station (terminus of India's first train in 1853), TMT AC electric green buses, and auto-rickshaws.\n• **Best Season:** Monsoon (July–Sept) for verdant waterfalls and rainforest mist; October to March for pleasant lake strolls.",
+        food: "**Thane's Iconic Street & Coastal Gastronomy:**\n\n• **Mamledar Misal Pav:** World-famous Naupada misal featuring tender sprouted moth beans in fiery rassa, garnished with crunchy farsan, coriander, and fresh pav.\n• **Traditional Maharashtrian Hearth:** Hot multi-grain Thalipeeth served with homemade white butter (loni), crispy Kothimbir Vadi, and Sabudana Khichdi.\n• **Agri-Koli Coastal Seafood:** Freshly caught Surmai fry, Tisrya (clams) masala, Bombil rava fry, and rice bhakri prepared with indigenous Koli masala blends.\n• **Lakeside Bites:** Creamy Kulfi falooda, piping hot roasted bhutta (corn), and tangy pani puri along the Talao Pali promenade.",
+        pack: "**Packing Guide for Thane & Mumbai Metropolitan Corridor:**\n\n• **Clothing:** Breathable light cottons year-round; during monsoon (June–Sept), pack quick-drying clothes and waterproof footwear.\n• **Rain & Sun Gear:** Sturdy umbrella or rain poncho during monsoon; sunglasses and sunscreen for lake walks in summer/winter.\n• **Trek Shoes:** Sturdy sneakers or trail walking shoes for Yeoor Hills forest trails and butterfly garden explorations.\n• **Hydration:** Reusable stainless steel bottle for city walks and nature treks.",
+        budget: "**Thane Travel Budget Guide (Per Person):**\n\n• **Budget (₹1,200–2,200/day):** Standard city stays, local street misal and thali dining (₹100–200/meal), and local trains or TMT buses (₹10–25).\n• **Mid-Range (₹3,000–5,500/day):** Quality business and green hotels along Ghodbunder Road / EEH, ride-hailing cabs, and lakefront dining.\n• **Eco-Resort (₹4,000–7,500/day):** Forest eco-cottages in Yeoor Hills overlooking the Sanjay Gandhi National Park canopy.",
+        safety: "**Thane Travel Safety & Emergency Helplines:**\n\n• **Medical Facilities:** Jupiter Hospital Eastern Express Highway (Apex NABH Multi-Specialty & Level-1 Trauma Hospital, Ph: 022-21725555 / 108) and Bethany Hospital.\n• **Police & Helplines:** Thane Police Commissionerate Tourist Assistance: 112 / 022-25443300. National Tourist Helpline: 1363.\n• **Nature Caution:** Stay strictly on marked trails in Yeoor Hills; observe forest department closing times at sunset."
+      },
+      hi: {
+        overview: "**ठाणे (महाराष्ट्र) — झीलों का हरित शहर और यूर हिल्स:**\n\n• **प्रमुख आकर्षण:** मासुंदा झील (तलाव पाली — नौकायन और शाम की सैर का केंद्र), उपवन झील (यूर पहाड़ियों की गोद में स्थित), 810 ई. का प्राचीन कोपिनेश्वर मंदिर (महाराष्ट्र का सबसे बड़ा शिवलिंग) और 1582 का ऐतिहासिक सेंट जॉन बैपटिस्ट चर्च।\n• **प्रकृति और वर्षावन:** यूर हिल्स (संजय गांधी राष्ट्रीय उद्यान का हरा-भरा बफर जोन, 70+ पक्षी प्रजातियाँ और तितली पार्क), गायमुख वाटरफ्रंट और घोडबंदर किला।\n• **प्रसिद्ध स्थानीय स्वाद:** विश्व प्रसिद्ध मामलेदार मिसल पाव, कोथिंबीर वड़ी, थालीपीठ और आग्री-कोली समुद्री भोजन।\n• **परिवहन:** भारत की पहली रेलगाड़ी (1853) का ऐतिहासिक स्टेशन, ठाणे नगर निगम (TMT) की एसी इलेक्ट्रिक बसें।\n• **सर्वोत्तम समय:** मानसून (जुलाई-सितंबर) हरियाली और झरनों के लिए; अक्टूबर से मार्च सुखद मौसम के लिए।",
+        food: "**ठाणे के प्रसिद्ध स्वाद और स्ट्रीट फूड:**\n\n• **मामलेदार मिसल पाव:** नौपाड़ा की मशहूर तीखी रस्सा वाली मिसल, जिसे कुरकुरे फरसाण और ताजे पाव के साथ परोसा जाता है।\n• **महाराष्ट्रीयन व्यंजन:** सफेद मक्खन के साथ गरमा-गरम थालीपीठ, कुरकुरी कोथिंबीर वड़ी और साबूदाना खिचड़ी।\n• **तटीय आग्री-कोली सीफूड:** सुरमई फ्राई, तिसऱ्या (क्लैम्स) मसाला और भाकरी।\n• **तलाव पाली स्ट्रीट फूड:** मटका कुल्फी फालूदा और भुना हुआ भुट्टा।",
+        pack: "**ठाणे यात्रा पैकिंग सूची:** हल्के सूती कपड़े; मानसून में रेनकोट या छाता; यूर हिल्स ट्रैकिंग के लिए आरामदायक जूते।",
+        budget: "**ठाणे यात्रा बजट:** ₹1,200–2,200/दिन (बजट); ₹3,000–5,500/दिन (मध्यम)।",
+        safety: "**सुरक्षा एवं हेल्पलाइन:** ज्यूपिटर अस्पताल (इमरजेंसी: 022-21725555 / 108)। ठाणे पुलिस: 112। राष्ट्रीय पर्यटक हेल्पलाइन: 1363।"
+      },
+      bn: {
+        overview: "**ঠাণে (মহারাষ্ট্র) — হ্রদের সবুজ শহর ও ইউর পাহাড়ের বনভূমি:**\n\n• **ঐতিহাসিক ও মনোরম স্থান:** মাসুন্দা হ্রদ (তালাও পালি — শহরের কেন্দ্রস্থলে শান্ত হ্রদ ও বোটিং), উপবন হ্রদ (ইউর পাহাড়ের কোলে প্রতিবছর সংস্কৃতিক আর্টস ফেস্টিভ্যাল অনুষ্ঠিত হয়), ৮১০ খ্রিস্টাব্দের প্রাচীন শিলাহারা রাজবংশের কপিনেশ্বর শিবমন্দির এবং ১৫৮২ সালের ঐতিহাসিক সেন্ট জন ব্যাপটিস্ট চার্চ।\n• **রেইনফরেস্ট ও ইকো-ট্যুরিজম:** ইউর হিলস (সঞ্জয় গান্ধী জাতীয় উদ্যানের সংরক্ষিত জীববৈচিত্র্য অঞ্চল, ৭০টিরও বেশি প্রজাতির পাখি ও আদিবাসী গ্রাম), গাইমুখ ওয়াটারফ্রন্ট ও ঘোদবন্দর প্রাচীন দুর্গ।\n• **আইকনিক স্থানীয় খাবার:** মহারাষ্ট্র বিখ্যাত ঐতিহাসিক মামলেদার মিসাল পাভ, মুচমুচে কোথিম্বির বড়ি, পুষ্টিকর থালিপীঠ এবং তাজা আগ্রী-কোলি উপকূলীয় মাছের থালি।\n• **যাতায়াত ব্যবস্থা:** ভারতের প্রথম ট্রেনের (১৮৫৩) ঐতিহাসিক টার্মিনাস, ঠাণে মিউনিসিপ্যাল পরিবেশবান্ধব এসি ইলেকট্রিক বাস ও লোকাল ট্রেন।\n• **ভ্রমণের সেরা সময়:** বর্ষাকাল (জুলাই–সেপ্টেম্বর) সবুজ পাহাড় ও জলপ্রপাতের জন্য; অক্টোবর থেকে মার্চ হ্রদের ধারের সুন্দর সান্ধ্য ভ্রমণের জন্য।",
+        food: "**ঠাণে শহরের খাদ্যসংস্কৃতি ও সেরা খাবারের তালিকা:**\n\n• **মামলেদার মিসাল পাভ:** নৌপাড়ার বিখ্যাত ঝাল রসা, অঙ্কুরিত মটর ও মুচমুচে ফারসানের অনন্য স্বাদ।\n• **ঐতিহ্যবাহী মারাঠি রান্না:** খাঁটি সাদা মাখন দিয়ে গরম ভাজা থালিপীঠ, ধনেপাতার কোথিম্বির বড়ি ও ভাকরি।\n• **উপকূলীয় কোলিবাসী মাছের পদ:** তাজা সুরমই ভাজা, ঝাল ঝাল ঝিনুক (তিসর‍্যা) কষা ও ভাতের রুটি।\n• **তালাও পালি স্ট্রিট ফুড:** কুখ্যাত কুলফি ফালুদা, নদীর পাড়ে পোড়া ভুট্টা ও ফুচকা।",
+        pack: "**ঠাণে ভ্রমণের প্যাকিং তালিকা:** হালকা আরামদায়ক সুতির পোশাক; বর্ষায় ছাতা বা রেইনকোট; ইউর পাহাড়ের জঙ্গলে হাঁটার জন্য গ্রিপযুক্ত জুতো।",
+        budget: "**ভ্রমণ বাজেট (জনপ্রতি):** ১,২০০–২,২০০ টাকা/দিন (বাজেট); ৩,০০০–৫,৫০০ টাকা/দিন (মিড-রেঞ্জ)।",
+        safety: "**জরুরি যোগাযোগ ও স্বাস্থ্যসেবা:** জুপিটার সুপার স্পেশালিটি হাসপাতাল (ফোন: ০২২-২১৭২৫৫৫৫ / ১০৮)। ঠাণে পুলিশ হেল্পলাইন: ১১২। জাতীয় পর্যটন হেল্পলাইন: ১৩৬৩।"
+      }
+    },
     kolkata: {
       en: {
         overview: "**Kolkata & West Bengal — The Cultural Capital of India:**\n\n• **Historic & Cultural Landmarks:** Victoria Memorial (grand Italian Renaissance marble palace), Howrah Bridge (1943 cantilever engineering marvel across the Hooghly), Dakshineswar Kali Temple, Belur Math (global Ramakrishna Mission headquarters), Indian Museum (Asia's oldest), and sunset strolls along Princep Ghat.\n• **Intellectual & Artisan Quarters:** College Street ('Boi Para') — the world's largest second-hand book market with the legendary Indian Coffee House; Kumartuli — the 300-year-old traditional clay sculptors' quarter handcrafting monumental deities.\n• **Iconic Zero-Mile Flavors:** Warm spongy Rosogolla, caramelized Mishti Doi, Sandesh; aromatic Kolkata Biryani (with succulent spiced potato and egg); original Nizam's Kathi Rolls; and crispy street Phuchka.\n• **Sustainable Transit:** Ride India's only operating historic electric tramway network, take scenic green river ferries across the Hooghly, or use the underwater East-West Metro line beneath the riverbed.\n• **Best Season:** October through March — pleasant winter weather and the UNESCO-inscribed Durga Puja celebration.",
@@ -321,21 +454,21 @@
   function renderWebGroundedBadge(plan) {
     if (!plan || !plan.web_search_summary) return "";
     const sourceLink = (plan.web_sources && plan.web_sources.length > 0) 
-      ? `<a href="${plan.web_sources[0]}" target="_blank" rel="noopener noreferrer" style="color:#2a9d8f; text-decoration:underline; font-weight:700; margin-left:8px;">Read Full Travel Guide ↗</a>` 
+      ? `<a href="${plan.web_sources[0]}" target="_blank" rel="noopener noreferrer" class="agent-source-link">Read Full Travel Guide ↗</a>` 
       : "";
     return `
-      <div class="agent-card" style="background: linear-gradient(135deg, rgba(42,157,143,0.06), rgba(82,183,136,0.12)); border: 1px solid rgba(42,157,143,0.3); border-left: 4px solid #2a9d8f;">
+      <div class="agent-card grounded-badge-card">
         <div class="agent-card-title" style="margin-bottom:8px;">
           <span style="display:flex; align-items:center; gap:8px;">
             <span>🌐</span>
             <span>LIVE INTERNET TRAVEL INTELLIGENCE</span>
           </span>
-          <span class="agent-card-tag verified" style="background:rgba(42,157,143,0.15); color:#1b4332; border-color:#2a9d8f;">WIKIVOYAGE VERIFIED</span>
+          <span class="agent-card-tag verified">WIKIVOYAGE VERIFIED</span>
         </div>
-        <p style="font-size:12.5px; color:#264653; line-height:1.55; margin:0 0 8px;">
+        <p class="agent-summary-text">
           ${plan.web_search_summary}
         </p>
-        <div style="font-size:11px; color:#5f707a; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+        <div class="agent-source-footer">
           <span>⚡ Grounded with live Wikivoyage & Wikimedia regional open data</span>
           ${sourceLink}
         </div>
@@ -354,7 +487,7 @@
             <div class="day-price-pill ${idx === 2 || (d.difference_note && d.difference_note.includes('Save')) ? 'best-deal' : ''}">
               <div class="day-name">${d.day}</div>
               <div class="day-cost">₹${d.price_inr.toLocaleString()}</div>
-              ${d.difference_note ? `<div style="font-size:9.5px; margin-top:2px; color:${idx === 2 ? '#2a9d8f' : '#888'}; font-weight:700;">${d.difference_note}</div>` : ''}
+              ${d.difference_note ? `<div class="day-diff-note ${idx === 2 ? 'best' : ''}">${d.difference_note}</div>` : ''}
             </div>
           `).join('')}
         </div>
@@ -366,20 +499,20 @@
         <div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span class="airline-badge">${opt.airline} ${opt.flight_number}</span>
-            ${opt.is_recommended ? '<span style="font-size:10px; background:#2d6a4f; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800;">CHEAPEST RECOMMENDED</span>' : ''}
+            ${opt.is_recommended ? '<span class="cheapest-badge">CHEAPEST RECOMMENDED</span>' : ''}
           </div>
           <div class="flight-timings">🕒 ${opt.departure_time} ➔ ${opt.arrival_time} • ${opt.duration} (${opt.stops})</div>
           <div class="flight-baggage">🧳 Cabin: ${opt.cabin_baggage} • Check-in: ${opt.checkin_baggage}</div>
         </div>
         <div class="flight-fare">
           <div class="flight-price-inr">₹${opt.price_inr.toLocaleString()}</div>
-          <div style="font-size:10px; color:#5f707a;">per person</div>
+          <div class="fare-unit-label">per person</div>
         </div>
       </div>
     `).join('');
 
     const altAirportsHtml = flights.alternative_airports && flights.alternative_airports.length > 0
-      ? `<div style="margin-top:8px; font-size:11.5px; color:#5f707a;"><b>Alternative Hubs:</b> ${flights.alternative_airports.join(' • ')}</div>`
+      ? `<div class="alt-hubs-row"><b>Alternative Hubs:</b> ${flights.alternative_airports.join(' • ')}</div>`
       : '';
 
     return `
@@ -400,7 +533,7 @@
         </div>
         ${altAirportsHtml}
         ${flights.tradeoff_summary ? `
-          <div style="margin-top:10px; padding:8px 10px; background:#f4efe4; border-radius:6px; font-size:11.5px; color:#4a5568; line-height:1.4;">
+          <div class="flight-tradeoff-box">
             <b>Trade-off Analysis:</b> ${flights.tradeoff_summary}
           </div>
         ` : ''}
@@ -416,11 +549,11 @@
         <div class="hotel-item-head">
           <div>
             <div class="hotel-name">${h.name}</div>
-            <div style="font-size:11px; color:#5f707a; margin-top:2px;">${h.category} • ${h.location}</div>
+            <div class="hotel-subtext">${h.category} • ${h.location}</div>
           </div>
           <div class="hotel-rating-badge">★ ${h.rating}</div>
         </div>
-        <div class="hotel-location-text">📍 ${h.distance_from_attractions}</div>
+        <div class="hotel-location-text">📍 ${h.distance_from_attractions || "City Centre Corridor"}</div>
         <div class="amenity-chips">
           ${h.amenities.map(a => `<span class="amenity-chip">✓ ${a}</span>`).join('')}
         </div>
@@ -441,7 +574,7 @@
           ${itemsHtml}
         </div>
         ${hotels.recommendation_note ? `
-          <p style="margin-top:10px; font-size:11.5px; color:#5f707a; line-height:1.4;">${hotels.recommendation_note}</p>
+          <p class="hotel-recommendation-note">${hotels.recommendation_note}</p>
         ` : ''}
       </div>
     `;
@@ -459,7 +592,7 @@
           <div class="day-box-area">📍 ${d.area_cluster}</div>
         </div>
         ${d.acclimatization_safety_note ? `
-          <div style="background:#fff3cd; color:#856404; padding:6px 12px; font-size:11.5px; font-weight:700;">
+          <div class="itinerary-safety-alert">
             ⚠️ ${d.acclimatization_safety_note}
           </div>
         ` : ''}
@@ -474,7 +607,7 @@
                   ${a.transit_mins_from_prev > 0 ? `<span> • 🚗 ${a.transit_mins_from_prev} min transit</span>` : ''}
                   ${a.estimated_cost_inr > 0 ? `<span> • 💰 ₹${a.estimated_cost_inr}</span>` : ''}
                 </div>
-                ${a.tip ? `<div style="font-size:11px; color:#2d6a4f; margin-top:2px;"><i>Tip: ${a.tip}</i></div>` : ''}
+                ${a.tip ? `<div class="slot-tip"><i>Tip: ${a.tip}</i></div>` : ''}
               </div>
             </div>
           `).join('')}
@@ -488,7 +621,7 @@
           <span>🗺️ OPTIMIZED CLUSTERED DAILY ITINERARY (${itinerary.length} DAYS)</span>
           <span class="agent-card-tag verified">ZERO-ZIGZAG ROUTING</span>
         </div>
-        <p style="font-size:12px; color:#5f707a; margin:0 0 12px;">Attractions grouped by geographical corridors to minimize intra-city travel times.</p>
+        <p class="itinerary-cluster-subtext">Attractions grouped by geographical corridors to minimize intra-city travel times.</p>
         <div class="itinerary-days-container">
           ${daysHtml}
         </div>
@@ -505,33 +638,33 @@
     `).join('');
 
     const categoryRowsHtml = budget.categories.map((c, i) => `
-      <div class="cat-row" style="padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+      <div class="cat-row">
         <div style="flex:1;">
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="width:10px; height:10px; border-radius:50%; background:${barColors[i % barColors.length]}; display:inline-block; flex-shrink:0;"></span>
-            <strong style="color:#1d2d44; font-size:13px;">${c.category}</strong>
+            <strong class="cat-name">${c.category}</strong>
           </div>
-          ${c.description ? `<div style="font-size:11.5px; color:#5f707a; margin-left:18px; margin-top:2px;">${c.description}</div>` : ''}
+          ${c.description ? `<div class="cat-desc">${c.description}</div>` : ''}
         </div>
-        <div style="text-align:right; flex-shrink:0; margin-left:12px;">
-          <b style="color:#1b4332; font-size:13.5px;">₹${c.cost_inr.toLocaleString()}</b>
-          <div style="font-size:11px; color:#5f707a;">${c.percentage}%</div>
+        <div class="cat-cost-col">
+          <b class="cat-cost-val">₹${c.cost_inr.toLocaleString()}</b>
+          <div class="cat-pct">${c.percentage}%</div>
         </div>
       </div>
     `).join('');
 
     const tipsHtml = (budget.cost_saving_tips && budget.cost_saving_tips.length > 0)
-      ? `<div style="margin-top:14px; padding:12px 14px; background:rgba(82,183,136,0.08); border:1px solid rgba(82,183,136,0.25); border-radius:8px;">
-          <div style="font-size:11.5px; font-weight:700; color:#2d6a4f; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">💡 Smart Money-Saving Tips For This Route</div>
-          <ul style="margin:0; padding-left:18px; font-size:12px; color:#264653; line-height:1.5;">
-            ${budget.cost_saving_tips.map(t => `<li style="margin-bottom:4px;">${t}</li>`).join('')}
+      ? `<div class="budget-tips-box">
+          <div class="budget-tips-title">💡 Smart Money-Saving Tips For This Route</div>
+          <ul>
+            ${budget.cost_saving_tips.map(t => `<li>${t}</li>`).join('')}
           </ul>
         </div>`
       : '';
 
     const rationaleHtml = budget.strategy_rationale
-      ? `<div style="margin-top:14px; padding:12px 14px; background:#f4efe4; border-left:4px solid #b78628; border-radius:4px 8px 8px 4px; font-size:12px; color:#3d3a37; line-height:1.45;">
-          <strong style="color:#b78628; display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em; font-size:11px;">🧠 Intelligent Division Strategy</strong>
+      ? `<div class="budget-strategy-box">
+          <strong class="budget-strategy-title">🧠 Intelligent Division Strategy</strong>
           ${budget.strategy_rationale}
         </div>`
       : '';
@@ -553,7 +686,7 @@
           </div>
           <div class="stat-box">
             <div class="stat-label">${budget.daily_avg_spend_inr ? 'Daily Average' : 'Est. Daily Spend'}</div>
-            <div class="stat-val" style="color:#457b9d;">₹${(budget.daily_avg_spend_inr || Math.round(budget.total_allocated_inr / 4)).toLocaleString()}/day</div>
+            <div class="stat-val stat-val-spend">₹${(budget.daily_avg_spend_inr || Math.round(budget.total_allocated_inr / 4)).toLocaleString()}/day</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Strategic Cushion</div>
@@ -570,7 +703,7 @@
         </div>
         ${rationaleHtml}
         ${budget.cushion_health_advice ? `
-          <div style="margin-top:12px; padding:10px 12px; background:#f0f7f3; border-radius:8px; font-size:12px; color:#1b4332; line-height:1.4;">
+          <div class="budget-cushion-box">
             <b>Cushion Health:</b> ${budget.cushion_health_advice}
           </div>
         ` : ''}
@@ -586,7 +719,7 @@
       <div class="agent-card">
         <div class="agent-card-title">
           <span>🛡️ EMERGENCY MEDICAL & SAFETY DOSSIER</span>
-          <span class="agent-card-tag" style="background:#fee2e2; color:#ef4444; border:1px solid #f87171;">24/7 SAFEGUARD</span>
+          <span class="agent-card-tag emergency-tag">24/7 SAFEGUARD</span>
         </div>
         <div class="emergency-card-box">
           <div class="emergency-head">
@@ -594,7 +727,7 @@
             <span>Nearest Apex Trauma Center:</span>
           </div>
           <div class="emergency-hosp-name">${emergency.nearest_hospital.name}</div>
-          <div style="font-size:11.5px; color:#5f707a; margin-top:3px;">
+          <div class="emergency-hosp-address">
             ${emergency.nearest_hospital.address} (${emergency.nearest_hospital.distance})
           </div>
           <div class="emergency-contact-row">
@@ -603,12 +736,12 @@
             <a class="emergency-btn secondary" href="tel:1363">ℹ️ Tourist Helpline: 1363</a>
           </div>
           ${emergency.weather_alert ? `
-            <div style="margin-top:10px; font-size:11.5px; color:#856404; background:#fff3cd; padding:6px 10px; border-radius:6px;">
+            <div class="emergency-weather-alert">
               <b>Weather Advisory:</b> ${emergency.weather_alert}
             </div>
           ` : ''}
           ${emergency.high_altitude_medical_tips ? `
-            <div style="margin-top:6px; font-size:11.5px; color:#1e40af; background:#dbeafe; padding:6px 10px; border-radius:6px;">
+            <div class="emergency-altitude-alert">
               <b>High Altitude Warning:</b> ${emergency.high_altitude_medical_tips}
             </div>
           ` : ''}
@@ -769,6 +902,96 @@
     botMsg.appendChild(cursor);
     box.appendChild(botMsg);
     box.scrollTop = box.scrollHeight;
+
+    // Check if user is asking for trip planning / itinerary — if so, run through autonomous agent and render full rich cards!
+    if (typeof detectPlanningIntent === "function" && detectPlanningIntent(q)) {
+      if (orb) orb.className = "ai-orb thinking";
+      if (statusText) statusText.textContent = "Formulating expedition plan...";
+      textSpan.textContent = "🗺️ Formulating your personalized expedition plan across flights, certified stays, daily itineraries, and budget allocations...";
+
+      try {
+        const userOrigin = await getUserDetectedOrigin();
+        const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: q.trim(),
+            session_id: agentSessionId,
+            lang: lang,
+            starting_city: userOrigin
+          })
+        });
+
+        if (!res.ok) throw new Error(`Agent error: ${res.status}`);
+        const data = await res.json();
+
+        if (data.session_id) {
+          agentSessionId = data.session_id;
+          localStorage.setItem("bharat_agent_session_id", agentSessionId);
+        }
+
+        if (cursor && cursor.parentNode) cursor.remove();
+        textSpan.style.opacity = "1";
+        textSpan.innerHTML = renderMarkdown(data.message || "");
+
+        // Render interactive cards inside this bot message
+        if (data.plan) {
+          let cardsHtml = "";
+          if (data.plan.web_search_summary && typeof renderWebGroundedBadge === "function") {
+            cardsHtml += renderWebGroundedBadge(data.plan);
+          }
+          if (data.plan.flights && typeof renderFlightCard === "function") {
+            cardsHtml += renderFlightCard(data.plan.flights);
+          }
+          if (data.plan.hotels && typeof renderHotelCard === "function") {
+            cardsHtml += renderHotelCard(data.plan.hotels);
+          }
+          if (data.plan.itinerary && typeof renderItineraryCard === "function") {
+            cardsHtml += renderItineraryCard(data.plan.itinerary);
+          }
+          if (data.plan.budget && typeof renderBudgetCard === "function") {
+            cardsHtml += renderBudgetCard(data.plan.budget);
+          }
+          if (data.plan.emergency && typeof renderEmergencyCard === "function") {
+            cardsHtml += renderEmergencyCard(data.plan.emergency);
+          }
+
+          if (cardsHtml) {
+            const cardsContainer = document.createElement("div");
+            cardsContainer.className = "inbuilt-chat-cards-wrap";
+            cardsContainer.innerHTML = cardsHtml;
+            botMsg.appendChild(cardsContainer);
+          }
+        } else if (data.quick_presets && data.quick_presets.length > 0) {
+          const presetsWrap = document.createElement("div");
+          presetsWrap.className = "chat-quick-presets";
+          presetsWrap.style.marginTop = "12px";
+          presetsWrap.innerHTML = data.quick_presets.map(p => `
+            <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan a ${p.days}-day trip with budget ₹${p.budget}')">
+              ⚡ ${p.label}
+            </button>
+          `).join('');
+          botMsg.appendChild(presetsWrap);
+        }
+
+        if (orb) orb.className = "ai-orb idle";
+        if (statusText) statusText.textContent = activeText;
+        if (submitBtn) submitBtn.disabled = false;
+        if (chatInput) {
+          chatInput.disabled = false;
+          chatInput.focus();
+        }
+        box.scrollTop = box.scrollHeight;
+        isGenerating = false;
+
+        chatHistory.push({ role: "user", text: q });
+        chatHistory.push({ role: "model", text: (data.message || "Plan generated.") });
+        return;
+      } catch (agentErr) {
+        console.warn("[Agent Live Itinerary in chat failed, falling back to conversational stream]:", agentErr);
+        // continue to standard streaming
+      }
+    }
 
     // 4. Token Queue & Typewriter Dispatcher State
     const tokenQueue = [];
@@ -1103,6 +1326,15 @@
   }
 
   function initFloatingChat() {
+    // Suppress on dedicated ai.html page which has its own native embedded chatbox console
+    const isAiPage = window.location.pathname.endsWith("ai.html") || 
+                     window.location.pathname.includes("/ai.html") || 
+                     window.location.pathname.endsWith("/ai") ||
+                     Boolean(document.getElementById("chatWindow") && document.getElementById("chatInput") && !document.getElementById("floatingChatWidget"));
+    if (isAiPage) {
+      return;
+    }
+
     let trigger = $("#floatingChatTrigger");
     let widget = $("#floatingChatWidget");
 
@@ -1262,26 +1494,32 @@
     // 2. If on home.html with #itineraryOutput, call AI agent endpoint directly
     const output = $("#itineraryOutput");
     if (output) {
-      output.innerHTML = `<div style="padding:32px 20px; text-align:center; background:rgba(82,183,136,0.06); border-radius:12px; border:1px solid rgba(82,183,136,0.2);">
-        <div style="font-size:36px; margin-bottom:12px;">⚡</div>
-        <h4 style="margin:0 0 6px; color:#2d6a4f; font-size:16px;">Bharat AI is Formulating Your Expedition...</h4>
-        <p style="font-size:12.5px; color:#5f707a; margin:0 0 12px;">Searching live web pricing for ${dest}, verifying passes, and balancing your ₹${budget.toLocaleString()} budget across journey parts.</p>
-        <div style="display:inline-block; width:48px; height:3px; background:#74c69d; border-radius:99px;"></div>
+      output.innerHTML = `<div class="planner-formulating-card">
+        <div class="planner-formulating-icon">⚡</div>
+        <h4 class="planner-formulating-title">Bharat AI is Formulating Your Expedition...</h4>
+        <p class="planner-formulating-sub">Searching live web pricing for ${dest}, verifying passes, and balancing your ₹${budget.toLocaleString()} budget across journey parts.</p>
+        <div class="planner-formulating-bar"></div>
       </div>`;
 
       try {
+        const userOrigin = await getUserDetectedOrigin();
         const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: queryStr, session_id: agentSessionId, lang: lang })
+          body: JSON.stringify({
+            message: queryStr,
+            session_id: agentSessionId,
+            lang: lang,
+            starting_city: userOrigin
+          })
         });
         if (res.ok) {
           const data = await res.json();
           if (data && data.type === "complete_plan" && data.plan) {
             let fullHtml = `
-              <div style="margin-bottom:16px; padding:12px 16px; background:rgba(82,183,136,0.1); border-left:4px solid #52b788; border-radius:4px 8px 8px 4px;">
-                <div style="font-size:11px; font-weight:800; color:#2d6a4f; text-transform:uppercase; letter-spacing:0.06em;">⚡ Autonomous AI Expedition Formulated</div>
-                <div style="font-size:13px; color:#1d2d44; margin-top:4px;">${renderMarkdown(data.message || "")}</div>
+              <div class="planner-ai-banner">
+                <div class="planner-ai-banner-badge">⚡ Autonomous AI Expedition Formulated</div>
+                <div class="planner-ai-banner-msg">${renderMarkdown(data.message || "")}</div>
               </div>
             `;
             if (data.plan.web_search_summary) {
@@ -1293,7 +1531,7 @@
             fullHtml += renderBudgetCard(data.plan.budget);
             fullHtml += renderEmergencyCard(data.plan.emergency);
             fullHtml += `
-              <div style="text-align:center; margin-top:20px; padding:16px; background:#f4efe4; border-radius:8px;">
+              <div class="planner-ai-cta-box">
                 <a href="planner.html?q=${encodeURIComponent(queryStr)}" class="btn primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                   <span>🗺️</span> Open Full Interactive Planner Console →
                 </a>
@@ -1369,10 +1607,98 @@
       { title: "স্থানীয় কারিগর বাজার ও তাঁত সমবায় সমিতি পরিদর্শন", pass: null, notes: "স্থানীয় তাঁতি ও শিল্পীদের থেকে সরাসরি পণ্য কিনুন।" }
     ];
 
-    const isLadakh = dest.toLowerCase().includes("ladakh");
-    const base = isLadakh
-      ? (lang === "hi" ? ladakhItineraryHi : lang === "bn" ? ladakhItineraryBn : ladakhItineraryEn)
-      : (lang === "hi" ? genericItineraryHi : lang === "bn" ? genericItineraryBn : genericItineraryEn);
+    const coochbeharItineraryEn = [
+      { title: "Victor Jubilee Palace & Central Heritage Corridor", pass: null, notes: "Explore Buckingham Palace-modeled 1887 royal palace, Italian Renaissance architecture, and Madan Mohan Bari." },
+      { title: "Sagar Dighi Heritage Lake & Baneswar Sacred Turtle Pond", pass: null, notes: "Ancient temple pond sanctifying endangered Black Softshell Turtles (Mohan). Shitalpati cane craft walk." },
+      { title: "Rasikbil Wetland Bird Sanctuary & Eco-Boating", pass: null, notes: "175-hectare lake sanctuary with migratory waterfowl, deer park, and python conservation centre." },
+      { title: "Gosanimari Archaeological Kamtapur Ruins & Torsa Embankment", pass: null, notes: "Historic 11th-15th century capital of Kamtapur Kingdom and golden hour river sunset." },
+      { title: "Koch-Rajbongshi Hearth Immersion & Village Departure", pass: null, notes: "Traditional Shorshe Ilish, Sidol chutney tasting, and direct community artisan farewell." }
+    ];
+
+    const coochbeharItineraryHi = [
+      { title: "विक्टर जुबली पैलेस और केंद्रीय विरासत कॉरिडोर", pass: null, notes: "1887 में बना भव्य शाही महल और ऐतिहासिक मदन मोहन बाड़ी मंदिर का भ्रमण।" },
+      { title: "सागर दिघी हेरिटেজ झील और बानेश्वर पवित्र कछुआ तालाब", pass: null, notes: "दुर्लभ काले कछुओं (मोहन) का प्राचीन मंदिर और शीतलपाटी हस्तशिल्प बाजार।" },
+      { title: "रसिकबिल वेटलैंड पक्षी अभयारण्य और इको-बोटिंग", pass: null, notes: "प्रवासी पक्षी, हिरण पार्क और प्राकृतिक दलदली झील का शांतिपूर्ण अनुभव।" },
+      { title: "गोसानीमारी पुरातत्व स्थल और तोर्षा नदी तट", pass: null, notes: "11वीं-15वीं सदी के कामतापुर साम्राज्य के अवशेष और सूर्यास्त का मनोरम दृश्य।" },
+      { title: "कोच-राजबंशी पारंपरिक स्वाद और प्रस्थान", pass: null, notes: "पारंपरिक सरसों इलिश, सिदोल चटनी और स्थानीय ग्रामीणों से सीधे हस्तशिल्प खरीद।" }
+    ];
+
+    const coochbeharItineraryBn = [
+      { title: "ভিক্টর জুবিলি রাজপ্রাসাদ ও মদন মোহন বাড়ি দর্শন", pass: null, notes: "১৮৮৭ সালের বাকিংহাম প্যালেসের আদলে তৈরি রাজবাড়ি ও ঐতিহ্যবাহী রাস মেলার কেন্দ্র।" },
+      { title: "সাগর দিঘি হেরিটেজ চত্বর ও বাণেশ্বর শিবমন্দিরের মোহন কচ্ছপ পুকুর", pass: null, notes: "পবিত্র কচ্ছপ সংরক্ষণ পুকুর ও শীতলপাটি বেতের হস্তশিল্প সমবায় পরিদর্শন।" },
+      { title: "রসিকবিল জলাভূমি পক্ষী অভয়ারণ্য ও ইকো-বোটিং", pass: null, notes: "পরিযায়ী পাখির কলকাকলি, হরিণ পার্ক ও ১৭৫ হেক্টর শান্ত প্রাকৃতিক হ্রদ।" },
+      { title: "গোসানিমারী প্রাচীন কমতাপুরের প্রত্নতাত্ত্বিক ঢিবি ও তোর্ষা নদী", pass: null, notes: "একাদশ-পঞ্চদশ শতাব্দীর ঐতিহাসিক কামতাপুর সাম্রাজ্যের ধ্বংসাবশেষ ও তোর্ষার সূর্যাস্ত।" },
+      { title: "কোচ-রাজবংশী লোকসংস্কৃতি, খাঁটি খাবার ও বিদায়", pass: null, notes: "তাজা ইলিশ মাছের ঝোল, সিদল ভর্তা ও গ্রামীণ কারিগরদের থেকে সরাসরি কেনাকাটা।" }
+    ];
+
+    const thaneItineraryEn = [
+      { title: "City of Lakes Heritage: Masunda Lake & Kopineshwar Mandir", pass: null, notes: "Talao Pali boating, legendary Mamledar Misal Pav breakfast, and 810 AD Shilahara temple." },
+      { title: "Yeoor Hills Rainforest Nature Trail & Adivasi Butterfly Center", pass: null, notes: "Sanjay Gandhi National Park buffer sanctuary trek, hornbills, and hilltop Thalipeeth." },
+      { title: "Upvan Lake Arts Promenade & Gaimukh Waterfront", pass: null, notes: "Scenic Upvan lake beneath Yeoor foothills and Chenna creek Portuguese fort excursion." },
+      { title: "Agri-Koli Coastal Seafood Trail & Talao Pali Nightwalk", pass: null, notes: "Authentic Surmai/Tisrya seafood thali, lakeside falooda, and heritage church stroll." },
+      { title: "Eco-Homestay Village Breakfast & Green Transit Departure", pass: null, notes: "Zero single-use plastic, TMT electric bus connection to Central Railway." }
+    ];
+
+    const thaneItineraryHi = [
+      { title: "झीलों के शहर की विरासत: मासुंदा झील और कोपिनेश्वर मंदिर", pass: null, notes: "तलाव पाली में नौकायन, ऐतिहासिक मामलेदार मिसल पाव और 810 ई. का प्राचीन मंदिर।" },
+      { title: "यूर हिल्स वर्षावन प्रकृति ट्रेल और आदिवासी तितली केंद्र", pass: null, notes: "संजय गांधी राष्ट्रीय उद्यान का हरा-भरा वन क्षेत्र, पक्षी दर्शन और थालीपीठ नाश्ता।" },
+      { title: "उपवन झील संस्कृति सैर और गायमुख जलप्रपात", pass: null, notes: "यूर पहाड़ियों की तलहटी में सुंदर उपवन झील और घोडबंदर खाड़ी का खूबसूरत नजारा।" },
+      { title: "आग्री-कोली तटीय भोजन और तलाव पाली नाइटवॉक", pass: null, notes: "प्रामाणिक सुरमई मछली थाली, फालूदा और 1582 के ऐतिहासिक पुर्तगाली चर्च का भ्रमण।" },
+      { title: "पर्यावरण-अनुकूल होमस्टे और इलेक्ट्रिक बस से प्रस्थान", pass: null, notes: "एकल-उपयोग प्लास्टिक मुक्त यात्रा, ठाणे रेलवे स्टेशन के लिए एसी इलेक्ट्रिक बसें।" }
+    ];
+
+    const thaneItineraryBn = [
+      { title: "হ্রদের শহরের ঐতিহ্য: মাসুন্দা হ্রদ (তালাও পালি) ও কপিনেশ্বর মন্দির", pass: null, notes: "তালাও পালিতে বোটিং, বিখ্যাত মামলেদার মিসাল পাভ ও ৮১০ খ্রিস্টাব্দের প্রাচীন শিবমন্দির।" },
+      { title: "ইউর হিলস সংরক্ষিত রেইনফরেস্ট ট্রেইল ও আদিবাসী প্রজাপতি পার্ক", pass: null, notes: "সঞ্জয় গান্ধী জাতীয় উদ্যানের বনভূমি, রঙিন পাখি দর্শন ও পাহাড়ি থালিপীঠ জলখাবার।" },
+      { title: "উপবন হ্রদ সাংস্কৃতিক প্রমোদ ও গাইমুখ নদীমোহনা", pass: null, notes: "ইউর পাহাড়ের পাদদেশে উপবন হ্রদ এবং মনোরম ঘোদবন্দর খাঁড়ির প্রাচীন পর্তুগিজ দুর্গ।" },
+      { title: "আগ্রী-কোলি উপকূলীয় খাদ্যসংস্কৃতি ও রাতের তালাও পালি", pass: null, notes: "খাঁটি সুরমই মাছের থালি, নদীর কুলফি ফালুদা ও ১৫৮২ সালের ঐতিহাসিক সেন্ট জন চার্চ।" },
+      { title: "পরিবেশবান্ধব বিদায় ও ইলেকট্রিক বাস সংযোগ", pass: null, notes: "প্লাস্টিক বর্জন, মধ্য রেলওয়ে ও মুম্বাই লোকাল ট্রেনের জন্য দ্রুত পরিবেশবান্ধব যাতায়াত।" }
+    ];
+
+    function generateDynamicCityItinerary(city, l) {
+      const c = (city || "Destination").trim();
+      if (l === "hi") {
+        return [
+          { title: `${c} आगमन, सुरक्षा ब्रीफिंग और केंद्रीय धरोहर परिचय`, pass: null, notes: `स्थानीय मार्गदर्शकों से मिलें और ${c} के प्रमुख ऐतिहासिक स्थलों का भ्रमण करें।` },
+          { title: `${c} प्राकृतिक इको-ट्रेल और वन्यजीव अन्वेषण`, pass: null, notes: `एकल-उपयोग प्लास्टिक मुक्त क्षेत्र। ${c} की जैव विविधता और हरित परिदृश्यों का आनंद लें।` },
+          { title: `${c} पारंपरिक कारीगर बाजार और हस्तशिल्प संस्कृति`, pass: null, notes: `स्थानीय बुनकरों और कारीगरों से सीधे उत्पाद खरीदकर स्थानीय अर्थव्यवस्था का समर्थन करें।` },
+          { title: `प्रामाणिक क्षेत्रीय भोजन और ${c} की विरासत यात्रा`, pass: null, notes: `पारंपरिक भोजनालयों में ${c} के प्रसिद्ध व्यंजनों और स्थानीय स्वादों का आनंद लें।` },
+          { title: `${c} समुदाय विदाई और पर्यावरण-अनुकूल प्रस्थान`, pass: null, notes: `कोई निशान न छोड़ें; टिकाऊ और जिम्मेदार पर्यटन स्मृतियों के साथ प्रस्थान।` }
+        ];
+      }
+      if (l === "bn") {
+        return [
+          { title: `${c} আগমন, নিরাপত্তা পরামর্শ ও কেন্দ্রীয় ঐতিহ্য দর্শন`, pass: null, notes: `স্থানীয় প্রত্যয়িত গাইডের সাথে দেখা করুন এবং ${c}-এর প্রধান ঐতিহাসিক স্থান ঘুরে দেখুন।` },
+          { title: `${c} প্রাকৃতিক ট্রেইল ও জীববৈচিত্র্য সংরক্ষণ পদযাত্রা`, pass: null, notes: `প্লাস্টিক বর্জন এলাকা। ${c}-এর সবুজ পাহাড়, হ্রদ বা নদীর নির্মল পরিবেশ উপভোগ করুন।` },
+          { title: `${c} ঐতিহ্যবাহী কারিগর পল্লী ও লোকশিল্প অভিজ্ঞতা`, pass: null, notes: `স্থানীয় কারিগরদের সাথে সরাসরি যোগাযোগ এবং গ্রামীণ হস্তশিল্প সংগ্রহ করুন।` },
+          { title: `খাঁটি স্থানীয় খাদ্যসংস্কৃতি ও ${c}-এর ঐতিহ্য ভ্রমণ`, pass: null, notes: `${c}-এর সুস্বাদু ঐতিহ্যবাহী রান্নাবান্না ও খাঁটি খাবারের স্বাদ গ্রহণ করুন।` },
+          { title: `দায়িত্বশীল পর্যটন স্মৃতি ও ${c} থেকে পরিবেশবান্ধব প্রস্থান`, pass: null, notes: `পরিবেশ পরিষ্কার রাখুন; টেকসই ভ্রমণের সুন্দর স্মৃতি নিয়ে বাড়ি ফিরুন।` }
+        ];
+      }
+      return [
+        { title: `Arrival, Heritage Briefing & Highlights of ${c}`, pass: null, notes: `Meet local verified guides and explore the central landmark monuments of ${c}.` },
+        { title: `${c} Nature Trail & Eco-Sanctuary Exploration`, pass: null, notes: `Zero single-use plastic zone. Experience the pristine biodiversity and scenic green corridors of ${c}.` },
+        { title: `Artisan Guild Walk & Living Culture Immersion in ${c}`, pass: null, notes: `Support fair-trade indigenous artisans, weavers, and traditional craft cooperatives directly.` },
+        { title: `Authentic Regional Gastronomy & Old Town Trail in ${c}`, pass: null, notes: `Savor farm-to-table culinary specialties and heirloom recipes passed down through generations in ${c}.` },
+        { title: `Responsible Community Exchange & Eco-Departure from ${c}`, pass: null, notes: `Leave no trace; depart with lasting memories and positive local community impact.` }
+      ];
+    }
+
+    const dLower = dest.toLowerCase();
+    const isLadakh = dLower.includes("ladakh") || dLower.includes("leh");
+    const isCoochbehar = dLower.includes("coochbehar") || dLower.includes("cooch behar") || dLower.includes("koch bihar") || dLower.includes("কোচবিহার") || dLower.includes("कूचबिहार");
+    const isThane = dLower.includes("thane") || dLower.includes("thana") || dLower.includes("ठाणे");
+
+    let base;
+    if (isLadakh) {
+      base = (lang === "hi" ? ladakhItineraryHi : lang === "bn" ? ladakhItineraryBn : ladakhItineraryEn);
+    } else if (isCoochbehar) {
+      base = (lang === "hi" ? coochbeharItineraryHi : lang === "bn" ? coochbeharItineraryBn : coochbeharItineraryEn);
+    } else if (isThane) {
+      base = (lang === "hi" ? thaneItineraryHi : lang === "bn" ? thaneItineraryBn : thaneItineraryEn);
+    } else {
+      base = generateDynamicCityItinerary(dest, lang);
+    }
     
     // Safe fetch for mountain passes
     let passData = {};
@@ -1458,7 +1784,7 @@
           <div>
             <h3>${item.title}</h3>
             <p>📍 ${dest} • ${transitText} • ${budgetText} ₹${Math.round(budget / days).toLocaleString()}</p>
-            <p style="margin-top:3px; font-size:12px; color:#9db2be;">📌 <i>${notePrefix} ${item.notes}</i></p>
+            <p class="day-notes-line">📌 <i>${notePrefix} ${item.notes}</i></p>
             ${advisoryBadge}
           </div>
         </div>
@@ -1560,6 +1886,10 @@
         }
       };
     });
+
+    // Initialize user origin location detection (GPS / IP)
+    getUserDetectedOrigin();
+    tryGpsOriginDetection();
 
     // Initialize Pan-India State & Territory Explorer
     initPanIndiaExplorer();
@@ -1795,13 +2125,15 @@
     </div>`;
 
     try {
+      const userOrigin = await getUserDetectedOrigin();
       const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: q.trim(),
           session_id: agentSessionId,
-          lang: lang
+          lang: lang,
+          starting_city: userOrigin
         })
       });
 
@@ -2087,6 +2419,67 @@
     }
   }
 
+  function toggleSpeechInput(inputId, micBtnId) {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      if (typeof toast === "function") toast("Voice input is not supported in this browser. Please type your question.");
+      return;
+    }
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(micBtnId);
+    if (!input) return;
+
+    if (window._activeRecognition) {
+      window._activeRecognition.stop();
+      window._activeRecognition = null;
+      if (btn) btn.classList.remove("listening");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRec();
+      const currentLang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+      recognition.lang = currentLang === "hi" ? "hi-IN" : (currentLang === "bn" ? "bn-IN" : "en-IN");
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        if (btn) btn.classList.add("listening");
+        if (typeof toast === "function") toast("🎙️ Listening... Speak your travel question.");
+      };
+
+      recognition.onresult = (event) => {
+        if (event.results && event.results[0] && event.results[0][0]) {
+          const transcript = event.results[0][0].transcript;
+          if (transcript) {
+            input.value = transcript;
+            if (typeof window.askAI === "function") {
+              window.askAI(transcript);
+              input.value = "";
+            }
+          }
+        }
+      };
+
+      recognition.onerror = (err) => {
+        console.warn("[Voice Rec Error]:", err);
+        if (btn) btn.classList.remove("listening");
+        window._activeRecognition = null;
+      };
+
+      recognition.onend = () => {
+        if (btn) btn.classList.remove("listening");
+        window._activeRecognition = null;
+      };
+
+      window._activeRecognition = recognition;
+      recognition.start();
+    } catch (e) {
+      console.warn("[Speech Recognition Init Error]:", e);
+      if (btn) btn.classList.remove("listening");
+    }
+  }
+
   // Expose on window for cross-file and inline HTML button accessibility
   window.renderMarkdown = renderMarkdown;
   window.aiReply = aiReply;
@@ -2102,6 +2495,7 @@
   window.togglePlannerLegacyForm = togglePlannerLegacyForm;
   window.toggleFullscreenChat = toggleFullscreenChat;
   window.resetChatConsole = resetChatConsole;
+  window.toggleSpeechInput = toggleSpeechInput;
 
   // Auto-initialize if DOM is ready, or on DOMContentLoaded
   if (document.readyState === "complete" || document.readyState === "interactive") {

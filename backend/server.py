@@ -29,7 +29,7 @@ def reload_environment():
 
 reload_environment()
 
-from fastapi import FastAPI, Depends, Query, HTTPException, Header, status
+from fastapi import FastAPI, Request, Depends, Query, HTTPException, Header, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, FileResponse, Response
@@ -581,12 +581,141 @@ class AgentChatRequest(BaseModel):
     session_id: Optional[str] = None
     message: str
     lang: Optional[str] = "en"
+    starting_city: Optional[str] = None
 
 class AgentConstraintUpdateRequest(BaseModel):
     session_id: str
     key: str
     value: Any
     lang: Optional[str] = "en"
+
+# --- Geolocation & Dynamic User Origin Resolution ---
+
+SERVER_GEO_CACHE: Dict[str, Dict[str, Any]] = {}
+
+def get_server_cached_origin_city() -> Optional[str]:
+    """Returns the most recent successfully detected user origin city, or None."""
+    if SERVER_GEO_CACHE:
+        for entry in reversed(list(SERVER_GEO_CACHE.values())):
+            c = entry.get("city")
+            if c and c.lower() not in ["null", "none", "unknown"]:
+                return c
+    return None
+
+def _sync_geo_locate(lat: Optional[float], lon: Optional[float], client_ip: str, is_loopback: bool):
+    import urllib.request
+    import urllib.parse
+    import json
+
+    # 1. If GPS coordinates were provided by browser
+    if lat is not None and lon is not None:
+        cache_key = f"gps_{round(lat, 3)}_{round(lon, 3)}"
+        if cache_key in SERVER_GEO_CACHE:
+            return SERVER_GEO_CACHE[cache_key]
+
+        try:
+            url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}"
+            req_nominatim = urllib.request.Request(url, headers={"User-Agent": "BharatExplore-SIH/2.0 (tourism@bharatexplore.org)"})
+            with urllib.request.urlopen(req_nominatim, timeout=2.0) as response:
+                nom_data = json.loads(response.read().decode("utf-8"))
+                addr = nom_data.get("address", {})
+                detected_city = (
+                    addr.get("city") or 
+                    addr.get("town") or 
+                    addr.get("municipality") or 
+                    addr.get("village") or 
+                    addr.get("state_district") or 
+                    addr.get("county") or 
+                    addr.get("state")
+                )
+                if detected_city:
+                    res = {
+                        "status": "success",
+                        "source": "gps",
+                        "city": detected_city.title(),
+                        "district": addr.get("state_district", "").title(),
+                        "state": addr.get("state", "").title(),
+                        "country": addr.get("country", "India"),
+                        "lat": lat,
+                        "lon": lon
+                    }
+                    SERVER_GEO_CACHE[cache_key] = res
+                    return res
+        except Exception as e:
+            print(f"[Geo GPS Reverse Geocode Error]: {e}")
+
+    ip_cache_key = f"ip_{client_ip if not is_loopback else 'self'}"
+    if ip_cache_key in SERVER_GEO_CACHE:
+        return SERVER_GEO_CACHE[ip_cache_key]
+
+    lookup_urls = [
+        f"http://ip-api.com/json/{'' if is_loopback else client_ip}",
+        f"https://ipwho.is/{'' if is_loopback else client_ip}"
+    ]
+
+    for u in lookup_urls:
+        try:
+            req_ip = urllib.request.Request(u, headers={"User-Agent": "BharatExplore-SIH/2.0"})
+            with urllib.request.urlopen(req_ip, timeout=2.0) as response:
+                ip_data = json.loads(response.read().decode("utf-8"))
+                city = ip_data.get("city")
+                if city:
+                    res = {
+                        "status": "success",
+                        "source": "ip",
+                        "city": city.title(),
+                        "district": (ip_data.get("regionName") or ip_data.get("region") or "").title(),
+                        "state": (ip_data.get("regionName") or ip_data.get("region") or "").title(),
+                        "country": ip_data.get("country", "India"),
+                        "lat": ip_data.get("lat") or ip_data.get("latitude"),
+                        "lon": ip_data.get("lon") or ip_data.get("longitude"),
+                        "ip": ip_data.get("query") or ip_data.get("ip") or client_ip
+                    }
+                    SERVER_GEO_CACHE[ip_cache_key] = res
+                    return res
+        except Exception as e:
+            print(f"[Geo IP Lookup Warning for {u}]: {e}")
+
+    cached_city = get_server_cached_origin_city() or "Kolkata"
+    return {
+        "status": "fallback",
+        "source": "cached",
+        "city": cached_city,
+        "state": "West Bengal",
+        "country": "India"
+    }
+
+@app.get("/api/geo/locate")
+async def geo_locate_endpoint(
+    request: Request,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None
+):
+    """
+    Detects user's physical departure city and region asynchronously from either:
+    1. Exact GPS coordinates (lat, lon) via reverse geocoding.
+    2. Client public IP address lookup.
+    Never defaults blindly to 'Delhi'.
+    """
+    import asyncio
+    client_ip = (
+        request.headers.get("x-forwarded-for", "").split(",")[0].strip() or
+        request.headers.get("x-real-ip", "").strip() or
+        (request.client.host if request.client else "")
+    )
+    is_loopback = not client_ip or client_ip in ["127.0.0.1", "::1", "localhost"] or client_ip.startswith("192.168.") or client_ip.startswith("10.")
+
+    try:
+        return await asyncio.wait_for(asyncio.to_thread(_sync_geo_locate, lat, lon, client_ip, is_loopback), timeout=2.8)
+    except Exception as ex:
+        print(f"[Geo locate async timeout / fallback]: {ex}")
+        return {
+            "status": "fallback",
+            "source": "timeout_cached",
+            "city": get_server_cached_origin_city() or "Kolkata",
+            "state": "West Bengal",
+            "country": "India"
+        }
 
 # --- REST Endpoints ---
 
@@ -2246,6 +2375,9 @@ async def agent_chat_endpoint(req: AgentChatRequest):
     checkpoint creation, model failover (429), and rich card payloads.
     """
     session_id = req.session_id or f"sess-{uuid.uuid4().hex[:10]}"
+    sess = get_session(session_id)
+    if req.starting_city and not sess.constraints.starting_city:
+        sess.constraints.starting_city = req.starting_city
     res = await agent_planner.process_user_turn(
         session_id=session_id,
         user_message=req.message,
@@ -2298,7 +2430,7 @@ def agent_execute_all_endpoint(req: AgentChatRequest):
     if not sess.constraints.number_of_days:
         sess.constraints.number_of_days = 4
     if not sess.constraints.starting_city:
-        sess.constraints.starting_city = "Delhi"
+        sess.constraints.starting_city = req.starting_city or get_server_cached_origin_city() or "Kolkata"
     sess.is_info_complete = True
     plan_result, narrative = agent_planner.execute_plan_queue(sess, lang=req.lang or "en")
     return {

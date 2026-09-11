@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -175,6 +175,7 @@
         <option value="hi">हिं</option>
         <option value="bn">বাং</option>
       </select>
+      <button id="themeToggleBtn" title="Toggle Day / Night Mode" aria-label="Toggle theme">☀️</button>
     </div>
   </header>
 
@@ -218,15 +219,15 @@
         <p class="eyebrow" data-i18n="cul_eyebrow">CULTURE & LIVING TRADITIONS</p>
         <h2 data-i18n="cul_title">Sacred Geometry & Mountain Philosophy</h2>
         <p data-i18n="cul_sub">Understand sacred prayer flags (Lung-ta), sacred Cham masked dances, mud-brick solar architecture, and seasonal Losar celebrations through immersive storytelling.</p>
-        <div class="culture-tags">
-          <span data-i18n="cul_tag_flags">Prayer Flags (Lung-ta)</span>
-          <span data-i18n="cul_tag_cham">Cham Dances</span>
-          <span data-i18n="cul_tag_arch">Mud-Brick Architecture</span>
-          <span data-i18n="cul_tag_losar">Losar New Year</span>
-          <span data-i18n="cul_tag_cuisine">Ladakhi Cuisine</span>
-          <span data-i18n="cul_tag_pashmina">Pashmina Weaving</span>
+        <div class="culture-tags" style="display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0;">
+          <button class="culture-quick-tag" onclick="quickFilterCulture('Prayer Flag')">🚩 Prayer Flags (Lung-ta)</button>
+          <button class="culture-quick-tag" onclick="quickFilterCulture('Cham')">🎭 Sacred Cham Dances</button>
+          <button class="culture-quick-tag" onclick="quickFilterCulture('Solar')">🏛️ Mud-Brick Solar Architecture</button>
+          <button class="culture-quick-tag" onclick="quickFilterCulture('Pashmina')">🧵 Changpa Pashmina</button>
+          <button class="culture-quick-tag" onclick="quickFilterCulture('Root')">🌿 Living Root Bridges</button>
+          <button class="culture-quick-tag" onclick="quickFilterCulture('Dhokra')">🏺 Bastar Dhokra</button>
         </div>
-        <button class="btn light" id="cultureBtn" data-i18n="cul_btn">Explore Cultural Storylines with Bharat AI →</button>
+        <button class="btn light" id="cultureBtn" onclick="exploreCultureAI()" data-i18n="cul_btn">Explore Cultural Storylines with Bharat AI →</button>
       </div>
     </section>
 
@@ -238,10 +239,14 @@
           <h3>Sonic Atmosphere of the High Passes</h3>
           <p>Experience the meditative acoustic frequency of high-altitude Himalayan monasteries. Tap to synthesize a real-time resonant 280 Hz Tibetan singing bowl chime with authentic harmonic overtones.</p>
         </div>
-        <div class="sonic-controls">
+        <div class="sonic-controls" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           <button class="chime-btn" onclick="playCultureBell(280)">
             <span>🔔</span>
-            <span>Chime Tibetan Singing Bowl</span>
+            <span>280 Hz Singing Bowl</span>
+          </button>
+          <button class="chime-btn" style="background: rgba(245, 158, 11, 0.22); border-color: #f59e0b; color: #fbbf24;" onclick="playCultureBell(432)">
+            <span>🕉️</span>
+            <span>432 Hz Temple Gong</span>
           </button>
           <div class="audio-soundwaves" title="Harmonic Resonance Active">
             <span class="soundwave-bar"></span>

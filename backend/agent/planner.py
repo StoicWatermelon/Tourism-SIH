@@ -211,10 +211,7 @@ class AgentPlanner:
                 daily_alloc = 3200 if c.travel_style == "Eco-Backpacker" else (9000 if c.travel_style == "Luxury & Heritage" else 5500)
                 c.budget = float((c.number_of_days * daily_alloc * travelers) + (4500 * travelers))
 
-        # Defaults if sensible
-        if not c.starting_city:
-            c.starting_city = "Delhi"  # Default reference domestic transit hub
-
+        # Preserve existing starting city if set, do not hardcode Delhi
         return c
 
     extract_constraints_from_query = extract_constraints_heuristic
@@ -296,7 +293,7 @@ class AgentPlanner:
         7. Calculate total cost.
         """
         dest = constraints.destination or "Destination"
-        orig = constraints.starting_city or "Delhi"
+        orig = constraints.starting_city or "Your Departure Location"
         days = constraints.number_of_days or 4
 
         return [
@@ -347,7 +344,7 @@ class AgentPlanner:
         c = session.constraints
         days = c.number_of_days or 4
         dest = c.destination or "Kerala"
-        orig = c.starting_city or "Delhi"
+        orig = c.starting_city or "Kolkata"
         budget = c.budget or 25000.0
         travelers = c.number_of_travelers or 1
 
@@ -612,6 +609,8 @@ class AgentPlanner:
             c.destination = str(value)
         elif key == "travel_style":
             c.travel_style = str(value)
+        elif key in ["starting_city", "origin", "from_city"]:
+            c.starting_city = str(value).title()
 
         session.constraints = c
         # Re-execute plan with updated constraint

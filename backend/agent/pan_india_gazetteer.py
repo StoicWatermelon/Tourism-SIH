@@ -671,6 +671,391 @@ GAZETTEER_DESTINATIONS: Dict[str, Dict[str, Any]] = {
                 ]
             }
         ]
+    },
+
+    "coochbehar": {
+        "name": "Coochbehar",
+        "state": "West Bengal",
+        "terrain": "royal_heritage",
+        "aliases": ["coochbehar", "cooch behar", "coochbihar", "koch bihar", "kochbihar", "কোচবিহার", "कूचबिहार"],
+        "gateway_airport": "Cooch Behar Airport (COH - Regional) / Bagdogra International Airport (IXB - 145 km) / Rupsi Airport (RUP - 65 km)",
+        "gateway_rail": "New Cooch Behar Junction (NCB) / Cooch Behar (COB) — Vande Bharat Express & Rajdhani connectivity",
+        "local_transit_desc": "Eco-friendly battery e-rickshaws (Totos), local cycle-rickshaws, and private shared cabs",
+        "permit_info": "ASI entry ticket for Cooch Behar Royal Victor Jubilee Palace; Forest permit for Rasikbil Bird Sanctuary",
+        "emergency_hospital": "Cooch Behar Government Medical College & Hospital (Apex 24/7 Trauma Care, Ph: 03582-222222) / MJN Hospital",
+        "culinary_specialties": [
+            {"name": "Shorshe Ilish & Bhetki Paturi with steamed Gobindobhog rice", "price": 280},
+            {"name": "Royal Chhanar Jilapi, Bhapa Sandesh & Rasgulla", "price": 80},
+            {"name": "Traditional Koch-Rajbongshi Sidol fish chutney & crispy Bora", "price": 140}
+        ],
+        "hotels": [
+            {"name": "Hotel Royal Palace & Heritage Suites", "category": "Heritage Comfort Stay", "price": 2400, "rating": 4.7, "location": "Near Cooch Behar Palace, Coochbehar"},
+            {"name": "Rasikbil Eco Forest Lodge & Lake Homestay", "category": "Eco Wetland Lodge", "price": 1600, "rating": 4.6, "location": "Rasikbil Sanctuary, Coochbehar"},
+            {"name": "The Maharaja Heritage Inn", "category": "Classic Heritage Hotel", "price": 3200, "rating": 4.8, "location": "Sagar Dighi Square, Coochbehar"}
+        ],
+        "clusters": [
+            {
+                "theme": "Royal Koch Dynasty Heritage & Sacred Shrines",
+                "area": "Victor Jubilee Palace & Central Heritage Corridor",
+                "activities": [
+                    {"time": "08:30 AM", "title": "Traditional Koch Breakfast of Radhaballabhi & Chhanar Jilapi", "loc": "Bhavani Ganj Market", "cat": "Food", "dur": 45, "transit": 0, "cost": 90, "tip": "Fresh fluffy lentil-stuffed pooris with aromatic Chhanar Jilapi sweets."},
+                    {"time": "09:30 AM", "title": "Cooch Behar Royal Palace (Victor Jubilee Palace)", "loc": "Victor Jubilee Palace Complex", "cat": "Heritage", "dur": 150, "transit": 10, "cost": 50, "tip": "Modeled after Buckingham Palace in 1887 under Maharaja Nripendra Narayan; marvel at the classical Italian Renaissance facade."},
+                    {"time": "12:15 PM", "title": "Historic Madan Mohan Bari Darshan", "loc": "Madan Mohan Square", "cat": "Heritage", "dur": 60, "transit": 10, "cost": 0, "tip": "1889 royal temple dedicated to Lord Madan Mohan (Krishna), celebrated for the grand annual Ras Mela festival."},
+                    {"time": "01:30 PM", "title": "Authentic Koch-Rajbongshi & Bengali Thali Lunch", "loc": "Sagar Dighi Court", "cat": "Food", "dur": 60, "transit": 10, "cost": 250, "tip": "Savor Shorshe Ilish, Moong Dal, Jhuri Aloo Bhaja, and seasonal Koch delicacies."},
+                    {"time": "03:00 PM", "title": "Sagar Dighi Heritage Lake & Promenade Walk", "loc": "Sagar Dighi", "cat": "Nature", "dur": 75, "transit": 5, "cost": 0, "tip": "Expansive 19th-century royal square lake bordered by heritage red-brick administrative buildings."},
+                    {"time": "04:30 PM", "title": "Baneswar Shiva Temple & Sacred Turtle Pond", "loc": "Baneswar (10 km)", "cat": "Heritage", "dur": 90, "transit": 20, "cost": 0, "tip": "Ancient temple pond sanctifying rare endangered Black Softshell Turtles locally known as Mohan."},
+                    {"time": "06:30 PM", "title": "Evening Illuminated Palace Gardens & Shitalpati Craft Walk", "loc": "Palace Grounds", "cat": "Rest", "dur": 60, "transit": 15, "cost": 0, "tip": "Browse authentic handwoven Shitalpati cane mats crafted by indigenous rural artisans."}
+                ]
+            },
+            {
+                "theme": "Wildlife Sanctuaries & Ancient Kamtapur Ruins",
+                "area": "Rasikbil Wetland & Gosanimari Archaeological Corridor",
+                "activities": [
+                    {"time": "07:00 AM", "title": "Scenic Rural Drive to Rasikbil Wetland Sanctuary", "loc": "Rasikbil Road", "cat": "Transit", "dur": 60, "transit": 45, "cost": 0, "tip": "Serene drive through Dooars tea gardens and rural riverbanks."},
+                    {"time": "08:15 AM", "title": "Birdwatching & Eco-Boating on Rasikbil Wetland Lake", "loc": "Rasikbil Bird Sanctuary", "cat": "Nature", "dur": 120, "transit": 0, "cost": 120, "tip": "Spot migratory waterfowl, whistling ducks, storks, and kingfishers on the 175-hectare lake."},
+                    {"time": "10:30 AM", "title": "Rasikbil Deer Park & Python Rehabilitation Centre", "loc": "Rasikbil Eco Park", "cat": "Nature", "dur": 60, "transit": 5, "cost": 30, "tip": "Conservation centre for spotted deer, tortoises, and rescued marsh pythons."},
+                    {"time": "12:30 PM", "title": "Village Eco-Homestay Fresh Fish & Rice Lunch", "loc": "Rasikbil Forest Village", "cat": "Food", "dur": 60, "transit": 10, "cost": 180, "tip": "Zero-mile pond fish curry prepared with freshly ground mustard and native herbs."},
+                    {"time": "02:30 PM", "title": "Gosanimari Archaeological Excavation & Rajpat Mound", "loc": "Gosanimari (Dinhata)", "cat": "Heritage", "dur": 90, "transit": 25, "cost": 0, "tip": "Ancient capital of the Kamtapur Kingdom (11th-15th century) featuring historic ramparts and stone artifacts."},
+                    {"time": "04:30 PM", "title": "Kameshwari Temple & Sacred Kamteshwari Shrine", "loc": "Gosanimari", "cat": "Heritage", "dur": 45, "transit": 10, "cost": 0, "tip": "Historic shrine rebuilt by Maharaja Pran Narayan in 1665 AD."},
+                    {"time": "05:45 PM", "title": "Torsa River Embankment Golden Hour Sunset", "loc": "Torsa River Ghat", "cat": "Rest", "dur": 60, "transit": 20, "cost": 0, "tip": "Watch fishermen cast their nets across the golden waters of the Torsa River."}
+                ]
+            }
+        ]
+    },
+
+    "thane": {
+        "name": "Thane",
+        "state": "Maharashtra",
+        "terrain": "lake_city_nature",
+        "aliases": ["thane", "thana", "ठाणे", "city of lakes", "yeoor", "upvan"],
+        "gateway_airport": "Chhatrapati Shivaji Maharaj International Airport Mumbai (BOM - 24 km via Eastern Express Highway)",
+        "gateway_rail": "Thane Railway Station (TNA) — Historic terminus of India's 1st passenger train (1853), Central & Trans-Harbour hub",
+        "local_transit_desc": "Thane Municipal Transport (TMT) AC electric buses, autorickshaws, and Mumbai Suburban local trains",
+        "permit_info": "Yeoor Hills / Sanjay Gandhi National Park buffer zone nature entry ticket",
+        "emergency_hospital": "Jupiter Hospital Apex Multi-Specialty & 24/7 Trauma Care (Eastern Express Highway, Ph: 022-21725555) / Bethany Hospital",
+        "culinary_specialties": [
+            {"name": "Legendary Mamledar Misal Pav (Spicy sprout curry with fresh pav & farsan)", "price": 95},
+            {"name": "Crispy Kothimbir Vadi & Multi-Grain Thalipeeth with homemade white butter", "price": 130},
+            {"name": "Authentic Agri-Koli Coastal Seafood Thali (Surmai fry, Tisrya masala & Bhakri)", "price": 320}
+        ],
+        "hotels": [
+            {"name": "The Byke Suraj Plaza Pure Veg & Eco Stay", "category": "Green City Hotel", "price": 2800, "rating": 4.6, "location": "Ghodbunder Road, Thane"},
+            {"name": "Yeoor Hills Jungle Lodge & Eco Cottages", "category": "Forest Eco Retreat", "price": 2500, "rating": 4.7, "location": "Yeoor Hills, Thane"},
+            {"name": "Fortune Park LakeCity (ITC Hotel Member)", "category": "Lakefront Premium Stay", "price": 4600, "rating": 4.8, "location": "Eastern Express Highway, Thane"}
+        ],
+        "clusters": [
+            {
+                "theme": "City of Lakes & Ancient Shilahara Heritage",
+                "area": "Masunda Lake & Historic Old Thane Core",
+                "activities": [
+                    {"time": "07:30 AM", "title": "Morning Stroll & Pedal Boating at Masunda Lake (Talao Pali)", "loc": "Talao Pali Lake Promenade", "cat": "Nature", "dur": 60, "transit": 0, "cost": 50, "tip": "Thane's most iconic lake; enjoy the cool morning breeze and lakeside gardens."},
+                    {"time": "08:45 AM", "title": "Legendary Mamledar Misal Pav Breakfast", "loc": "Naupada / Station Road", "cat": "Food", "dur": 45, "transit": 10, "cost": 95, "tip": "Savor Maharashtra's world-famous spicy sprout curry topped with crispy farsan and lime."},
+                    {"time": "10:00 AM", "title": "Historic Kopineshwar Mandir Darshan", "loc": "Jambli Naka, Old Thane", "cat": "Heritage", "dur": 60, "transit": 10, "cost": 0, "tip": "Built in 810 AD by the Shilahara dynasty; houses the largest Shivalinga in Maharashtra."},
+                    {"time": "11:30 AM", "title": "St. John the Baptist Church Heritage Visit", "loc": "Masunda Lake North Bank", "cat": "Heritage", "dur": 45, "transit": 5, "cost": 0, "tip": "Historic church established by the Portuguese in 1582, famed for its carved wooden altars."},
+                    {"time": "01:00 PM", "title": "Authentic Agri-Koli Seafood / Maharashtrian Thali Lunch", "loc": "Panch Pakhadi", "cat": "Food", "dur": 60, "transit": 10, "cost": 300, "tip": "Try authentic fresh fish fry or jowar bhakri with pitla and kothimbir vadi."},
+                    {"time": "03:30 PM", "title": "Upvan Lake Sunset Promenade & Sanskriti Arts Walk", "loc": "Upvan Lake Foothills", "cat": "Nature", "dur": 90, "transit": 15, "cost": 0, "tip": "Picturesque lake nestled directly against the green backdrop of the Yeoor Hills."},
+                    {"time": "06:00 PM", "title": "Talao Pali Evening Street Food & Falooda Trail", "loc": "Talao Pali Street", "cat": "Food", "dur": 60, "transit": 15, "cost": 120, "tip": "Try famous Kulfi falooda, pani puri, and roasted corn along the promenade."}
+                ]
+            },
+            {
+                "theme": "Yeoor Hills Rainforest & Sanjay Gandhi National Park",
+                "area": "Yeoor Hills & Ghodbunder Green Corridor",
+                "activities": [
+                    {"time": "06:30 AM", "title": "Morning Rainforest Trail & Birdwatching in Yeoor Hills", "loc": "Yeoor Hills Nature Gate", "cat": "Adventure", "dur": 120, "transit": 20, "cost": 50, "tip": "Buffer sanctuary of Sanjay Gandhi National Park housing hornbills, parakeets, and peacocks."},
+                    {"time": "08:45 AM", "title": "Traditional Maharashtrian Hilltop Breakfast", "loc": "Yeoor Village Hilltop", "cat": "Food", "dur": 45, "transit": 5, "cost": 110, "tip": "Warm Thalipeeth with white butter, fresh poha, and hot cutting chai."},
+                    {"time": "10:00 AM", "title": "Yeoor Eco-Butterfly Garden & Adivasi Craft Center", "loc": "Patonapada Tribal Village", "cat": "Nature", "dur": 75, "transit": 10, "cost": 25, "tip": "Indigenous community nursery and traditional Warli and bamboo folk crafts."},
+                    {"time": "12:30 PM", "title": "Farm-Fresh Forest Homestay Maharashtrian Lunch", "loc": "Yeoor Eco Cottages", "cat": "Food", "dur": 60, "transit": 10, "cost": 220, "tip": "Wholesome rural meals cooked over clay chulhas with local seasonal produce."},
+                    {"time": "02:30 PM", "title": "Gaimukh Waterfront & Nagla Block Estuary Excursion", "loc": "Ghodbunder Creek / Gaimukh", "cat": "Nature", "dur": 90, "transit": 25, "cost": 0, "tip": "Scenic waterfront promenade overlooking the historic Portuguese Ghodbunder Fort and Ulhas river estuary."},
+                    {"time": "04:30 PM", "title": "Ghodbunder Fort Exploration", "loc": "Ghodbunder Hilltop", "cat": "Heritage", "dur": 60, "transit": 10, "cost": 0, "tip": "Historic 16th-century Portuguese and Maratha horse-trade fort overlooking the creek."},
+                    {"time": "06:00 PM", "title": "Sunset Viewpoint at Yeoor Ridge Overlooking Thane", "loc": "Yeoor Ridge Top", "cat": "Rest", "dur": 60, "transit": 20, "cost": 0, "tip": "Spectacular panoramic sunset over the forested slopes and glittering lake city skyline."}
+                ]
+            }
+        ]
+    },
+
+    "pune": {
+        "name": "Pune",
+        "state": "Maharashtra",
+        "terrain": "cultural_heritage",
+        "aliases": ["pune", "poona", "पुणे"],
+        "gateway_airport": "Pune International Airport (PNQ - Lohegaon)",
+        "gateway_rail": "Pune Junction (PUNE) / Deccan Queen & Vande Bharat Express",
+        "local_transit_desc": "Pune Metro Rail, PMPML air-conditioned buses, and autorickshaws",
+        "permit_info": "ASI ticket for Aga Khan Palace & Shaniwar Wada",
+        "emergency_hospital": "Jehangir Hospital / Ruby Hall Clinic Apex Trauma (Ph: 020-66455100)",
+        "culinary_specialties": [
+            {"name": "Kattar Puneri Misal Pav & Chitale Bandhu Bakarwadi", "price": 110},
+            {"name": "Traditional Pithla Bhakri with fiery Thecha", "price": 140},
+            {"name": "Sujata Mastani thick mango-icecream shake", "price": 120}
+        ],
+        "hotels": [
+            {"name": "Hotel Shreyas Heritage Traditional Stay", "category": "Heritage Culture Stay", "price": 2600, "rating": 4.7, "location": "Deccan Gymkhana, Pune"},
+            {"name": "Conrad Pune Luxury", "category": "Luxury City Hotel", "price": 8500, "rating": 4.9, "location": "Mangaldas Road, Pune"}
+        ],
+        "clusters": [
+            {
+                "theme": "Maratha Empire Legacy & Gandhi Memorial",
+                "area": "Shaniwar Wada & Aga Khan Palace",
+                "activities": [
+                    {"time": "08:00 AM", "title": "Puneri Misal Pav Breakfast at KataKirr", "loc": "Karve Road", "cat": "Food", "dur": 45, "transit": 0, "cost": 110, "tip": "Classic fiery Maharashtrian misal served with fresh pav and curd."},
+                    {"time": "09:15 AM", "title": "Historic Shaniwar Wada Peshwa Fort Ruins", "loc": "Bajirao Road", "cat": "Heritage", "dur": 90, "transit": 15, "cost": 25, "tip": "18th-century seat of the Peshwa rulers of the Maratha Empire with majestic Delhi Darwaza."},
+                    {"time": "11:15 AM", "title": "Aga Khan Palace & Mahatma Gandhi Memorial", "loc": "Nagar Road", "cat": "Heritage", "dur": 90, "transit": 25, "cost": 25, "tip": "Historic Italian arches where Mahatma Gandhi and Kasturba Gandhi were interned in 1942."},
+                    {"time": "01:15 PM", "title": "Authentic Maharashtrian Thali Lunch", "loc": "Deccan Gymkhana", "cat": "Food", "dur": 60, "transit": 20, "cost": 280, "tip": "Unlimited pure vegetarian meal with Puran Poli, Varan Bhaat, and Kothimbir Vadi."},
+                    {"time": "03:30 PM", "title": "Sinhagad Fort Historic Hilltop Excursion", "loc": "Sinhagad Summit (30 km)", "cat": "Adventure", "dur": 120, "transit": 45, "cost": 50, "tip": "Tanaji Malusare's heroic battle fort offering panoramic views of Khadakwasla reservoir."},
+                    {"time": "06:00 PM", "title": "Savor Sujata Mastani Drink at FC Road", "loc": "Fergusson College Road", "cat": "Food", "dur": 45, "transit": 30, "cost": 120, "tip": "Pune's signature dessert beverage blending fruit milk shake topped with ice cream."}
+                ]
+            }
+        ]
+    },
+    "murshidabad": {
+        "name": "Murshidabad",
+        "state": "West Bengal",
+        "terrain": "cultural_heritage",
+        "aliases": ["murshidabad", "mursidabad", "মুর্শিদাবাদ", "মর্শিদাবাদ", "मुर्शिदाबाद", "hazarduari"],
+        "gateway_airport": "Netaji Subhash Chandra Bose International Airport Kolkata (CCU - 200 km)",
+        "gateway_rail": "Murshidabad Railway Station / Hazarduari Express from Sealdah (SDAH)",
+        "local_transit_desc": "Electric battery Toto e-rickshaws, traditional horse-drawn tangas, and river country boats across Bhagirathi",
+        "permit_info": "Standard ASI entry ticket for Hazarduari Palace Museum; open daily except Fridays",
+        "emergency_hospital": "Murshidabad Medical College & Hospital (Apex 24/7 Trauma Care, Berhampore, Ph: 03482-252233)",
+        "culinary_specialties": [
+            {"name": "Murshidabadi Chhanabora (Caramelized cottage cheese fried dark and dipped in cardamom syrup)", "price": 120},
+            {"name": "Traditional Nawabi Shahi Dum Biryani", "price": 280},
+            {"name": "Radhaballabhi & Chholar Dal breakfast", "price": 90}
+        ],
+        "hotels": [
+            {"name": "Hotel Manjusha Heritage River View", "category": "Heritage Riverside Stay", "price": 2400, "rating": 4.7, "location": "Killa Nizamat, Murshidabad"},
+            {"name": "The Cossimbazar Palace Rajbari Heritage Stay", "category": "Aristocratic Palace Heritage", "price": 4500, "rating": 4.8, "location": "Cossimbazar, Murshidabad"}
+        ],
+        "clusters": [
+            {
+                "theme": "Nawabi Grandeur & Killa Nizamat Heritage",
+                "area": "Hazarduari Palace & Imambara Corridor",
+                "activities": [
+                    {"time": "08:30 AM", "title": "Traditional Radhaballabhi & Chhanabora Breakfast", "loc": "Chawk Bazaar", "cat": "Food", "dur": 60, "transit": 0, "cost": 120, "tip": "Freshly fried dark Chhanabora sweet paired with savory dal."},
+                    {"time": "09:30 AM", "title": "Hazarduari Palace (Palace of 1000 Doors) Museum", "loc": "Killa Nizamat", "cat": "Heritage", "dur": 150, "transit": 15, "cost": 50, "tip": "Inspect the 1837 Italian marble palace with its legendary Armoury and Nawab library."},
+                    {"time": "12:15 PM", "title": "Nizamat Imambara & Historic Clock Tower", "loc": "Imambara Complex", "cat": "Heritage", "dur": 75, "transit": 10, "cost": 0, "tip": "India's largest Shia congregation hall situated directly opposite Hazarduari."},
+                    {"time": "01:45 PM", "title": "Authentic Nawabi Rice & Murshidabadi Fish Thali", "loc": "Bhagirathi Riverside", "cat": "Food", "dur": 60, "transit": 15, "cost": 280, "tip": "Fresh Katla fish cooked in mild poppy seed postor gravy."},
+                    {"time": "03:30 PM", "title": "Katra Mosque & Jahan Kosha Cannon", "loc": "Topkhana", "cat": "Heritage", "dur": 90, "transit": 20, "cost": 25, "tip": "Nawab Murshid Quli Khan's 1723 domed tomb mosque with the giant 11-foot cannon."},
+                    {"time": "05:30 PM", "title": "Sunset Cruise on Bhagirathi River by Country Boat", "loc": "Lalbagh Ghat", "cat": "Nature", "dur": 60, "transit": 15, "cost": 250, "tip": "Serene evening water breeze reflecting the floodlit palaces."}
+                ]
+            },
+            {
+                "theme": "Aristocratic Rajbaris, Silk Weaving & Motijheel Ecology",
+                "area": "Kathgola, Nashipur & Cossimbazar Corridor",
+                "activities": [
+                    {"time": "08:00 AM", "title": "Traditional Kochur Torkari & Luchi Breakfast", "loc": "Lalbagh Bazaar", "cat": "Food", "dur": 45, "transit": 0, "cost": 90, "tip": "Hot puffed deep-fried wheat breads served with spiced colocasia potato curry."},
+                    {"time": "09:00 AM", "title": "Kathgola Gardens & Adinath Jain Temple", "loc": "Kathgola Palace Complex", "cat": "Heritage", "dur": 105, "transit": 15, "cost": 40, "tip": "Splendid marble palace set in ornate Italian gardens with a historic Adinath temple."},
+                    {"time": "11:00 AM", "title": "Nashipur Rajbari & Old Palace Grounds", "loc": "Nashipur", "cat": "Heritage", "dur": 75, "transit": 10, "cost": 30, "tip": "Miniature replica of Hazarduari Palace built by Raja Debi Singha."},
+                    {"time": "12:45 PM", "title": "Authentic Postor Bora & Bengali Fish Thali", "loc": "Berhampore Highway Dining", "cat": "Food", "dur": 60, "transit": 15, "cost": 240, "tip": "Crispy poppy-seed fritters paired with mustard hilsa or rohu fish curry."},
+                    {"time": "02:15 PM", "title": "Murshidabad Pure Mulberry Silk Weaving Handloom Walk", "loc": "Islampur Silk Cluster", "cat": "Culture", "dur": 90, "transit": 20, "cost": 0, "tip": "Watch master weavers create intricate Baluchari and Swarnachari silk sarees on wooden looms."},
+                    {"time": "04:15 PM", "title": "Motijheel (Pearl Lake) Eco-Park & Light & Sound Show", "loc": "Motijheel Complex", "cat": "Nature", "dur": 105, "transit": 15, "cost": 50, "tip": "Historic oxbow horseshoe lake where Ghaseti Begum lived, now a tranquil green birding sanctuary."}
+                ]
+            }
+        ]
+    },
+    "kolhapur": {
+        "name": "Kolhapur",
+        "state": "Maharashtra",
+        "terrain": "cultural_heritage",
+        "aliases": ["kolhapur", "कोल्हापुर", "কোলাপুর", "panhala", "rankala"],
+        "gateway_airport": "Chhatrapati Rajaram Maharaj Airport Kolhapur (KLH) / Pune Airport (PNQ - 235 km)",
+        "gateway_rail": "Chhatrapati Shahu Maharaj Terminus Kolhapur (KOP)",
+        "local_transit_desc": "City auto-rickshaws, municipal KMT buses, and shared tourist cabs to Panhala Fort",
+        "permit_info": "Free entry to temples; nominal state archaeology ticket for Panhala Fort monuments",
+        "emergency_hospital": "Chhatrapati Pramila Raje (CPR) Government Hospital (Apex 24/7 Trauma Care, Ph: 0231-2641555)",
+        "culinary_specialties": [
+            {"name": "Authentic Kolhapuri Misal Pav with fiery kat/rassa", "price": 100},
+            {"name": "Tambda & Pandhra Rassa with Jowar Bhakri", "price": 280},
+            {"name": "Traditional Kolhapuri Bhel & Kandi Pedha", "price": 90}
+        ],
+        "hotels": [
+            {"name": "Hotel Sayaji Kolhapur", "category": "Premium Business & Heritage Hotel", "price": 4200, "rating": 4.8, "location": "Old Pune-Bangalore Highway, Kolhapur"},
+            {"name": "Veer Shivaji Heritage Homestay", "category": "Traditional Maratha Homestay", "price": 1800, "rating": 4.6, "location": "Near Rankala Lake, Kolhapur"}
+        ],
+        "clusters": [
+            {
+                "theme": "Sacred Mahalakshmi & Maratha Royal Heritage",
+                "area": "Bhavani Mandap & New Palace Corridor",
+                "activities": [
+                    {"time": "07:30 AM", "title": "Historic Shri Ambabai (Mahalakshmi) Temple Darshan", "loc": "Mahalakshmi Complex", "cat": "Heritage", "dur": 90, "transit": 0, "cost": 0, "tip": "7th-century Chalukya architectural marvel; one of the 51 sacred Shakti Peethas."},
+                    {"time": "09:15 AM", "title": "Iconic Phadtare Misal Pav Breakfast", "loc": "Udyam Nagar", "cat": "Food", "dur": 45, "transit": 15, "cost": 100, "tip": "Mild or fiery rassa served with fresh soft pav and diced onions."},
+                    {"time": "10:30 AM", "title": "Chhatrapati Shahu Maharaj New Palace Museum", "loc": "New Palace Grounds", "cat": "Heritage", "dur": 120, "transit": 15, "cost": 60, "tip": "Black polished stone palace housing authentic Maratha armory, royal throne, and letters."},
+                    {"time": "01:00 PM", "title": "Authentic Kolhapuri Thali Lunch", "loc": "Deval Club Road", "cat": "Food", "dur": 60, "transit": 15, "cost": 280, "tip": "Savor Pithla Bhakri or traditional Tambda and Pandhra Rassa."},
+                    {"time": "03:00 PM", "title": "Scenic Excursion to Panhala Hill Fort (20 km)", "loc": "Panhala Fort", "cat": "Adventure", "dur": 150, "transit": 35, "cost": 50, "tip": "Largest Deccan fort; explore Sajja Kothi, Ambarkhana granaries, and Teen Darwaza."},
+                    {"time": "06:00 PM", "title": "Evening Walk & Sunset at Rankala Lake Promenade", "loc": "Rankala Lake", "cat": "Rest", "dur": 60, "transit": 30, "cost": 0, "tip": "Historic lake with view of Shalini Palace; enjoy local bhel puri and cool breezes."}
+                ]
+            }
+        ]
+    },
+    "nashik": {
+        "name": "Nashik",
+        "state": "Maharashtra",
+        "terrain": "spiritual_heritage",
+        "aliases": ["nashik", "nasik", "नासिक", "नाशिक", "trimbakeshwar", "sula"],
+        "gateway_airport": "Nashik Airport Ozar (ISK - 20 km) / Mumbai International (BOM - 165 km)",
+        "gateway_rail": "Nashik Road Railway Station (NK) with direct Vande Bharat Express connectivity",
+        "local_transit_desc": "City auto-rickshaws, Citilinc AC city buses, and shared taxis to Trimbakeshwar",
+        "permit_info": "Free entry to temples; VIP pass available online for Trimbakeshwar Jyotirlinga darshan",
+        "emergency_hospital": "Nashik District Civil Hospital & Apollo Hospitals (Apex 24/7 Trauma Care, Ph: 0253-2572038)",
+        "culinary_specialties": [
+            {"name": "Sadhana Chulivarchi Misal cooked on wood-fire", "price": 120},
+            {"name": "Khandeshi Shev Bhaji with Hot Jowar Bhakri", "price": 160},
+            {"name": "Fresh Vineyard Table Grapes & Modak", "price": 90}
+        ],
+        "hotels": [
+            {"name": "The Source at Sula Vineyards", "category": "Luxury Vineyard Resort", "price": 8500, "rating": 4.9, "location": "Gangapur Dam, Nashik"},
+            {"name": "Hotel Panchavati Yatri Heritage", "category": "Central Pilgrim & Heritage Stay", "price": 2200, "rating": 4.6, "location": "Vakil Wadi, Nashik"}
+        ],
+        "clusters": [
+            {
+                "theme": "Sacred Godavari Ghats & Panchavati Ramayana Trail",
+                "area": "Panchavati & Ramkund Heritage Zone",
+                "activities": [
+                    {"time": "07:30 AM", "title": "Holy Dip & Aarti at Ramkund on Sacred Godavari River", "loc": "Ramkund Ghat", "cat": "Heritage", "dur": 60, "transit": 0, "cost": 0, "tip": "Kumbh Mela sacred ghat where Lord Rama performed rituals during exile."},
+                    {"time": "08:45 AM", "title": "Sadhana Woodfire Chulivarchi Misal Breakfast", "loc": "Gangapur Road", "cat": "Food", "dur": 60, "transit": 20, "cost": 120, "tip": "Served with jalebi, papad, and fresh thick buttermilk."},
+                    {"time": "10:15 AM", "title": "Kalaram Temple & Sita Gufa Cave Exploration", "loc": "Panchavati", "cat": "Heritage", "dur": 90, "transit": 15, "cost": 0, "tip": "Spectacular black stone temple and the five sacred banyan trees of Panchavati."},
+                    {"time": "01:00 PM", "title": "Traditional Maharashtrian Thali Lunch", "loc": "College Road", "cat": "Food", "dur": 60, "transit": 15, "cost": 240, "tip": "Authentic regional lunch featuring Shev Bhaji, Varan Bhaat, and seasonal sweets."},
+                    {"time": "02:45 PM", "title": "Pandavleni Buddhist Caves & Ancient Water Cisterns", "loc": "Pandavleni Hill", "cat": "Heritage", "dur": 120, "transit": 20, "cost": 25, "tip": "24 Hinayana rock-cut caves carved into the hillside dating from 2nd century BC."},
+                    {"time": "05:15 PM", "title": "Sunset & Wine Trail Tour at Sula Vineyards", "loc": "Govardhan Village", "cat": "Nature", "dur": 90, "transit": 20, "cost": 400, "tip": "Stroll through manicured vineyards overlooking the serene Gangapur reservoir."}
+                ]
+            }
+        ]
+    },
+    "agra": {
+        "name": "Agra",
+        "state": "Uttar Pradesh",
+        "terrain": "monumental_heritage",
+        "aliases": ["agra", "taj mahal", "आगरा", "আগ্রা", "fatehpur sikri"],
+        "gateway_airport": "Agra Airport Kheria (AGR) / Delhi International Airport (DEL - 200 km)",
+        "gateway_rail": "Agra Cantt (AGC) / Gatimaan Express (100 mins from Delhi Hazrat Nizamuddin)",
+        "local_transit_desc": "Electric battery golf carts, CNG auto-rickshaws, and prepaid tourist cabs",
+        "permit_info": "ASI ticket for Taj Mahal & Agra Fort; Taj Mahal is strictly CLOSED on Fridays",
+        "emergency_hospital": "S.N. Medical College & Hospital (Apex Government 24/7 Trauma Care, Ph: 0562-2260353)",
+        "culinary_specialties": [
+            {"name": "Agra Petha (Kesar, Angoori, and Chocolate)", "price": 140},
+            {"name": "Bedmi Puri & Spicy Dubki Aloo breakfast", "price": 90},
+            {"name": "Mughlai Paneer Pasanda & Roomali Roti", "price": 260}
+        ],
+        "hotels": [
+            {"name": "ITC Mughal Luxury Collection", "category": "5-Star Heritage Luxury", "price": 8500, "rating": 4.9, "location": "Fatehabad Road, Agra"},
+            {"name": "Coral Tree Eco Homestay", "category": "Certified Green Homestay", "price": 2400, "rating": 4.8, "location": "Near Taj East Gate, Agra"}
+        ],
+        "clusters": [
+            {
+                "theme": "UNESCO Mughal Marvels & Yamuna Riverfront",
+                "area": "Taj Mahal & Agra Fort Corridor",
+                "activities": [
+                    {"time": "06:00 AM", "title": "Sunrise Spectacle at the Taj Mahal (UNESCO)", "loc": "Taj Mahal East Gate", "cat": "Heritage", "dur": 150, "transit": 0, "cost": 50, "tip": "Arrive at dawn for ethereal soft morning light and fewest crowds."},
+                    {"time": "09:00 AM", "title": "Traditional Bedmi Puri & Jalebi Breakfast", "loc": "Kinari Bazaar", "cat": "Food", "dur": 45, "transit": 15, "cost": 100, "tip": "Hot puffed urad dal puris with spiced potato curry."},
+                    {"time": "10:15 AM", "title": "Agra Fort (Red Sandstone Citadel & Jahangiri Mahal)", "loc": "Agra Fort Complex", "cat": "Heritage", "dur": 120, "transit": 15, "cost": 50, "tip": "Explore Diwan-i-Khas, Sheesh Mahal, and Shah Jahan's octagonal prison tower (Musamman Burj)."},
+                    {"time": "01:00 PM", "title": "Authentic Mughlai Culinary Lunch", "loc": "Fatehabad Road", "cat": "Food", "dur": 60, "transit": 15, "cost": 320, "tip": "Rich saffron korma, paneer tikka, and soft sheermal flatbread."},
+                    {"time": "02:45 PM", "title": "Itmad-ud-Daulah (The Baby Taj) & Marble Inlay Walk", "loc": "Yamuna River Bank", "cat": "Heritage", "dur": 90, "transit": 20, "cost": 30, "tip": "Exquisite pietra dura inlay marble work predating the Taj Mahal."},
+                    {"time": "05:00 PM", "title": "Sunset View of Taj Mahal from Mehtab Bagh Gardens", "loc": "Mehtab Bagh", "cat": "Nature", "dur": 90, "transit": 20, "cost": 25, "tip": "Charbagh garden complex across the river reflecting the sunset glow on the white marble."}
+                ]
+            }
+        ]
+    },
+    "shimla": {
+        "name": "Shimla",
+        "state": "Himachal Pradesh",
+        "terrain": "himalayan_hill_station",
+        "aliases": ["shimla", "simla", "शिमला", "শিমলা", "kufri", "mall road"],
+        "gateway_airport": "Shimla Airport Jubbarhatti (SLV - 22 km) / Chandigarh International (IXC - 120 km)",
+        "gateway_rail": "Kalka-Shimla UNESCO Mountain Heritage Toy Train / Shimla Railway Station",
+        "local_transit_desc": "Strictly pedestrianized Mall Road (No vehicles allowed); HP Tourism electric golf carts & shared taxis",
+        "permit_info": "No special permits required for Indian or foreign nationals",
+        "emergency_hospital": "Indira Gandhi Medical College & Hospital (IGMC Shimla, Apex Trauma Center, Ph: 0177-2804251)",
+        "culinary_specialties": [
+            {"name": "Pahadi Chana Madra & Rice", "price": 180},
+            {"name": "Warm Steamed Siddu with Pure Desi Ghee", "price": 120},
+            {"name": "Traditional Tudkiya Bhath & Plum Wine Cake", "price": 160}
+        ],
+        "hotels": [
+            {"name": "The Oberoi Cecil Heritage", "category": "Luxury Colonial Heritage", "price": 11500, "rating": 4.9, "location": "Chaura Maidan, Shimla"},
+            {"name": "Pineview Eco Homestay & Heritage Cottage", "category": "Pine Forest Eco Homestay", "price": 2400, "rating": 4.7, "location": "Jakhoo Hill, Shimla"}
+        ],
+        "clusters": [
+            {
+                "theme": "Colonial Mall Road, The Ridge & Jakhoo Hill",
+                "area": "The Ridge & Jakhoo Peak Corridor",
+                "activities": [
+                    {"time": "08:00 AM", "title": "Traditional Pahadi Breakfast of Siddu & Ghee", "loc": "Mall Road Cafe", "cat": "Food", "dur": 60, "transit": 0, "cost": 140, "tip": "Steamed walnut-poppy seed yeast bread dipped in hot melted ghee."},
+                    {"time": "09:15 AM", "title": "Historic Christ Church & The Ridge Promenade Walk", "loc": "The Ridge", "cat": "Heritage", "dur": 75, "transit": 10, "cost": 0, "tip": "North India's second oldest church with neo-Gothic stained glass windows."},
+                    {"time": "10:45 AM", "title": "Jakhoo Ropeway Cable Car to Hanuman Temple Summit", "loc": "Jakhoo Hill (8,050 ft)", "cat": "Adventure", "dur": 90, "transit": 15, "cost": 500, "tip": "Highest peak in Shimla with giant 108-foot Hanuman statue and Himalayan panorama."},
+                    {"time": "01:00 PM", "title": "Himachali Dham Thali Lunch", "loc": "Lakkar Bazaar", "cat": "Food", "dur": 60, "transit": 15, "cost": 260, "tip": "Traditional celebratory feast of Chana Madra, Khatta, and Meetha Bhaat."},
+                    {"time": "02:45 PM", "title": "Viceregal Lodge (Indian Institute of Advanced Study)", "loc": "Observatory Hill", "cat": "Heritage", "dur": 120, "transit": 20, "cost": 100, "tip": "Majestic Scottish baronial castle where historic Indian independence pacts were drawn."},
+                    {"time": "05:30 PM", "title": "Sunset Stroll & Wooden Toy Souvenirs at Lakkar Bazaar", "loc": "Lakkar Bazaar", "cat": "Rest", "dur": 60, "transit": 15, "cost": 0, "tip": "Support local artisans carving walnut and deodar wood artifacts."}
+                ]
+            }
+        ]
+    },
+    "alleppey": {
+        "name": "Alleppey",
+        "state": "Kerala",
+        "terrain": "backwaters_lagoon",
+        "aliases": ["alleppey", "alappuzha", "आलप्पुझा", "আলেপ্পি", "vembanad"],
+        "gateway_airport": "Cochin International Airport (COK - 85 km) / Trivandrum International (TRV - 150 km)",
+        "gateway_rail": "Alappuzha Railway Station (ALLP) with direct coastal express trains",
+        "local_transit_desc": "Government SWTD public passenger water ferries, rented canoes, and solar e-boats",
+        "permit_info": "Verify DTPC Green Palm eco-certification on all houseboats",
+        "emergency_hospital": "Government T.D. Medical College Hospital (Apex 24/7 Trauma Care, Vandanam, Ph: 0477-2282015)",
+        "culinary_specialties": [
+            {"name": "Karimeen Pollichathu (Pearl spot fish wrapped in banana leaf)", "price": 350},
+            {"name": "Kuttanad Backwater Duck Roast & Rice Appam", "price": 280},
+            {"name": "Steamed Puttu & Kadala Curry with Coconut", "price": 90}
+        ],
+        "hotels": [
+            {"name": "Kanoos Luxury Backwater Eco Houseboat", "category": "Solar-Electric Certified Houseboat", "price": 9500, "rating": 4.9, "location": "Punnamada Jetty, Alleppey"},
+            {"name": "Marari Green Village Eco Homestay", "category": "Coastal Village Homestay", "price": 2200, "rating": 4.7, "location": "Mararikulam, Alleppey"}
+        ],
+        "clusters": [
+            {
+                "theme": "Vembanad Backwaters, Canal Villages & Paddy Trails",
+                "area": "Punnamada Lake & Kuttanad Waterway Corridor",
+                "activities": [
+                    {"time": "07:30 AM", "title": "Traditional Appam & Stew Breakfast by the Canal", "loc": "Finishing Point Jetty", "cat": "Food", "dur": 45, "transit": 0, "cost": 120, "tip": "Fresh fermented rice hoppers with fragrant coconut milk vegetable stew."},
+                    {"time": "08:30 AM", "title": "Morning Village Canoe Cruise through Narrow Canals", "loc": "Kainakary Waterways", "cat": "Nature", "dur": 120, "transit": 15, "cost": 400, "tip": "Glide silently through rural waterways beneath swaying coconut palms."},
+                    {"time": "11:00 AM", "title": "Kuttanad Below-Sea-Level Farming Exploration", "loc": "Kuttanad Delta", "cat": "Culture", "dur": 90, "transit": 20, "cost": 0, "tip": "One of the few places in the world where farming is practiced 4 to 10 ft below sea level."},
+                    {"time": "01:00 PM", "title": "Authentic Sadya & Grilled Karimeen Lunch", "loc": "Canalside Toddy Shop Dining", "cat": "Food", "dur": 60, "transit": 15, "cost": 320, "tip": "Fresh pearl spot fish marinated in spices, wrapped in plantain leaf and pan-roasted."},
+                    {"time": "03:00 PM", "title": "Alappuzha Historic Lighthouse & Teak Pier Beach Walk", "loc": "Alappuzha Beach", "cat": "Heritage", "dur": 90, "transit": 20, "cost": 40, "tip": "Climb the 1862 spiral staircase for 360-degree views of the Arabian Sea."},
+                    {"time": "05:30 PM", "title": "Sunset Cruise on Vembanad Lake by Public Solar Ferry", "loc": "Vembanad Waters", "cat": "Rest", "dur": 75, "transit": 15, "cost": 50, "tip": "Zero-emission solar boat with panoramic views of migratory birds returning to roost."}
+                ]
+            }
+        ]
+    },
+    "munnar": {
+        "name": "Munnar",
+        "state": "Kerala",
+        "terrain": "highland_tea_valley",
+        "aliases": ["munnar", "मुन्नार", "মুন্নার", "eravikulam", "mattupetty"],
+        "gateway_airport": "Cochin International Airport (COK - 110 km) / Madurai Airport (IXM - 140 km)",
+        "gateway_rail": "Aluva Railway Station (AWY - 110 km) or Ernakulam Junction (ERS)",
+        "local_transit_desc": "Local mountain jeeps, auto-rickshaws, and eco-buses inside National Parks",
+        "permit_info": "Online advance booking recommended for Eravikulam National Park (Rajamalai safari)",
+        "emergency_hospital": "Tata Tea General Hospital (Apex 24/7 Highland Emergency, Nullatanni, Ph: 04865-230457)",
+        "culinary_specialties": [
+            {"name": "Organic Highland Green/Black Tea with Cardamom", "price": 40},
+            {"name": "Lacy Appam with Coconut Milk Stew", "price": 110},
+            {"name": "Kerala Malabar Parotta with Pepper Roast", "price": 180}
+        ],
+        "hotels": [
+            {"name": "Windermere Estate Heritage Plantation", "category": "Boutique Tea Plantation Retreat", "price": 8200, "rating": 4.9, "location": "Pothamedu, Munnar"},
+            {"name": "Olive Brook Eco Homestay", "category": "Cardamom Valley Eco Homestay", "price": 2600, "rating": 4.7, "location": "Pothamedu Viewpoint Road, Munnar"}
+        ],
+        "clusters": [
+            {
+                "theme": "Tea Plantations, Eravikulam Wildlife & Anamudi Views",
+                "area": "Rajamalai & Mattupetty Corridor",
+                "activities": [
+                    {"time": "07:30 AM", "title": "Puttu & Kadala Breakfast with Fresh Cardamom Tea", "loc": "Munnar Town Bazaar", "cat": "Food", "dur": 45, "transit": 0, "cost": 100, "tip": "Fragrant high-grown orthodox tea paired with steamed rice cylinders."},
+                    {"time": "08:30 AM", "title": "Eravikulam National Park (Home of Nilgiri Tahr)", "loc": "Rajamalai Sanctuary", "cat": "Nature", "dur": 150, "transit": 20, "cost": 200, "tip": "Observe the endangered mountain goat and view South India's highest summit, Anamudi (8,842 ft)."},
+                    {"time": "11:30 AM", "title": "KDHP Tea Museum & Artisan Factory Tour", "loc": "Nullatanni Estate", "cat": "Heritage", "dur": 90, "transit": 15, "cost": 125, "tip": "Witness orthodox CTC tea processing demonstration and professional tea tasting session."},
+                    {"time": "01:30 PM", "title": "Traditional Kerala Meal on Plantain Leaf", "loc": "Old Munnar", "cat": "Food", "dur": 60, "transit": 10, "cost": 200, "tip": "Avial, sambar, thoran, and fresh buttermilk served with red rice."},
+                    {"time": "03:00 PM", "title": "Mattupetty Dam & Eco-Boating over Mountain Reservoir", "loc": "Mattupetty Dam", "cat": "Adventure", "dur": 90, "transit": 25, "cost": 300, "tip": "Surrounded by rolling tea gardens and Shola forests; watch for wild elephants at water edge."},
+                    {"time": "05:00 PM", "title": "Echo Point & Kundala Lake Sunset Walk", "loc": "Echo Point", "cat": "Nature", "dur": 75, "transit": 15, "cost": 0, "tip": "Natural acoustic echo phenomenon amid serene pine and eucalyptus hills."}
+                ]
+            }
+        ]
     }
 }
 

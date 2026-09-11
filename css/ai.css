@@ -2302,3 +2302,1284 @@
   border-color: #ef4444;
 }
 
+/* ═══════════════════════════════════════════════════════
+   DARK MODE — AI / PLANNER PAGE (ai.css elements)
+   Applied via [data-theme="dark"] on <html>
+   ═══════════════════════════════════════════════════════ */
+
+/* Section wrappers that inherit the light body bg */
+[data-theme="dark"] .section,
+[data-theme="dark"] .planner-section,
+[data-theme="dark"] #planner {
+  background: transparent;
+}
+
+/* Planner AI hero — already dark, but ensure border stays visible */
+[data-theme="dark"] .planner-ai-hero {
+  background: linear-gradient(135deg, rgba(6, 20, 14, 0.98) 0%, rgba(12, 40, 26, 0.98) 100%);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+/* Textarea in the AI hero */
+[data-theme="dark"] .planner-nl-textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #e8f5e9;
+}
+
+/* Legacy form destination input (has inline background:#fff) */
+[data-theme="dark"] #planDestination {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #e2eff5 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+
+/* Progress section */
+[data-theme="dark"] .planner-progress-section {
+  background: rgba(6, 15, 10, 0.85);
+  border-color: rgba(52, 211, 153, 0.18);
+}
+
+/* Planner output narrative/question blocks */
+[data-theme="dark"] .planner-narrative-block {
+  background: rgba(6, 20, 14, 0.85);
+  border-color: rgba(52, 211, 153, 0.2);
+  color: #c8e6c9;
+}
+
+[data-theme="dark"] .planner-question-block {
+  background: linear-gradient(135deg, rgba(20, 60, 40, 0.2), rgba(6, 20, 14, 0.9));
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+[data-theme="dark"] .planner-question-text {
+  color: #e8f5e9;
+}
+
+/* Quick pills */
+[data-theme="dark"] .planner-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(52, 211, 153, 0.25);
+  color: #a7d4b8;
+}
+
+[data-theme="dark"] .planner-pill:hover {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #e8f5e9;
+}
+
+/* Legacy toggle text */
+[data-theme="dark"] .planner-legacy-toggle {
+  color: rgba(200, 230, 201, 0.5);
+}
+
+[data-theme="dark"] .planner-legacy-toggle:hover {
+  color: #74c69d;
+}
+
+/* Home plan teaser input */
+[data-theme="dark"] .home-plan-teaser {
+  background: linear-gradient(180deg, #040d09 0%, #071410 100%);
+}
+
+[data-theme="dark"] .home-plan-input {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8f5e9;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+/* AI agent cards */
+[data-theme="dark"] .agent-grid .agent-card,
+[data-theme="dark"] .agent-card {
+  background: #0c1e16 !important;
+  border-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .agent-card-name {
+  color: #e2eff5;
+}
+
+[data-theme="dark"] .agent-card-desc {
+  color: #94a3b8;
+}
+
+/* Itinerary day boxes rendered dynamically */
+[data-theme="dark"] .itinerary-day-box {
+  background: #0c1e16 !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+}
+
+[data-theme="dark"] .itinerary-day-title {
+  color: #e2eff5;
+}
+
+[data-theme="dark"] .itinerary-activity {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(52, 211, 153, 0.1);
+  color: #94a3b8;
+}
+
+/* Hotel & flight option items */
+[data-theme="dark"] .hotel-list,
+[data-theme="dark"] .flight-list {
+  background: transparent;
+}
+
+[data-theme="dark"] .hotel-name,
+[data-theme="dark"] .flight-route {
+  color: #e2eff5;
+}
+
+[data-theme="dark"] .hotel-price,
+[data-theme="dark"] .flight-price {
+  color: #74c69d;
+}
+
+/* Stat boxes in output */
+[data-theme="dark"] .stats-grid .stat-box {
+  background: #0c1e16 !important;
+  border-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .stat-label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .stat-value {
+  color: #e2eff5;
+}
+
+/* Emergency cards */
+[data-theme="dark"] .emergency-section {
+  background: rgba(20, 5, 5, 0.5);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+[data-theme="dark"] .emergency-card-box h4 {
+  color: #fca5a5;
+}
+
+/* AI Card Insight panel (cuisine page floating AI guide) */
+[data-theme="dark"] .ai-card-insight-panel {
+  background: rgba(6, 20, 14, 0.97) !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+  color: #c8e6c9;
+}
+
+[data-theme="dark"] .ai-card-insight-header {
+  background: rgba(10, 30, 20, 0.98) !important;
+  border-bottom-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+[data-theme="dark"] .ai-card-insight-title {
+  color: #e8f5e9;
+}
+
+[data-theme="dark"] .ai-card-insight-body {
+  color: #a7d4b8;
+}
+
+[data-theme="dark"] .ai-card-insight-body p,
+[data-theme="dark"] .ai-card-insight-body li {
+  color: #a7d4b8;
+}
+
+[data-theme="dark"] .ai-card-action-chat {
+  background: rgba(52, 211, 153, 0.08);
+  border-color: rgba(52, 211, 153, 0.25);
+  color: #74c69d;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AI PLANNER & CHAT ADAPTIVE STYLES (LIGHT & DARK)
+   ═══════════════════════════════════════════════════════ */
+
+/* Base Styles */
+.flight-tradeoff-box {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #f4efe4;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: #4a5568;
+  line-height: 1.4;
+}
+
+.itinerary-safety-alert {
+  background: #fff3cd;
+  color: #856404;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+.cat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.cat-name {
+  color: #1d2d44;
+  font-size: 13px;
+}
+.cat-desc {
+  font-size: 11.5px;
+  color: #5f707a;
+  margin-left: 18px;
+  margin-top: 2px;
+}
+.cat-cost-col {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.cat-cost-val {
+  color: #1b4332;
+  font-size: 13.5px;
+}
+.cat-pct {
+  font-size: 11px;
+  color: #5f707a;
+}
+
+.budget-tips-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(82, 183, 136, 0.08);
+  border: 1px solid rgba(82, 183, 136, 0.25);
+  border-radius: 8px;
+}
+.budget-tips-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #2d6a4f;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.budget-tips-box ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #264653;
+  line-height: 1.5;
+}
+.budget-tips-box li {
+  margin-bottom: 4px;
+}
+
+
+.budget-strategy-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #f4efe4;
+  border-left: 4px solid #b78628;
+  border-radius: 4px 8px 8px 4px;
+  font-size: 12px;
+  color: #3d3a37;
+  line-height: 1.45;
+}
+.budget-strategy-title {
+  color: #b78628;
+  display: block;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11px;
+}
+
+.budget-cushion-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #f0f7f3;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #1b4332;
+  line-height: 1.4;
+}
+
+.emergency-weather-alert {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: #856404;
+  background: #fff3cd;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.emergency-altitude-alert {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: #1e40af;
+  background: #dbeafe;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+/* Welcome Instruction Message Component Classes (Light & Dark) */
+.welcome-heading {
+  margin: 8px 0 4px;
+  font-size: 16.5px;
+  color: #1b4332;
+  font-weight: 800;
+}
+.welcome-sub {
+  margin: 0;
+  color: #40916c;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.welcome-divider {
+  margin: 12px 0;
+  border-top: 1px solid rgba(45, 106, 79, 0.15);
+}
+.instruction-title {
+  font-weight: 700;
+  color: #1b4332;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.instruction-list {
+  margin: 0 0 12px 18px;
+  padding: 0;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #2d3748;
+}
+.quick-prompts-box {
+  background: rgba(82, 183, 136, 0.1);
+  border: 1px solid rgba(82, 183, 136, 0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.quick-prompts-label {
+  font-weight: 700;
+  color: #1b4332;
+  font-size: 11.5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.quick-prompts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.welcome-tip {
+  margin: 0;
+  font-size: 11.5px;
+  color: #718096;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .welcome-heading {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .welcome-sub {
+  color: #74c69d !important;
+}
+[data-theme="dark"] .welcome-divider {
+  border-top-color: rgba(52, 211, 153, 0.2) !important;
+}
+[data-theme="dark"] .instruction-title {
+  color: #74c69d !important;
+}
+[data-theme="dark"] .instruction-list {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .quick-prompts-box {
+  background: rgba(52, 211, 153, 0.08) !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .quick-prompts-label {
+  color: #74c69d !important;
+}
+[data-theme="dark"] .welcome-tip {
+  color: #94a3b8 !important;
+}
+
+/* Planner AI Output Banner & CTA Box */
+.planner-ai-banner {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(82, 183, 136, 0.1);
+  border-left: 4px solid #52b788;
+  border-radius: 4px 8px 8px 4px;
+}
+.planner-ai-banner-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2d6a4f;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.planner-ai-banner-msg {
+  font-size: 13px;
+  color: #1d2d44;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.planner-ai-cta-box {
+  text-align: center;
+  margin-top: 20px;
+  padding: 16px;
+  background: #f4efe4;
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .planner-ai-banner {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-left-color: #34d399 !important;
+}
+[data-theme="dark"] .planner-ai-banner-badge {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .planner-ai-banner-msg {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .planner-ai-cta-box {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(52, 211, 153, 0.2) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE ITINERARY TEXT & CARD LEGIBILITY (SIH 2026)
+   Guarantees 100% crisp light text contrast on dark cards
+   ═══════════════════════════════════════════════════════ */
+
+/* Itinerary Day Cards & Timelines */
+[data-theme="dark"] .day-box-header {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.2) !important;
+}
+[data-theme="dark"] .day-box-title {
+  color: #6ee7b7 !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .day-box-area {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .timeline-slot-item {
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+[data-theme="dark"] .slot-time {
+  color: #34d399 !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .slot-activity-title {
+  color: #f1f5f9 !important;
+  font-weight: 700 !important;
+}
+[data-theme="dark"] .slot-meta-row,
+[data-theme="dark"] .slot-meta-row span {
+  color: #94a3b8 !important;
+}
+
+/* Agent Card Shells */
+[data-theme="dark"] .agent-card {
+  background: #0c1e16 !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+}
+[data-theme="dark"] .agent-card-title span:first-child {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .agent-card p {
+  color: #94a3b8 !important;
+}
+
+/* Flight Options */
+[data-theme="dark"] .flight-option-item {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+}
+[data-theme="dark"] .airline-badge {
+  background: rgba(52, 211, 153, 0.15) !important;
+  color: #6ee7b7 !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+[data-theme="dark"] .flight-timings {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .flight-baggage {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .flight-price-inr {
+  color: #34d399 !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .flight-fare div:last-child {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .day-price-pill {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+}
+[data-theme="dark"] .day-name {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .day-cost {
+  color: #f1f5f9 !important;
+}
+[data-theme="dark"] .deal-savings-banner {
+  background: rgba(52, 211, 153, 0.1) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+
+/* Hotel Options */
+[data-theme="dark"] .hotel-item {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+}
+[data-theme="dark"] .hotel-name {
+  color: #f1f5f9 !important;
+  font-weight: 700 !important;
+}
+[data-theme="dark"] .hotel-item-head div div:last-child {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .hotel-location-text {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .hotel-price-row {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .hotel-price-row b {
+  color: #34d399 !important;
+}
+[data-theme="dark"] .amenity-chip {
+  background: rgba(52, 211, 153, 0.12) !important;
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .hotel-rating-badge {
+  background: #92400e !important;
+  color: #fef3c7 !important;
+}
+
+/* Stat Boxes in Budget Card */
+[data-theme="dark"] .stat-box {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+}
+[data-theme="dark"] .stat-label {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .stat-val {
+  color: #f1f5f9 !important;
+}
+[data-theme="dark"] .stat-val.highlight-green {
+  color: #34d399 !important;
+}
+
+/* Emergency Safeguard Card */
+[data-theme="dark"] .emergency-card-box {
+  background: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+[data-theme="dark"] .emergency-hosp-name {
+  color: #fca5a5 !important;
+  font-weight: 700 !important;
+}
+[data-theme="dark"] .emergency-head {
+  color: #f87171 !important;
+}
+[data-theme="dark"] .emergency-contact-row span {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .emergency-contact-row b {
+  color: #fca5a5 !important;
+}
+
+/* Client-Side Itinerary Output on planner.html / home */
+[data-theme="dark"] .itinerary-output {
+  background: #081912 !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .day {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .day strong {
+  color: #fbbf24 !important;
+}
+[data-theme="dark"] .day h3 {
+  color: #f1f5f9 !important;
+}
+[data-theme="dark"] .day p {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .day p i {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .pass-advisory-badge {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #e2eff5 !important;
+}
+
+/* Native Inbuilt Chatbox on ai.html */
+[data-theme="dark"] .chat {
+  background: #081912 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  color: #e2eff5 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+}
+[data-theme="dark"] .chat-head {
+  background: #061712 !important;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.2) !important;
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .chat-head b {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .chat-head small {
+  color: #34d399 !important;
+}
+[data-theme="dark"] .chat-model-tag {
+  background: rgba(52, 211, 153, 0.12) !important;
+  color: #74c69d !important;
+  border: 1px solid rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .chat-head-btn {
+  background: rgba(52, 211, 153, 0.1) !important;
+  color: #74c69d !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .chat-head-btn:hover {
+  background: #2d6a4f !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .messages {
+  background: #081912 !important;
+}
+[data-theme="dark"] .msg.bot {
+  background: #0c231a !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .msg.bot p,
+[data-theme="dark"] .msg.bot li,
+[data-theme="dark"] .msg.bot span {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .msg.bot strong {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .msg.bot a {
+  color: #34d399 !important;
+}
+[data-theme="dark"] .msg.user {
+  background: linear-gradient(135deg, #10b981 0%, #065f46 100%) !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .chat-form {
+  background: #061712 !important;
+  border-top: 1px solid rgba(52, 211, 153, 0.2) !important;
+}
+[data-theme="dark"] .chat-form input {
+  background: #0c231a !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .chat-form input::placeholder {
+  color: #64748b !important;
+}
+[data-theme="dark"] .chat-form button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Origin Badge & Mic Styling */
+.planner-origin-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(82, 183, 136, 0.12);
+  border: 1px solid rgba(82, 183, 136, 0.35);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12.5px;
+  color: #1b4332;
+  margin-top: 10px;
+  backdrop-filter: blur(8px);
+}
+[data-theme="dark"] .planner-origin-bar {
+  background: rgba(27, 67, 50, 0.6) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+  color: #e2eff5 !important;
+}
+.detected-origin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #2d6a4f;
+  cursor: pointer;
+}
+[data-theme="dark"] .detected-origin-badge {
+  color: #6ee7b7 !important;
+}
+.origin-source-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  background: rgba(45, 106, 79, 0.15);
+  color: #1b4332;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+[data-theme="dark"] .origin-source-tag {
+  background: rgba(52, 211, 153, 0.2) !important;
+  color: #34d399 !important;
+}
+.change-origin-btn {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: #2d6a4f;
+  cursor: pointer;
+  padding: 2px 4px;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.change-origin-btn:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+[data-theme="dark"] .change-origin-btn {
+  color: #a7f3d0 !important;
+}
+.chat-origin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(82, 183, 136, 0.12);
+  border: 1px solid rgba(82, 183, 136, 0.3);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: #1b4332;
+  margin-left: 8px;
+}
+[data-theme="dark"] .chat-origin-chip {
+  background: rgba(27, 67, 50, 0.5) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+  color: #a7f3d0 !important;
+}
+.chat-mic-btn {
+  background: transparent;
+  border: 1px solid rgba(82, 183, 136, 0.35);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #2d6a4f;
+  transition: all 0.2s ease;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.chat-mic-btn:hover {
+  background: rgba(82, 183, 136, 0.15);
+  transform: scale(1.05);
+}
+.chat-mic-btn.listening {
+  background: #e63946 !important;
+  color: #fff !important;
+  border-color: #e63946 !important;
+  animation: pulseRed 1.2s infinite;
+}
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(230, 57, 70, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
+}
+[data-theme="dark"] .chat-mic-btn {
+  color: #74c69d !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+}
+.inbuilt-chat-cards-wrap {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.inbuilt-chat-cards-wrap .agent-card,
+.inbuilt-chat-cards-wrap .itinerary-day-box,
+.inbuilt-chat-cards-wrap .planner-hotel-card,
+.inbuilt-chat-cards-wrap .planner-flight-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BHARAT AI NATIVE CHAT WORKSPACE & DYNAMIC CARD CONTRAST
+   High-contrast dark mode legibility + dedicated AI console
+   ═══════════════════════════════════════════════════════ */
+
+/* Floating Chat Suppression on Dedicated AI Page */
+body.ai-page #floatingChatContainer,
+body.ai-page #floatingChatWidget,
+body.ai-page #floatingChatTrigger {
+  display: none !important;
+}
+
+/* Base Semantic Classes for Dynamic Agent Cards (Light Theme) */
+.grounded-badge-card {
+  background: linear-gradient(135deg, rgba(42, 157, 143, 0.08), rgba(82, 183, 136, 0.14));
+  border: 1px solid rgba(42, 157, 143, 0.3);
+  border-left: 4px solid #2a9d8f;
+}
+.agent-summary-text {
+  font-size: 12.5px;
+  color: #1e293b;
+  line-height: 1.55;
+  margin: 0 0 8px;
+}
+.agent-source-footer {
+  font-size: 11px;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.agent-source-link {
+  color: #047857;
+  text-decoration: underline;
+  font-weight: 700;
+  margin-left: 8px;
+}
+.fare-unit-label {
+  font-size: 10px;
+  color: #64748b;
+}
+.alt-hubs-row {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: #475569;
+}
+.hotel-subtext {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.hotel-recommendation-note {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: #475569;
+  line-height: 1.4;
+}
+.slot-tip {
+  font-size: 11px;
+  color: #065f46;
+  margin-top: 2px;
+}
+.itinerary-cluster-subtext {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 12px;
+}
+.emergency-tag {
+  background: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #f87171;
+}
+.emergency-hosp-address {
+  font-size: 11.5px;
+  color: #475569;
+  margin-top: 3px;
+}
+.day-notes-line {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #475569;
+}
+.day-diff-note {
+  font-size: 9.5px;
+  margin-top: 2px;
+  color: #64748b;
+  font-weight: 700;
+}
+.day-diff-note.best {
+  color: #047857;
+}
+.cheapest-badge {
+  font-size: 10px;
+  background: #047857;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+.stat-val.stat-val-spend {
+  color: #0d9488;
+}
+.planner-formulating-card {
+  padding: 32px 20px;
+  text-align: center;
+  background: rgba(82, 183, 136, 0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(82, 183, 136, 0.2);
+}
+.planner-formulating-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+.planner-formulating-title {
+  margin: 0 0 6px;
+  color: #047857;
+  font-size: 16px;
+  font-weight: 700;
+}
+.planner-formulating-sub {
+  font-size: 12.5px;
+  color: #475569;
+  margin: 0 0 12px;
+}
+.planner-formulating-bar {
+  display: inline-block;
+  width: 48px;
+  height: 3px;
+  background: #34d399;
+  border-radius: 99px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CRUCIAL DARK MODE OVERRIDES FOR DYNAMIC ITINERARY CARDS
+   ═══════════════════════════════════════════════════════ */
+[data-theme="dark"] .grounded-badge-card {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+  border-left-color: #34d399 !important;
+}
+[data-theme="dark"] .agent-summary-text {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .agent-source-footer {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .agent-source-link {
+  color: #34d399 !important;
+}
+[data-theme="dark"] .fare-unit-label {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .alt-hubs-row {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .alt-hubs-row b {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .hotel-subtext {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .hotel-recommendation-note {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .slot-tip {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .slot-tip i {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .itinerary-cluster-subtext {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .emergency-tag {
+  background: rgba(220, 38, 38, 0.2) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+}
+[data-theme="dark"] .emergency-hosp-address {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .day-notes-line {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .day-notes-line i {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .day-diff-note {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .day-diff-note.best {
+  color: #34d399 !important;
+}
+[data-theme="dark"] .stat-val.stat-val-spend {
+  color: #38bdf8 !important;
+}
+[data-theme="dark"] .flight-tradeoff-box {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .flight-tradeoff-box b {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .itinerary-safety-alert {
+  background: rgba(245, 158, 11, 0.16) !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  color: #fde047 !important;
+}
+[data-theme="dark"] .cat-row {
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+[data-theme="dark"] .cat-name {
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .cat-desc {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .cat-cost-val {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .cat-pct {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .budget-tips-box {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .budget-tips-title {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .budget-tips-box li {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .budget-strategy-box {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-left-color: #fbbf24 !important;
+  color: #e2eff5 !important;
+}
+[data-theme="dark"] .budget-strategy-title {
+  color: #fbbf24 !important;
+}
+[data-theme="dark"] .budget-cushion-box {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .budget-cushion-box b {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .emergency-weather-alert {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #fde047 !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+}
+[data-theme="dark"] .emergency-weather-alert b {
+  color: #fde047 !important;
+}
+[data-theme="dark"] .emergency-altitude-alert {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+}
+[data-theme="dark"] .emergency-altitude-alert b {
+  color: #93c5fd !important;
+}
+[data-theme="dark"] .planner-formulating-card {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+[data-theme="dark"] .planner-formulating-title {
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] .planner-formulating-sub {
+  color: #cbd5e1 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEDICATED NATIVE BHARAT AI CONSOLE PAGE WORKSPACE
+   ═══════════════════════════════════════════════════════ */
+.ai-console-section {
+  padding: 30px 4vw 60px;
+  background: transparent;
+  min-height: calc(100vh - 120px);
+}
+
+.ai-console-workspace {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .ai-console-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* AI Companion Control Panel (Left Sidebar) */
+.ai-console-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ai-sidebar-card {
+  background: #ffffff;
+  border: 1px solid rgba(13, 148, 136, 0.18);
+  border-radius: var(--radius-sm, 14px);
+  padding: 18px 16px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="dark"] .ai-sidebar-card {
+  background: #081912 !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+.ai-sidebar-title {
+  font-family: var(--font-main, 'Montserrat', sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent, #0d9488);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-theme="dark"] .ai-sidebar-title {
+  color: #34d399 !important;
+}
+
+.ai-mode-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-mode-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: var(--ink, #0f172a);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.ai-mode-link:hover {
+  background: rgba(13, 148, 136, 0.1);
+  border-color: #0d9488;
+  color: #0d9488;
+  transform: translateX(3px);
+}
+
+[data-theme="dark"] .ai-mode-link {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(52, 211, 153, 0.18) !important;
+  color: #e2eff5 !important;
+}
+
+[data-theme="dark"] .ai-mode-link:hover {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border-color: #34d399 !important;
+  color: #6ee7b7 !important;
+}
+
+/* Dedicated Native Chat Box on ai.html */
+.chat-native-page {
+  background: #ffffff;
+  border-radius: var(--radius, 16px);
+  border: 1.5px solid rgba(13, 148, 136, 0.25);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 180px);
+  min-height: 680px;
+  max-height: 920px;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme="dark"] .chat-native-page {
+  background: #081912 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65) !important;
+}
+
+.chat-native-page .messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+
+@media (max-width: 768px) {
+  .chat-native-page {
+    height: calc(100vh - 140px);
+    min-height: 540px;
+  }
+  .chat-native-page .messages {
+    padding: 16px;
+  }
+}
+
+.ai-quick-strip {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  background: rgba(13, 148, 136, 0.04);
+  border-top: 1px solid rgba(13, 148, 136, 0.12);
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .ai-quick-strip {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-top-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+.ai-quick-chip {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ai-quick-chip:hover {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
+}
+
+[data-theme="dark"] .ai-quick-chip {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .ai-quick-chip:hover {
+  background: #059669 !important;
+  color: #ffffff !important;
+  border-color: #34d399 !important;
+}
+
