@@ -1,0 +1,1276 @@
+
+=======================================================
+SOS CHUNKS IN: Bharat_Explore_SIH_Tourism/backend/server.py
+=======================================================
+
+--- Lines 455 to 465 ---
+ 455: @app.middleware("http")
+ 456: async def vercel_path_normalizer(request, call_next):
+ 457:     raw_path = request.url.path
+ 458:     api_prefixes = (
+ 459:         "/config", "/health", "/auth", "/user", "/admin", "/destinations",
+ 460:         "/passes", "/pass", "/journey", "/chat", "/sos"
+ 461:     )
+ 462:     if any(raw_path == p or raw_path.startswith(f"{p}/") for p in api_prefixes) and not raw_path.startswith("/api/"):
+ 463:         request.scope["path"] = f"/api{raw_path}"
+ 464: 
+ 465:     return await call_next(request)
+
+--- Lines 1401 to 1415 ---
+1401:         "notes": notes
+1402:     }
+1403: 
+1404: 
+1405: # ═══════════════════════════════════════════════════════════════════════════
+1406: #  HIGH-ALTITUDE SOS DISTRESS & EMERGENCY TELEMETRY (SIH 2026)
+1407: #  Multi-device real-time emergency dispatch & GIS map synchronization
+1408: # ═══════════════════════════════════════════════════════════════════════════
+1409: 
+1410: class SOSSignalRequest(BaseModel):
+1411:     id: Optional[str] = None
+1412:     lat: float = Field(..., description="Latitude coordinate")
+1413:     lng: float = Field(..., description="Longitude coordinate")
+1414:     location_name: Optional[str] = "Khardung La Pass Sector, Ladakh"
+1415:     emergency_type: Optional[str] = "Altitude Sickness (AMS Hypoxia)"
+
+--- Lines 1417 to 1458 ---
+1417:     traveler_name: Optional[str] = "Anonymous Traveler"
+1418:     phone: Optional[str] = ""
+1419:     altitude: Optional[str] = "17,582 ft"
+1420:     status: Optional[str] = "ACTIVE"
+1421: 
+1422: SOS_STORE_FILE = Path(__file__).resolve().parent / "sos_signals.json"
+1423: 
+1424: def _load_sos_signals_from_disk() -> dict:
+1425:     try:
+1426:         if SOS_STORE_FILE.exists():
+1427:             content = SOS_STORE_FILE.read_text(encoding="utf-8")
+1428:             if content.strip():
+1429:                 return json.loads(content)
+1430:     except Exception as _e:
+1431:         print(f"[SOS] Error loading from {SOS_STORE_FILE}: {_e}")
+1432:     return {}
+1433: 
+1434: def _save_sos_signals_to_disk(signals: dict):
+1435:     try:
+1436:         SOS_STORE_FILE.write_text(json.dumps(signals, indent=2), encoding="utf-8")
+1437:     except Exception as _e:
+1438:         print(f"[SOS] Error saving to {SOS_STORE_FILE}: {_e}")
+1439: 
+1440: _ephemeral_sos_signals: dict = _load_sos_signals_from_disk()
+1441: 
+1442: @app.post("/api/sos")
+1443: @app.post("/sos")
+1444: def broadcast_sos_signal(
+1445:     payload: SOSSignalRequest,
+1446:     current_user: Optional[dict] = Depends(get_optional_user)
+1447: ):
+1448:     """
+1449:     Broadcasts a real-time emergency SOS distress signal across the Pan-India
+1450:     and Himalayan GIS grid. Signals are immediately projected as pulsing radar
+1451:     markers on all connected map dashboards and persisted permanently until resolved.
+1452:     """
+1453:     signal_id = payload.id or f"sos-{int(datetime.now().timestamp() * 1000)}"
+1454:     traveler_name = payload.traveler_name
+1455:     phone = payload.phone or ""
+1456: 
+1457:     if current_user:
+1458:         user_name = current_user.get("fullName") or current_user.get("full_name") or current_user.get("email", "")
+
+--- Lines 1474 to 1490 ---
+1474:         "status": "ACTIVE",
+1475:         "created_at": utc_now().isoformat(),
+1476:         "is_demo": False
+1477:     }
+1478: 
+1479:     _ephemeral_sos_signals[signal_id] = record
+1480:     _save_sos_signals_to_disk(_ephemeral_sos_signals)
+1481: 
+1482:     # Resilient Supabase persistence if table exists
+1483:     if is_supabase_configured():
+1484:         try:
+1485:             supabase_admin.table("sos_signals").insert({
+1486:                 "id": signal_id,
+1487:                 "lat": record["lat"],
+1488:                 "lng": record["lng"],
+1489:                 "location_name": record["location_name"],
+1490:                 "emergency_type": record["emergency_type"],
+
+--- Lines 1493 to 1540 ---
+1493:                 "phone": record["phone"],
+1494:                 "altitude": record["altitude"],
+1495:                 "status": "ACTIVE"
+1496:             }).execute()
+1497:         except Exception as _e:
+1498:             print(f"[Supabase] sos_signals remote insert note: {_e}")
+1499: 
+1500:     return {
+1501:         "success": True,
+1502:         "signal": record,
+1503:         "total_active": len([s for s in _ephemeral_sos_signals.values() if s.get("status") == "ACTIVE"]),
+1504:         "message": "Emergency SOS distress beacon transmitted to Himalayan GIS Grid and Medical Responders."
+1505:     }
+1506: 
+1507: @app.get("/api/sos")
+1508: @app.get("/sos")
+1509: def get_active_sos_signals():
+1510:     """
+1511:     Returns all active distress signals currently broadcasting on the map network.
+1512:     Guaranteed to preserve active beacons across server restarts and polling cycles.
+1513:     """
+1514:     active_signals = []
+1515:     
+1516:     # Try fetching from Supabase if configured
+1517:     if is_supabase_configured():
+1518:         try:
+1519:             res = supabase.table("sos_signals").select("*").eq("status", "ACTIVE").order("created_at", desc=True).limit(50).execute()
+1520:             if res and res.data:
+1521:                 for row in res.data:
+1522:                     active_signals.append(row)
+1523:         except Exception as _e:
+1524:             pass
+1525: 
+1526:     # Merge fresh from disk to ensure cross-worker or restarted process signals are always present
+1527:     disk_signals = _load_sos_signals_from_disk()
+1528:     for s_id, s_data in disk_signals.items():
+1529:         if s_id not in _ephemeral_sos_signals:
+1530:             _ephemeral_sos_signals[s_id] = s_data
+1531:         elif s_data.get("status") == "RESOLVED":
+1532:             _ephemeral_sos_signals[s_id]["status"] = "RESOLVED"
+1533: 
+1534:     remote_ids = {s["id"] for s in active_signals}
+1535:     for s_id, s_data in _ephemeral_sos_signals.items():
+1536:         if s_data.get("status") == "ACTIVE" and s_id not in remote_ids:
+1537:             active_signals.append(s_data)
+1538: 
+1539:     # Sort descending by creation timestamp
+1540:     active_signals.sort(key=lambda s: str(s.get("created_at", "")), reverse=True)
+
+--- Lines 1543 to 1595 ---
+1543:         "success": True,
+1544:         "count": len(active_signals),
+1545:         "signals": active_signals
+1546:     }
+1547: 
+1548: @app.post("/api/sos/{signal_id}/resolve")
+1549: @app.post("/sos/{signal_id}/resolve")
+1550: @app.delete("/api/sos/{signal_id}")
+1551: @app.delete("/sos/{signal_id}")
+1552: def resolve_sos_signal(signal_id: str):
+1553:     """
+1554:     Marks an SOS distress signal as resolved / stands down emergency alert.
+1555:     """
+1556:     if signal_id in _ephemeral_sos_signals:
+1557:         _ephemeral_sos_signals[signal_id]["status"] = "RESOLVED"
+1558:         _ephemeral_sos_signals[signal_id]["resolved_at"] = utc_now().isoformat()
+1559: 
+1560:     disk_signals = _load_sos_signals_from_disk()
+1561:     if signal_id in disk_signals:
+1562:         disk_signals[signal_id]["status"] = "RESOLVED"
+1563:         disk_signals[signal_id]["resolved_at"] = utc_now().isoformat()
+1564:         _save_sos_signals_to_disk(disk_signals)
+1565:     else:
+1566:         _save_sos_signals_to_disk(_ephemeral_sos_signals)
+1567: 
+1568:     if is_supabase_configured():
+1569:         try:
+1570:             supabase_admin.table("sos_signals").update({
+1571:                 "status": "RESOLVED",
+1572:                 "resolved_at": utc_now().isoformat()
+1573:             }).eq("id", signal_id).execute()
+1574:         except Exception as _e:
+1575:             print(f"[Supabase] sos_signals resolve note: {_e}")
+1576: 
+1577:     return {
+1578:         "success": True,
+1579:         "signal_id": signal_id,
+1580:         "message": "Distress beacon resolved successfully."
+1581:     }
+1582: 
+1583: @app.post("/api/sos/reset-demo")
+1584: @app.post("/sos/reset-demo")
+1585: def reset_sos_demo():
+1586:     """Resets distress telemetry back to clean state."""
+1587:     global _ephemeral_sos_signals
+1588:     _ephemeral_sos_signals = {}
+1589:     _save_sos_signals_to_disk({})
+1590:     return {"success": True, "message": "Emergency SOS distress telemetry reset to clean state."}
+1591: 
+1592: 
+1593: # Comprehensive Destination-Aware AI Intelligence & Heuristic Knowledge Base
+1594: # Designed for Smart India Hackathon (SIH 2026) Bharat Explore Platform
+1595: 
+
+=======================================================
+SOS CHUNKS IN: Bharat_Explore_SIH_Tourism/js/map.js
+=======================================================
+
+--- Lines 1352 to 1391 ---
+1352:     });
+1353:   }
+1354: }
+1355: 
+1356: // ═══════════════════════════════════════════════════════
+1357: //  LIVE SOS DISTRESS TELEMETRY & RADAR DISPATCH ENGINE
+1358: // ═══════════════════════════════════════════════════════
+1359: 
+1360: let sosMarkersLayer = null;
+1361: let activeSosSignals = [];
+1362: let sosMarkersMap = {};
+1363: let sosBannerEl = null;
+1364: 
+1365: async function fetchAndRenderSosSignals() {
+1366:   if (!leafletMap || !sosMarkersLayer) return;
+1367: 
+1368:   let remoteSignals = [];
+1369:   try {
+1370:     const res = await fetch('/api/sos');
+1371:     if (res.ok) {
+1372:       const data = await res.json();
+1373:       if (data && Array.isArray(data.signals)) {
+1374:         remoteSignals = data.signals;
+1375:       }
+1376:     }
+1377:   } catch (e) {
+1378:     console.warn('[SOS] Remote fetch fallback active:', e);
+1379:   }
+1380: 
+1381:   // Load persistent local active SOS signals and resolved IDs
+1382:   let localSignals = [];
+1383:   let resolvedIds = [];
+1384:   try {
+1385:     localSignals = JSON.parse(localStorage.getItem('bharat_active_sos') || '[]');
+1386:     resolvedIds = JSON.parse(localStorage.getItem('bharat_resolved_sos_ids') || '[]');
+1387:   } catch (e) {}
+1388: 
+1389:   // Merge remote and local by id, filtering out any explicitly resolved by user
+1390:   const signalsMap = new Map();
+1391: 
+
+--- Lines 1394 to 1556 ---
+1394:     if (sig && sig.id && sig.status === 'ACTIVE' && !resolvedIds.includes(sig.id)) {
+1395:       signalsMap.set(sig.id, sig);
+1396:     }
+1397:   });
+1398: 
+1399:   // 2. Merge local signals so user's active SOS beacon is NEVER wiped out by empty/reloaded server responses
+1400:   localSignals.forEach(sig => {
+1401:     if (sig && sig.id && sig.status === 'ACTIVE' && !resolvedIds.includes(sig.id)) {
+1402:       signalsMap.set(sig.id, sig);
+1403:     }
+1404:   });
+1405: 
+1406:   activeSosSignals = Array.from(signalsMap.values());
+1407:   renderSosMarkers(activeSosSignals);
+1408:   renderSosBanner(activeSosSignals);
+1409: }
+1410: 
+1411: function renderSosMarkers(signals) {
+1412:   if (!sosMarkersLayer) return;
+1413:   sosMarkersLayer.clearLayers();
+1414:   sosMarkersMap = {};
+1415: 
+1416:   signals.forEach(sig => {
+1417:     if (sig.status !== 'ACTIVE') return;
+1418: 
+1419:     const lat = parseFloat(sig.lat);
+1420:     const lng = parseFloat(sig.lng);
+1421:     if (isNaN(lat) || isNaN(lng)) return;
+1422: 
+1423:     const customIcon = L.divIcon({
+1424:       className: 'sos-beacon-wrapper',
+1425:       html: `
+1426:         <div class="sos-beacon-marker" title="ACTIVE SOS DISTRESS: ${sig.location_name || 'Emergency Beacon'}">
+1427:           <div class="sos-ripple sos-ripple-1"></div>
+1428:           <div class="sos-ripple sos-ripple-2"></div>
+1429:           <div class="sos-core">🚨</div>
+1430:           <span class="sos-label">SOS ACTIVE</span>
+1431:         </div>
+1432:       `,
+1433:       iconSize: [44, 44],
+1434:       iconAnchor: [22, 22]
+1435:     });
+1436: 
+1437:     const marker = L.marker([lat, lng], { icon: customIcon, zIndexOffset: 2000 });
+1438: 
+1439:     const timeStr = sig.created_at ? formatTimeAgo(sig.created_at) : 'Active now';
+1440:     const popupHtml = `
+1441:       <div class="sos-popup-card">
+1442:         <div class="sos-popup-header">
+1443:           <span class="sos-popup-badge">🚨 CRITICAL DISTRESS</span>
+1444:           <span class="sos-popup-time">${timeStr}</span>
+1445:         </div>
+1446:         <h3 class="sos-popup-title">${sig.emergency_type || 'Emergency Distress'}</h3>
+1447:         <div class="sos-popup-loc">📍 <b>${sig.location_name || 'Himalayan Grid'}</b> (${lat.toFixed(4)}, ${lng.toFixed(4)})</div>
+1448:         <div class="sos-popup-desc">
+1449:           "${sig.description || 'Emergency assistance requested. Altitude hypoxia protocols engaged.'}"
+1450:           <div style="margin-top:6px; font-size:11px; color:#cbd5e1;"><b>Traveler:</b> ${sig.traveler_name || 'Verified Explorer'} ${sig.phone ? '• Tel: ' + sig.phone : ''}</div>
+1451:         </div>
+1452:         <div class="sos-popup-hotlines">
+1453:           <a href="tel:112" class="sos-call-btn police">🚨 Call 112 Police / Emergency</a>
+1454:           <a href="tel:1363" class="sos-call-btn" style="background:rgba(245,158,11,0.2); border:1px solid #f59e0b; color:#fbbf24;">📞 Call 1363 Tourist Helpline</a>
+1455:           <a href="tel:+911982252014" class="sos-call-btn hospital">🚑 Call SNM Trauma (+91-1982-252014)</a>
+1456:         </div>
+1457:         <button class="sos-resolve-btn" onclick="window.resolveSosSignal('${sig.id}')">✓ Mark Distress as Resolved / Stand Down</button>
+1458:       </div>
+1459:     `;
+1460: 
+1461:     marker.bindPopup(popupHtml, {
+1462:       className: 'sos-emergency-popup',
+1463:       maxWidth: 340,
+1464:       autoPanPadding: [20, 20]
+1465:     });
+1466: 
+1467:     sosMarkersMap[sig.id] = marker;
+1468:     sosMarkersLayer.addLayer(marker);
+1469:   });
+1470: }
+1471: 
+1472: function renderSosBanner(signals) {
+1473:   const mapContainer = document.getElementById('map');
+1474:   if (!mapContainer) return;
+1475: 
+1476:   const active = signals.filter(s => s.status === 'ACTIVE');
+1477: 
+1478:   if (!active.length) {
+1479:     if (sosBannerEl) {
+1480:       sosBannerEl.remove();
+1481:       sosBannerEl = null;
+1482:     }
+1483:     return;
+1484:   }
+1485: 
+1486:   if (!sosBannerEl) {
+1487:     sosBannerEl = document.createElement('div');
+1488:     sosBannerEl.className = 'map-sos-floating-banner';
+1489:     mapContainer.appendChild(sosBannerEl);
+1490:   }
+1491: 
+1492:   const first = active[0];
+1493:   sosBannerEl.innerHTML = `
+1494:     <span class="sos-banner-dot"></span>
+1495:     <span class="sos-banner-text">
+1496:       🚨 <b>${active.length} ACTIVE DISTRESS BEACON${active.length > 1 ? 'S' : ''}:</b>
+1497:       ${first.location_name || 'High Altitude Sector'}
+1498:     </span>
+1499:     <button class="sos-focus-btn" onclick="window.focusSosBeacon('${first.id}')">Focus Beacon 🎯</button>
+1500:   `;
+1501: }
+1502: 
+1503: function focusSosBeacon(sigId) {
+1504:   if (!leafletMap) return;
+1505:   const sig = activeSosSignals.find(s => s.id === sigId) || activeSosSignals[0];
+1506:   if (!sig) return;
+1507: 
+1508:   const lat = parseFloat(sig.lat);
+1509:   const lng = parseFloat(sig.lng);
+1510:   leafletMap.flyTo([lat, lng], 11, { duration: 1.5 });
+1511: 
+1512:   setTimeout(() => {
+1513:     const marker = sosMarkersMap[sig.id];
+1514:     if (marker) {
+1515:       marker.openPopup();
+1516:     }
+1517:   }, 1600);
+1518: }
+1519: 
+1520: async function resolveSosSignal(sigId) {
+1521:   // 1. Instantly record resolution in localStorage so beacon is turned off only by user action
+1522:   try {
+1523:     const resolvedIds = JSON.parse(localStorage.getItem('bharat_resolved_sos_ids') || '[]');
+1524:     if (!resolvedIds.includes(sigId)) {
+1525:       resolvedIds.push(sigId);
+1526:       localStorage.setItem('bharat_resolved_sos_ids', JSON.stringify(resolvedIds));
+1527:     }
+1528:     const local = JSON.parse(localStorage.getItem('bharat_active_sos') || '[]');
+1529:     const updated = local.filter(s => s.id !== sigId);
+1530:     localStorage.setItem('bharat_active_sos', JSON.stringify(updated));
+1531:   } catch (e) {}
+1532: 
+1533:   // 2. Remove from active state immediately
+1534:   activeSosSignals = activeSosSignals.filter(s => s.id !== sigId);
+1535:   renderSosMarkers(activeSosSignals);
+1536:   renderSosBanner(activeSosSignals);
+1537: 
+1538:   // 3. Notify backend
+1539:   try {
+1540:     await fetch(`/api/sos/${encodeURIComponent(sigId)}/resolve`, { method: 'POST' });
+1541:   } catch (e) {
+1542:     console.warn('[SOS] Resolve remote note:', e);
+1543:   }
+1544: 
+1545:   toast('Distress signal marked as resolved and stood down.');
+1546:   window.dispatchEvent(new CustomEvent('bharat:sos-resolved', { detail: { id: sigId } }));
+1547: }
+1548: 
+1549: function formatTimeAgo(isoStr) {
+1550:   try {
+1551:     const diffSec = Math.floor((new Date() - new Date(isoStr)) / 1000);
+1552:     if (diffSec < 60) return 'Just now';
+1553:     const diffMin = Math.floor(diffSec / 60);
+1554:     if (diffMin < 60) return `${diffMin}m ago`;
+1555:     const diffHr = Math.floor(diffMin / 60);
+1556:     return `${diffHr}h ago`;
+
+--- Lines 1732 to 1771 ---
+1732: 
+1733:     hotspotMarkersMap[h.id] = marker;
+1734:     hotspotMarkersLayer.addLayer(marker);
+1735:   });
+1736: 
+1737:   // Create SOS Distress Beacon Layer (SIH 2026)
+1738:   sosMarkersLayer = L.layerGroup().addTo(leafletMap);
+1739:   fetchAndRenderSosSignals();
+1740: 
+1741:   // Periodic Telemetry Polling (Every 6 seconds so everybody sees live SOS signals)
+1742:   if (!window._sosPollInterval) {
+1743:     window._sosPollInterval = setInterval(fetchAndRenderSosSignals, 6000);
+1744:   }
+1745: 
+1746:   // Cross-Tab and Instant Event Listeners for real-time sync
+1747:   window.addEventListener('storage', (e) => {
+1748:     if (e.key === 'bharat_sos_broadcast' || e.key === 'bharat_active_sos') {
+1749:       fetchAndRenderSosSignals();
+1750:     }
+1751:   });
+1752:   window.addEventListener('bharat:sos-sent', () => {
+1753:     fetchAndRenderSosSignals();
+1754:     setTimeout(fetchAndRenderSosSignals, 1000);
+1755:   });
+1756:   window.addEventListener('bharat:sos-resolved', () => {
+1757:     fetchAndRenderSosSignals();
+1758:   });
+1759: 
+1760:   // Check URL parameters for direct SOS beacon focus (e.g. map.html?sos=sos-demo-khardungla)
+1761:   try {
+1762:     const urlParams = new URLSearchParams(window.location.search);
+1763:     const targetSos = urlParams.get('sos');
+1764:     if (targetSos) {
+1765:       setTimeout(() => {
+1766:         focusSosBeacon(targetSos === 'latest' ? null : targetSos);
+1767:       }, 900);
+1768:     }
+1769:   } catch (e) {}
+1770: 
+1771:   // Load vivid state & country boundaries GeoJSON
+
+--- Lines 1782 to 1793 ---
+1782:       const target = e.originalEvent.target;
+1783:       if (target.closest('.hotspot-marker-wrapper') || 
+1784:           target.closest('.hotspot-pin') || 
+1785:           target.closest('.map-hover-card') ||
+1786:           target.closest('.leaflet-popup') ||
+1787:           target.closest('.sos-beacon-wrapper') ||
+1788:           target.closest('.map-sos-floating-banner')) {
+1789:         return;
+1790:       }
+1791:     }
+1792:     closeActiveTooltip();
+1793:   });
+
+--- Lines 1841 to 1853 ---
+1841:   window.focusHotspot = focusHotspot;
+1842:   window.planHotspot = planHotspot;
+1843:   window.closeActiveTooltip = closeActiveTooltip;
+1844:   window.filterMapHotspots = filterMapHotspots;
+1845:   window.statePanel = statePanel;
+1846:   window.fetchAndRenderSosSignals = fetchAndRenderSosSignals;
+1847:   window.focusSosBeacon = focusSosBeacon;
+1848:   window.resolveSosSignal = resolveSosSignal;
+1849: 
+1850:   // Auto-initialize if DOM is ready, or on DOMContentLoaded
+1851:   if (document.readyState === "complete" || document.readyState === "interactive") {
+1852:     setTimeout(initMap, 50);
+1853:   } else {
+
+=======================================================
+SOS CHUNKS IN: Bharat_Explore_SIH_Tourism/js/app.js
+=======================================================
+
+--- Lines 1373 to 1383 ---
+1373:     updateResponsibleScore(5, "Pledged Plastic-Free & Reusable Flask commitment!");
+1374:   }
+1375: }
+1376: 
+1377: // ═══════════════════════════════════════════════════════
+1378: //  EMERGENCY HELP & SOS DISTRESS DISPATCH ENGINE (SIH 2026)
+1379: // ═══════════════════════════════════════════════════════
+1380: 
+1381: // detectedGpsCoords is null until device GPS or IP-lookup resolves
+1382: let detectedGpsCoords = null;
+1383: 
+
+--- Lines 1417 to 1427 ---
+1417:     }
+1418:   }
+1419: }
+1420: 
+1421: function tryAcquireGpsCoordinates() {
+1422:   const gpsDisplay = document.getElementById("sosGpsDisplay");
+1423:   if (gpsDisplay) {
+1424:     gpsDisplay.innerHTML = `📍 <b>Acquiring device location...</b>`;
+1425:   }
+1426: 
+1427:   if ("geolocation" in navigator) {
+
+--- Lines 1469 to 1484 ---
+1469:     osc.start();
+1470:     osc.stop(audioCtx.currentTime + 0.36);
+1471:   } catch (e) {}
+1472: }
+1473: 
+1474: async function transmitEmergencySOS() {
+1475:   const transmitBtn = document.getElementById("transmitSosBtn");
+1476:   const feedbackEl = document.getElementById("sosBroadcastFeedback");
+1477:   const emergencyTypeSelect = document.getElementById("sosEmergencyType");
+1478:   const notesInput = document.getElementById("sosNotes");
+1479:   const sectorSelect = document.getElementById("sosSectorSelect");
+1480: 
+1481:   const emergencyType = emergencyTypeSelect ? emergencyTypeSelect.value : "Altitude Sickness (AMS / SpO2 Hypoxia)";
+1482:   const notes = notesInput && notesInput.value.trim() ? notesInput.value.trim() : "Urgent assistance requested. AMS hypoxia protocol active.";
+1483:   
+1484:   // Resolve which coordinates to use:
+
+--- Lines 1492 to 1502 ---
+1492:     targetCoords = detectedGpsCoords;
+1493:   } else {
+1494:     // Still waiting for GPS — block transmission and retry
+1495:     if (feedbackEl) {
+1496:       feedbackEl.classList.add("active");
+1497:       feedbackEl.innerHTML = `<div class="sos-feedback-text"><span>⏳</span><div><strong>Acquiring your location...</strong><div style="font-size:11.5px;">Please wait a moment and try again, or select a sector manually.</div></div></div>`;
+1498:     }
+1499:     tryAcquireGpsCoordinates();
+1500:     return;
+1501:   }
+1502: 
+
+--- Lines 1517 to 1527 ---
+1517:   }
+1518: 
+1519:   playEmergencyChime();
+1520: 
+1521:   const payload = {
+1522:     id: `sos-${Date.now()}`,
+1523:     lat: targetCoords.lat,
+1524:     lng: targetCoords.lng,
+1525:     location_name: targetCoords.name,
+1526:     emergency_type: emergencyType,
+1527:     description: notes,
+
+--- Lines 1530 to 1565 ---
+1530:     altitude: targetCoords.alt || "17,582 ft",
+1531:     status: "ACTIVE"
+1532:   };
+1533: 
+1534:   try {
+1535:     const res = await fetch("/api/sos", {
+1536:       method: "POST",
+1537:       headers: { "Content-Type": "application/json" },
+1538:       body: JSON.stringify(payload)
+1539:     });
+1540: 
+1541:     if (!res.ok) {
+1542:       console.warn("[SOS] Remote API status:", res.status);
+1543:     }
+1544:   } catch (err) {
+1545:     console.warn("[SOS] Network fallback active:", err);
+1546:   }
+1547: 
+1548:   try {
+1549:     const resolvedIds = JSON.parse(localStorage.getItem("bharat_resolved_sos_ids") || "[]");
+1550:     const updatedResolved = resolvedIds.filter(id => id !== payload.id);
+1551:     localStorage.setItem("bharat_resolved_sos_ids", JSON.stringify(updatedResolved));
+1552: 
+1553:     const stored = JSON.parse(localStorage.getItem("bharat_active_sos") || "[]");
+1554:     const filteredStored = stored.filter(s => s.id !== payload.id);
+1555:     filteredStored.unshift(payload);
+1556:     localStorage.setItem("bharat_active_sos", JSON.stringify(filteredStored));
+1557:     localStorage.setItem("bharat_sos_broadcast", JSON.stringify(payload));
+1558:   } catch (e) {}
+1559: 
+1560:   window.dispatchEvent(new CustomEvent("bharat:sos-sent", { detail: payload }));
+1561: 
+1562:   setTimeout(playEmergencyChime, 250);
+1563: 
+1564:   if (transmitBtn) {
+1565:     transmitBtn.disabled = false;
+
+--- Lines 1567 to 1598 ---
+1567:   }
+1568: 
+1569:   if (feedbackEl) {
+1570:     feedbackEl.classList.add("active");
+1571:     feedbackEl.innerHTML = `
+1572:       <div class="sos-feedback-text">
+1573:         <span>✅</span>
+1574:         <div>
+1575:           <strong>DISTRESS SIGNAL BROADCASTED ACROSS THE STATE MAP!</strong>
+1576:           <div style="font-size:11.5px; opacity:0.9;">Beacons active at ${targetCoords.name}. High-altitude medical responders alerted.</div>
+1577:         </div>
+1578:       </div>
+1579:       <a href="map.html?sos=${payload.id}" class="sos-view-map-link" onclick="handleViewSosOnMap(event, '${payload.id}')">
+1580:         🗺️ View Live on Map →
+1581:       </a>
+1582:     `;
+1583:   }
+1584: 
+1585:   toast("🚨 Emergency SOS Distress Signal Broadcasted to State Map!");
+1586: }
+1587: 
+1588: function handleViewSosOnMap(e, sosId) {
+1589:   const mapContainer = document.getElementById("map");
+1590:   if (mapContainer && typeof window.focusSosBeacon === "function") {
+1591:     e.preventDefault();
+1592:     closeHelpModal();
+1593:     window.focusSosBeacon(sosId);
+1594:   }
+1595: }
+1596: 
+1597: function openHelpModal() {
+1598:   const modal = document.getElementById("fieldKitModal");
+
+--- Lines 1607 to 1617 ---
+1607:   if (modal) {
+1608:     modal.classList.remove("open");
+1609:   }
+1610: }
+1611: 
+1612: window.transmitEmergencySOS = transmitEmergencySOS;
+1613: window.openHelpModal = openHelpModal;
+1614: window.closeHelpModal = closeHelpModal;
+1615: window.tryAcquireGpsCoordinates = tryAcquireGpsCoordinates;
+1616: 
+1617: 
+
+--- Lines 1831 to 1841 ---
+1831:       renderJourneyDrawer();
+1832:       $("#journeyDrawer").classList.add("open");
+1833:     };
+1834:   }
+1835: 
+1836:   // Dashboard Help & SOS button
+1837:   const dashHelpBtn = $("#dashHelpBtn");
+1838:   if (dashHelpBtn) {
+1839:     dashHelpBtn.onclick = () => openHelpModal();
+1840:   }
+1841: 
+
+--- Lines 1843 to 1867 ---
+1843:   const fieldKitQuickBtn = $("#fieldKitQuickBtn");
+1844:   if (fieldKitQuickBtn) {
+1845:     fieldKitQuickBtn.onclick = () => openHelpModal();
+1846:   }
+1847: 
+1848:   // Transmit SOS button in modal
+1849:   const transmitSosBtn = $("#transmitSosBtn");
+1850:   if (transmitSosBtn) {
+1851:     transmitSosBtn.onclick = (e) => {
+1852:       e.preventDefault();
+1853:       transmitEmergencySOS();
+1854:     };
+1855:   }
+1856: 
+1857:   // Sector selector in SOS box — update GPS display when user manually picks a pass
+1858:   const sosSectorSelect = $("#sosSectorSelect");
+1859:   if (sosSectorSelect) {
+1860:     sosSectorSelect.onchange = (e) => {
+1861:       const val = e.target.value;
+1862:       const gpsDisplay = $("#sosGpsDisplay");
+1863:       if (val === "current-device" || !val) {
+1864:         // Switch back to device GPS
+1865:         if (detectedGpsCoords) {
+1866:           if (gpsDisplay) {
+1867:             gpsDisplay.innerHTML = `📍 Device Location: <b>${detectedGpsCoords.lat}, ${detectedGpsCoords.lng}</b> ✅`;
+
+=======================================================
+SOS CHUNKS IN: Bharat_Explore_SIH_Tourism/css/map.css
+=======================================================
+
+--- Lines 671 to 717 ---
+ 671:     font-size: 24px;
+ 672:   }
+ 673: }
+ 674: 
+ 675: /* ═══════════════════════════════════════════════════════
+ 676:    EMERGENCY SOS DISTRESS BEACON & MAP RADAR TELEMETRY (SIH 2026)
+ 677:    ═══════════════════════════════════════════════════════ */
+ 678: 
+ 679: /* Pulsing Radar SOS Marker */
+ 680: .sos-beacon-wrapper {
+ 681:   position: relative;
+ 682:   display: flex;
+ 683:   align-items: center;
+ 684:   justify-content: center;
+ 685: }
+ 686: 
+ 687: .sos-beacon-marker {
+ 688:   position: relative;
+ 689:   width: 44px;
+ 690:   height: 44px;
+ 691:   display: flex;
+ 692:   align-items: center;
+ 693:   justify-content: center;
+ 694:   cursor: pointer;
+ 695: }
+ 696: 
+ 697: .sos-beacon-marker .sos-ripple {
+ 698:   position: absolute;
+ 699:   width: 100%;
+ 700:   height: 100%;
+ 701:   border-radius: 50%;
+ 702:   background: rgba(239, 68, 68, 0.4);
+ 703:   border: 2px solid rgba(239, 68, 68, 0.9);
+ 704:   pointer-events: none;
+ 705:   animation: sosRadarPing 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+ 706: }
+ 707: 
+ 708: .sos-beacon-marker .sos-ripple-2 {
+ 709:   animation-delay: 0.75s;
+ 710: }
+ 711: 
+ 712: .sos-beacon-marker .sos-core {
+ 713:   position: relative;
+ 714:   width: 32px;
+ 715:   height: 32px;
+ 716:   border-radius: 50%;
+ 717:   background: radial-gradient(circle, #ff2a2a 0%, #b91c1c 100%);
+
+--- Lines 720 to 734 ---
+ 720:   display: flex;
+ 721:   align-items: center;
+ 722:   justify-content: center;
+ 723:   font-size: 15px;
+ 724:   color: #fff;
+ 725:   animation: sosCorePulse 1s ease-in-out infinite alternate;
+ 726:   z-index: 2;
+ 727: }
+ 728: 
+ 729: .sos-beacon-marker .sos-label {
+ 730:   position: absolute;
+ 731:   top: -24px;
+ 732:   left: 50%;
+ 733:   transform: translateX(-50%);
+ 734:   background: #b91c1c;
+
+--- Lines 743 to 776 ---
+ 743:   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+ 744:   pointer-events: none;
+ 745:   z-index: 3;
+ 746: }
+ 747: 
+ 748: @keyframes sosRadarPing {
+ 749:   0% {
+ 750:     transform: scale(0.4);
+ 751:     opacity: 1;
+ 752:   }
+ 753:   100% {
+ 754:     transform: scale(2.8);
+ 755:     opacity: 0;
+ 756:   }
+ 757: }
+ 758: 
+ 759: @keyframes sosCorePulse {
+ 760:   0% {
+ 761:     transform: scale(0.92);
+ 762:     box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+ 763:   }
+ 764:   100% {
+ 765:     transform: scale(1.08);
+ 766:     box-shadow: 0 0 24px rgba(255, 34, 34, 1);
+ 767:   }
+ 768: }
+ 769: 
+ 770: /* Floating SOS Distress Alert Banner on Map */
+ 771: .map-sos-floating-banner {
+ 772:   position: absolute;
+ 773:   top: 14px;
+ 774:   left: 50%;
+ 775:   transform: translateX(-50%);
+ 776:   z-index: 1000;
+
+--- Lines 785 to 826 ---
+ 785:   padding: 8px 18px 8px 14px;
+ 786:   box-shadow: 0 10px 30px rgba(220, 38, 38, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+ 787:   color: #fff;
+ 788:   font-size: 13px;
+ 789:   max-width: 90vw;
+ 790:   animation: sosBannerPulse 2s infinite ease-in-out;
+ 791: }
+ 792: 
+ 793: @keyframes sosBannerPulse {
+ 794:   0%, 100% {
+ 795:     border-color: rgba(239, 68, 68, 0.6);
+ 796:     box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
+ 797:   }
+ 798:   50% {
+ 799:     border-color: rgba(255, 80, 80, 1);
+ 800:     box-shadow: 0 12px 36px rgba(255, 40, 40, 0.55);
+ 801:   }
+ 802: }
+ 803: 
+ 804: .map-sos-floating-banner .sos-banner-dot {
+ 805:   width: 10px;
+ 806:   height: 10px;
+ 807:   border-radius: 50%;
+ 808:   background: #ef4444;
+ 809:   box-shadow: 0 0 8px #ef4444;
+ 810:   animation: sosCorePulse 0.8s infinite alternate;
+ 811:   flex-shrink: 0;
+ 812: }
+ 813: 
+ 814: .map-sos-floating-banner .sos-banner-text {
+ 815:   font-weight: 600;
+ 816:   display: flex;
+ 817:   align-items: center;
+ 818:   gap: 6px;
+ 819: }
+ 820: 
+ 821: .map-sos-floating-banner .sos-focus-btn {
+ 822:   background: #ef4444;
+ 823:   color: #fff;
+ 824:   border: none;
+ 825:   border-radius: 999px;
+ 826:   padding: 4px 12px;
+
+--- Lines 829 to 872 ---
+ 829:   cursor: pointer;
+ 830:   transition: all 0.2s ease;
+ 831:   white-space: nowrap;
+ 832: }
+ 833: 
+ 834: .map-sos-floating-banner .sos-focus-btn:hover {
+ 835:   background: #dc2626;
+ 836:   transform: scale(1.05);
+ 837: }
+ 838: 
+ 839: /* Custom Leaflet SOS Emergency Popup */
+ 840: .sos-emergency-popup .leaflet-popup-content-wrapper {
+ 841:   background: #0f172a;
+ 842:   color: #f8fafc;
+ 843:   border-radius: 14px;
+ 844:   border: 2px solid #ef4444;
+ 845:   box-shadow: 0 14px 40px rgba(220, 38, 38, 0.45);
+ 846:   padding: 2px;
+ 847: }
+ 848: 
+ 849: .sos-emergency-popup .leaflet-popup-tip {
+ 850:   background: #0f172a;
+ 851:   border: 1px solid #ef4444;
+ 852: }
+ 853: 
+ 854: .sos-popup-card {
+ 855:   padding: 14px 16px;
+ 856:   min-width: 260px;
+ 857:   max-width: 320px;
+ 858: }
+ 859: 
+ 860: .sos-popup-header {
+ 861:   display: flex;
+ 862:   align-items: center;
+ 863:   justify-content: space-between;
+ 864:   margin-bottom: 8px;
+ 865: }
+ 866: 
+ 867: .sos-popup-badge {
+ 868:   background: rgba(239, 68, 68, 0.2);
+ 869:   color: #fca5a5;
+ 870:   border: 1px solid #ef4444;
+ 871:   font-size: 10px;
+ 872:   font-weight: 800;
+
+--- Lines 876 to 925 ---
+ 876:   display: inline-flex;
+ 877:   align-items: center;
+ 878:   gap: 4px;
+ 879: }
+ 880: 
+ 881: .sos-popup-time {
+ 882:   font-size: 11px;
+ 883:   color: #94a3b8;
+ 884: }
+ 885: 
+ 886: .sos-popup-title {
+ 887:   font-size: 16px;
+ 888:   font-weight: 700;
+ 889:   color: #ffffff;
+ 890:   margin: 0 0 4px;
+ 891: }
+ 892: 
+ 893: .sos-popup-loc {
+ 894:   font-size: 12px;
+ 895:   color: #cbd5e1;
+ 896:   margin-bottom: 8px;
+ 897:   display: flex;
+ 898:   align-items: center;
+ 899:   gap: 4px;
+ 900: }
+ 901: 
+ 902: .sos-popup-desc {
+ 903:   background: rgba(255, 255, 255, 0.05);
+ 904:   border-radius: 8px;
+ 905:   padding: 8px 10px;
+ 906:   font-size: 12px;
+ 907:   color: #e2e8f0;
+ 908:   line-height: 1.4;
+ 909:   margin-bottom: 12px;
+ 910:   border-left: 3px solid #ef4444;
+ 911: }
+ 912: 
+ 913: .sos-popup-hotlines {
+ 914:   display: flex;
+ 915:   flex-direction: column;
+ 916:   gap: 6px;
+ 917:   margin-bottom: 10px;
+ 918: }
+ 919: 
+ 920: .sos-call-btn {
+ 921:   display: flex;
+ 922:   align-items: center;
+ 923:   justify-content: center;
+ 924:   gap: 6px;
+ 925:   padding: 7px 12px;
+
+--- Lines 928 to 960 ---
+ 928:   font-weight: 700;
+ 929:   text-decoration: none;
+ 930:   transition: all 0.2s ease;
+ 931: }
+ 932: 
+ 933: .sos-call-btn.hospital {
+ 934:   background: rgba(16, 185, 129, 0.2);
+ 935:   border: 1px solid #10b981;
+ 936:   color: #34d399;
+ 937: }
+ 938: 
+ 939: .sos-call-btn.hospital:hover {
+ 940:   background: #10b981;
+ 941:   color: #fff;
+ 942: }
+ 943: 
+ 944: .sos-call-btn.police {
+ 945:   background: rgba(59, 130, 246, 0.2);
+ 946:   border: 1px solid #3b82f6;
+ 947:   color: #93c5fd;
+ 948: }
+ 949: 
+ 950: .sos-call-btn.police:hover {
+ 951:   background: #3b82f6;
+ 952:   color: #fff;
+ 953: }
+ 954: 
+ 955: .sos-resolve-btn {
+ 956:   width: 100%;
+ 957:   background: transparent;
+ 958:   border: 1px solid rgba(255, 255, 255, 0.2);
+ 959:   color: #94a3b8;
+ 960:   font-size: 11px;
+
+--- Lines 962 to 970 ---
+ 962:   border-radius: 6px;
+ 963:   cursor: pointer;
+ 964:   transition: all 0.2s ease;
+ 965: }
+ 966: 
+ 967: .sos-resolve-btn:hover {
+ 968:   background: rgba(255, 255, 255, 0.1);
+ 969:   color: #fff;
+ 970: }
+
+=======================================================
+SOS CHUNKS IN: Bharat_Explore_SIH_Tourism/css/style.css
+=======================================================
+
+--- Lines 3421 to 3435 ---
+3421:   mask-composite: exclude;
+3422:   pointer-events: none;
+3423: }
+3424: 
+3425: /* ═══════════════════════════════════════════════════════
+3426:    EMERGENCY HELP & SOS MODAL CONSOLE (SIH 2026)
+3427:    ═══════════════════════════════════════════════════════ */
+3428: 
+3429: /* Top Navigation SOS Quick Trigger */
+3430: .nav-sos-quick-btn {
+3431:   background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+3432:   color: #ffffff !important;
+3433:   font-weight: 800;
+3434:   font-size: 12px;
+3435:   padding: 6px 14px;
+
+--- Lines 3440 to 3464 ---
+3440:   display: inline-flex;
+3441:   align-items: center;
+3442:   gap: 6px;
+3443:   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+3444:   letter-spacing: 0.5px;
+3445:   animation: navSosGlow 2.4s infinite ease-in-out;
+3446: }
+3447: 
+3448: @keyframes navSosGlow {
+3449:   0%, 100% {
+3450:     box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+3451:     transform: scale(1);
+3452:   }
+3453:   50% {
+3454:     box-shadow: 0 0 22px rgba(255, 40, 40, 0.8), 0 0 32px rgba(239, 68, 68, 0.3);
+3455:     transform: scale(1.04);
+3456:   }
+3457: }
+3458: 
+3459: .nav-sos-quick-btn:hover {
+3460:   transform: scale(1.08);
+3461:   box-shadow: 0 0 28px rgba(255, 20, 20, 1);
+3462: }
+3463: 
+3464: .nav-help-btn {
+
+--- Lines 3471 to 3481 ---
+3471: .nav-help-btn:hover {
+3472:   background: rgba(245, 158, 11, 0.25) !important;
+3473:   border-color: #f59e0b !important;
+3474: }
+3475: 
+3476: /* Dashboard Help & SOS Button */
+3477: .dash-help-btn {
+3478:   background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.25));
+3479:   color: #fca5a5 !important;
+3480:   border: 1.5px solid #ef4444 !important;
+3481:   padding: 7px 16px;
+
+--- Lines 3494 to 3504 ---
+3494:   color: #ffffff !important;
+3495:   transform: translateY(-2px);
+3496:   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+3497: }
+3498: 
+3499: /* Help & SOS Modal Box Layout */
+3500: .help-modal-card {
+3501:   max-width: 860px !important;
+3502:   background: #091512 !important;
+3503:   border: 1px solid rgba(255, 255, 255, 0.15) !important;
+3504:   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(239, 68, 68, 0.15) !important;
+
+--- Lines 3538 to 3577 ---
+3538:   color: #94a3b8;
+3539:   font-size: 13.5px;
+3540:   margin: 0;
+3541: }
+3542: 
+3543: /* 1. SOS Beacon Box (Topmost Component in Modal) */
+3544: .sos-beacon-box {
+3545:   background: linear-gradient(180deg, rgba(220, 38, 38, 0.16) 0%, rgba(15, 23, 42, 0.8) 100%);
+3546:   border: 2px solid #ef4444;
+3547:   border-radius: 16px;
+3548:   padding: 20px 22px;
+3549:   margin-bottom: 24px;
+3550:   box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+3551:   position: relative;
+3552:   overflow: hidden;
+3553: }
+3554: 
+3555: .sos-beacon-box::before {
+3556:   content: "";
+3557:   position: absolute;
+3558:   top: 0; right: 0; width: 140px; height: 140px;
+3559:   background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+3560:   pointer-events: none;
+3561: }
+3562: 
+3563: .sos-beacon-top-row {
+3564:   display: flex;
+3565:   justify-content: space-between;
+3566:   align-items: center;
+3567:   margin-bottom: 14px;
+3568:   flex-wrap: wrap;
+3569:   gap: 8px;
+3570: }
+3571: 
+3572: .sos-status-tag {
+3573:   display: inline-flex;
+3574:   align-items: center;
+3575:   gap: 6px;
+3576:   background: rgba(239, 68, 68, 0.25);
+3577:   color: #fca5a5;
+
+--- Lines 3580 to 3599 ---
+3580:   padding: 4px 10px;
+3581:   border-radius: 999px;
+3582:   border: 1px solid #ef4444;
+3583: }
+3584: 
+3585: .sos-status-tag .live-dot {
+3586:   width: 8px;
+3587:   height: 8px;
+3588:   border-radius: 50%;
+3589:   background: #ef4444;
+3590:   box-shadow: 0 0 6px #ef4444;
+3591:   animation: sosCorePulse 0.8s infinite alternate;
+3592: }
+3593: 
+3594: .sos-gps-chip {
+3595:   font-size: 11.5px;
+3596:   color: #cbd5e1;
+3597:   background: rgba(0, 0, 0, 0.4);
+3598:   padding: 4px 10px;
+3599:   border-radius: 6px;
+
+--- Lines 3601 to 3650 ---
+3601:   display: inline-flex;
+3602:   align-items: center;
+3603:   gap: 5px;
+3604: }
+3605: 
+3606: .sos-input-grid {
+3607:   display: grid;
+3608:   grid-template-columns: 1fr 1fr;
+3609:   gap: 12px;
+3610:   margin-bottom: 14px;
+3611: }
+3612: 
+3613: @media (max-width: 640px) {
+3614:   .sos-input-grid {
+3615:     grid-template-columns: 1fr;
+3616:   }
+3617: }
+3618: 
+3619: .sos-field label {
+3620:   display: block;
+3621:   font-size: 12px;
+3622:   font-weight: 600;
+3623:   color: #e2e8f0;
+3624:   margin-bottom: 5px;
+3625: }
+3626: 
+3627: .sos-field select,
+3628: .sos-field input {
+3629:   width: 100%;
+3630:   background: rgba(0, 0, 0, 0.45);
+3631:   border: 1px solid rgba(255, 255, 255, 0.2);
+3632:   border-radius: 8px;
+3633:   padding: 9px 12px;
+3634:   color: #fff;
+3635:   font-size: 13px;
+3636: }
+3637: 
+3638: .sos-field select:focus,
+3639: .sos-field input:focus {
+3640:   outline: none;
+3641:   border-color: #ef4444;
+3642:   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+3643: }
+3644: 
+3645: .sos-transmit-btn {
+3646:   width: 100%;
+3647:   background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+3648:   color: #ffffff;
+3649:   border: none;
+3650:   border-radius: 12px;
+
+--- Lines 3659 to 3678 ---
+3659:   gap: 10px;
+3660:   box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
+3661:   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+3662: }
+3663: 
+3664: .sos-transmit-btn:hover {
+3665:   transform: translateY(-2px) scale(1.01);
+3666:   box-shadow: 0 12px 32px rgba(255, 30, 30, 0.65);
+3667: }
+3668: 
+3669: .sos-transmit-btn:active {
+3670:   transform: scale(0.98);
+3671: }
+3672: 
+3673: .sos-broadcast-feedback {
+3674:   margin-top: 14px;
+3675:   background: rgba(16, 185, 129, 0.15);
+3676:   border: 1.5px solid #10b981;
+3677:   border-radius: 10px;
+3678:   padding: 12px 14px;
+
+--- Lines 3681 to 3704 ---
+3681:   justify-content: space-between;
+3682:   gap: 12px;
+3683:   flex-wrap: wrap;
+3684: }
+3685: 
+3686: .sos-broadcast-feedback.active {
+3687:   display: flex;
+3688: }
+3689: 
+3690: .sos-feedback-text {
+3691:   font-size: 13px;
+3692:   color: #a7f3d0;
+3693:   font-weight: 600;
+3694:   display: flex;
+3695:   align-items: center;
+3696:   gap: 8px;
+3697: }
+3698: 
+3699: .sos-view-map-link {
+3700:   background: #10b981;
+3701:   color: #06231d;
+3702:   font-weight: 800;
+3703:   font-size: 12px;
+3704:   padding: 6px 14px;
+
+--- Lines 3708 to 3723 ---
+3708:   align-items: center;
+3709:   gap: 4px;
+3710:   transition: all 0.2s ease;
+3711: }
+3712: 
+3713: .sos-view-map-link:hover {
+3714:   background: #34d399;
+3715:   transform: translateY(-1px);
+3716: }
+3717: 
+3718: /* 2. National Tourist Helpline & Police Numbers (Immediately Below SOS) */
+3719: .hotlines-section {
+3720:   margin-bottom: 24px;
+3721: }
+3722: 
+3723: .hotlines-title {
+
+=======================================================
+SOS CHUNKS IN: Bharat_Explore_SIH_Tourism/js/i18n.js
+=======================================================
+
+--- Lines 22 to 32 ---
+  22:       nav_ai: "Bharat AI",
+  23:       nav_responsible: "Eco Travel",
+  24:       nav_culture: "Culture",
+  25:       nav_food: "Cuisine",
+  26:       nav_search: "Global Search",
+  27:       nav_help_sos: "🆘 Help",
+  28:       nav_offline_pass: "🛡️ Offline Pass",
+  29:       nav_saved_title: "My Journey Bookmarks",
+  30: 
+  31:       // Hero
+  32:       hero_badge: "SIH 2026 SUSTAINABLE TOURISM PLATFORM",
+
+--- Lines 304 to 314 ---
+ 304:       nav_ai: "भारत AI",
+ 305:       nav_responsible: "इको ट्रैवल",
+ 306:       nav_culture: "संस्कृति",
+ 307:       nav_food: "व्यंजन",
+ 308:       nav_search: "खोजें",
+ 309:       nav_help_sos: "🆘 सहायता (Help)",
+ 310:       nav_offline_pass: "🛡️ ऑफलाइन पास",
+ 311:       nav_saved_title: "मेरी सुरक्षित यात्रा",
+ 312: 
+ 313:       // Hero
+ 314:       hero_badge: "SIH 2026 सतत पर्यटन मंच",
+
+--- Lines 586 to 596 ---
+ 586:       nav_ai: "ভারত AI",
+ 587:       nav_responsible: "ইকো ট্রাভেল",
+ 588:       nav_culture: "সংস্কৃতি",
+ 589:       nav_food: "খাবার",
+ 590:       nav_search: "অনুসন্ধান",
+ 591:       nav_help_sos: "🆘 সাহায্য (Help)",
+ 592:       nav_offline_pass: "🛡️ অফলাইন পাস",
+ 593:       nav_saved_title: "আমার সংরক্ষিত ভ্রমণ",
+ 594: 
+ 595:       // Hero
+ 596:       hero_badge: "SIH 2026 টেকসই পর্যটন প্ল্যাটফর্ম",

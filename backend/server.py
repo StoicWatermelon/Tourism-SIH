@@ -2284,15 +2284,27 @@ async def chat_stream_endpoint(req: ChatRequest):
         else:
             prompt_content = f"{dest_lock}User Question: {clean_query}\n(CRITICAL MANDATE: Stay strictly on topic without mentioning unrelated destinations or mountain passes.)"
 
-        # Construct multi-turn contents list for Gemini API
+        # Construct multi-turn contents list for Gemini API strictly adhering to alternation
         contents_list = []
         if req.history:
-            for item in req.history[-6:]:
+            for item in req.history[-10:]:
                 role_val = item.get("role", "user")
                 role_str = "model" if role_val in ["model", "bot", "assistant"] else "user"
                 txt_val = item.get("content") or item.get("text") or ""
-                if txt_val.strip():
-                    contents_list.append(types.Content(role=role_str, parts=[types.Part.from_text(text=txt_val.strip())]))
+                clean_t = txt_val.strip()
+                if not clean_t:
+                    continue
+                if contents_list and contents_list[-1].role == role_str:
+                    continue
+                contents_list.append(types.Content(role=role_str, parts=[types.Part.from_text(text=clean_t)]))
+
+        # Gemini requires multi-turn contents to start with 'user'
+        while contents_list and contents_list[0].role != "user":
+            contents_list.pop(0)
+
+        # Before appending the new user query, ensure preceding turn was 'model'
+        if contents_list and contents_list[-1].role == "user":
+            contents_list.pop()
 
         contents_list.append(types.Content(role="user", parts=[types.Part.from_text(text=prompt_content)]))
 
@@ -2451,6 +2463,26 @@ def _fetch_web_intel_sync(clean_query: str, clean_cat: str, loc_clean: str, stri
     import urllib.request
     import urllib.parse
     
+    # Check if this is an Innovation / CodeBreakerz / TMSL card
+    combined_ctx = f"{clean_query} {clean_cat} {loc_clean} {desc or ''}".lower()
+    is_innovation_card = any(
+        w in combined_ctx for w in [
+            "codebreakerz", "code breakerz", "sih 2026", "sih",
+            "techno main", "tmsl", "sarnajit", "riddhadeb", "piyal",
+            "rimil", "souryadeep", "supratim"
+        ]
+    )
+    if is_innovation_card:
+        summary_text = (
+            "Techno Main Salt Lake (TMSL), the premier flagship engineering and technology institution of "
+            "Techno India Group located in Salt Lake City (Sector V), Kolkata, West Bengal. Affiliated with MAKAUT "
+            "and approved by AICTE, TMSL is renowned for engineering excellence, computer science, and innovation, "
+            "serving as the proud institutional home and incubation hub for Team Code Breakerz in the Smart India Hackathon (SIH 2026)."
+        )
+        source_url = "https://en.wikipedia.org/wiki/Techno_India_Group"
+        source_title = "Wikipedia: Techno Main Salt Lake (TMSL)"
+        return summary_text, source_url, source_title
+
     # 1. Try Wikivoyage via agent_tools for destinations, circuits, and cities
     web_info = {}
     is_non_dest = any(w in clean_cat.lower() or w in clean_query.lower() for w in ["safety", "health", "innovation", "protocol", "architecture", "design", "culture", "tradition", "solar", "mud", "brick", "prayer", "dance", "team", "codebreakerz", "flag"])
@@ -2483,7 +2515,7 @@ def _fetch_web_intel_sync(clean_query: str, clean_cat: str, loc_clean: str, stri
         elif any(w in q_lower for w in ["pashmina", "changpa", "cashmere"]):
             search_terms.extend(["Pashmina", "Changpa", "Cashmere wool"])
         elif any(w in q_lower for w in ["code breakerz", "codebreakerz", "sih 2026", "hackathon"]):
-            search_terms.extend(["Smart India Hackathon", "Ministry of Tourism (India)"])
+            search_terms.extend(["Techno India Group", "Techno Main Salt Lake", "Ministry of Tourism (India)"])
 
         if loc_clean and loc_clean.lower() not in clean_query.lower():
             search_terms.append(f"{stripped_term} {loc_clean}".strip())
@@ -2562,13 +2594,13 @@ async def get_card_insight_endpoint(
     is_safety = any(k in clean_cat.lower() or k in clean_query.lower() for k in ["safety", "protocol", "medical", "hospital", "oxygen", "ams", "permit", "ilp", "emergency", "danger"])
     is_culture = any(k in clean_cat.lower() or k in clean_query.lower() for k in ["culture", "tradition", "living heritage", "prayer", "ritual", "monast", "dance", "pashmina", "vernacular"])
     is_cuisine = any(k in clean_cat.lower() for k in ["food", "cuisine", "indigenous cuisine"])
-    is_innovation = any(k in clean_cat.lower() or k in clean_query.lower() for k in ["codebreakerz", "code breakerz", "sih", "team", "innovation", "architect"])
+    is_innovation = any(k in clean_cat.lower() or k in clean_query.lower() or k in loc_clean.lower() or k in (desc or "").lower() for k in ["codebreakerz", "code breakerz", "sih", "team", "innovation", "architect", "techno main", "tmsl", "sarnajit", "riddhadeb", "piyal", "rimil", "souryadeep", "supratim"])
 
     best_season = "October through May (ideal weather)"
     if is_safety:
         best_season = "24/7 Emergency Operations • Year-Round Readiness"
     elif is_innovation:
-        best_season = "Smart India Hackathon 2026 Innovation Cycle"
+        best_season = "Smart India Hackathon 2026 Innovation Cycle • Active Lab"
     elif any(k in clean_query.lower() for k in ["ladakh", "spiti", "himalaya"]) or any(k in loc_clean.lower() for k in ["ladakh", "spiti", "himalaya"]):
         best_season = "May to October (summer passes clear of snow, crisp clear skies)"
     elif gz and gz.get("terrain") == "high_altitude_pass":
@@ -2580,7 +2612,7 @@ async def get_card_insight_endpoint(
     if is_safety:
         transit_hub = "SNM District Hospital Leh (24/7 Oxygen) • BRO 1077 Highway Rescue Emergency Dispatch"
     elif is_innovation:
-        transit_hub = "Decentralized Pan-India Cloud & Edge Telemetry • SIH Innovation Lab"
+        transit_hub = "Techno Main Salt Lake Campus, Sector V, Bidhannagar, Kolkata 700091 • Salt Lake Sector V Metro"
     elif gz:
         transit_hub = f"{gz.get('gateway_airport', 'Domestic airport')} / {gz.get('gateway_rail', 'Railhead')}"
     elif "ladakh" in loc_clean.lower() or "leh" in loc_clean.lower():
@@ -2592,7 +2624,7 @@ async def get_card_insight_endpoint(
     if is_safety:
         eco_tip = "Mandatory 48-hour rest at 11,500 ft before ascending high passes. Never push through symptoms of hypoxia."
     elif is_innovation:
-        eco_tip = "Engineered to promote carbon-neutral travel, sustainable village homestays, and decentralized tourism across India."
+        eco_tip = "Engineered at Techno Main Salt Lake (TMSL) to champion carbon-neutral travel, sustainable village homestays, and decentralized tourism across India."
     elif any(k in clean_query.lower() for k in ["monaster", "temple", "sacred", "prayer", "flag", "gompa", "ghat"]):
         eco_tip = "Observe silent reverence, remove footwear before entering inner sanctums, and ask permission before taking portraits of resident monks or pilgrims."
     elif is_cuisine:
@@ -2626,9 +2658,9 @@ async def get_card_insight_endpoint(
             ]
         elif is_innovation:
             highlights = [
-                "Autonomous AI travel companion built with Google Gemini 3.1 and live pan-India internet grounding.",
-                "Offline-first traveler field pass with vector PDF rendering and emergency rescue telephone directory.",
-                "Interactive spatial telemetry mapping 44 regional hotspots and 6 high-altitude Himalayan passes."
+                "Premier engineering and research institution situated in Kolkata's major IT and innovation hub (Sector V, Salt Lake City).",
+                "Flagship campus of Techno India Group, fostering advanced research in artificial intelligence, cloud architecture, and high-altitude telemetry systems.",
+                "Proud alma mater and innovation home of Team Code Breakerz, engineering the Bharat Explore sustainable tourism platform for SIH 2026."
             ]
         else:
             highlights = [
@@ -2668,13 +2700,15 @@ async def get_card_insight_endpoint(
         if is_safety:
             ai_perspective = f"Comprehensive safety and acclimatization protocols for {clean_query} ensure safe passage across high Himalayan frontiers and remote travel corridors."
         elif is_innovation:
-            ai_perspective = f"{clean_query} represents pioneering SIH 2026 digital infrastructure uniting sustainable eco-tourism, live geospatial telemetry, and community empowerment."
+            ai_perspective = f"Techno Main Salt Lake (TMSL) is the proud innovation campus behind Team Code Breakerz, engineering intelligent pan-India travel companion systems and real-time high-altitude telemetry for Bharat Explore."
         else:
             ai_perspective = f"{clean_query} offers an authentic window into the heritage and landscapes of {loc_clean or 'India'}, celebrated by travelers for sustainable immersion and cultural richness."
 
     suggested_prompt = f"Plan a trip to {clean_query} focusing on local experiences"
     if is_safety:
         suggested_prompt = f"What is the emergency high-altitude medical protocol for {clean_query}?"
+    elif is_innovation:
+        suggested_prompt = "Tell me more about Techno Main Salt Lake and Team Code Breakerz innovations"
     elif gz:
         suggested_prompt = f"Plan a 4-day trip to {gz['name']} under 25000"
     elif loc_clean:
@@ -2683,16 +2717,18 @@ async def get_card_insight_endpoint(
     result = {
         "title": clean_query,
         "category": clean_cat,
-        "location": loc_clean or (gz.get("state") if gz else "India"),
+        "location": "Techno Main Salt Lake (TMSL), Kolkata" if is_innovation else (loc_clean or (gz.get("state") if gz else "India")),
         "summary": summary_text[:750] if summary_text else (desc or "Detailed destination intelligence available on Bharat Explore."),
         "ai_perspective": ai_perspective,
-        "source_url": source_url or "https://en.wikivoyage.org/wiki/India",
-        "source_title": source_title or "Wikivoyage Travel Guide",
+        "source_url": source_url or ("https://en.wikipedia.org/wiki/Techno_India_Group" if is_innovation else "https://en.wikivoyage.org/wiki/India"),
+        "source_title": source_title or ("Wikipedia: Techno Main Salt Lake (TMSL)" if is_innovation else "Wikivoyage Travel Guide"),
         "highlights": highlights,
         "best_season": best_season,
         "transit_hub": transit_hub,
         "eco_tip": eco_tip,
-        "suggested_prompt": suggested_prompt
+        "suggested_prompt": suggested_prompt,
+        "is_innovation": is_innovation,
+        "hide_actions": is_innovation
     }
     CARD_INSIGHT_CACHE[cache_key] = result
     return result

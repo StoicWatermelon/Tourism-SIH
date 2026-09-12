@@ -830,10 +830,29 @@
     `;
     gridEl.appendChild(card);
 
-    const openHandler = () => openModal(member);
+    const openHandler = (e) => {
+      if (typeof window.openAICardInsight === "function") {
+        // Handled by Bharat AI Card Intelligence
+        return;
+      }
+      openModal(member);
+    };
     card.addEventListener('click', openHandler);
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openHandler(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (typeof window.openAICardInsight === "function") {
+          window.openAICardInsight({
+            title: member.role ? `${member.name} (${member.role})` : member.name,
+            category: "SIH 2026 Innovation Team",
+            location: "Techno Main Salt Lake (TMSL)",
+            desc: member.desc || "Smart India Hackathon 2026 Bharat Explore Developer",
+            isCodeBreakerz: true
+          });
+          return;
+        }
+        openModal(member);
+      }
     });
 
     /* Magnetic tilt + border-glow tracking */

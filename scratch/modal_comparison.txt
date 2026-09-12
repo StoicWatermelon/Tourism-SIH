@@ -1,0 +1,83 @@
+ROOT MODAL (9 chars):
+NOT FOUND
+
+==================================================
+SUB MODAL (4170 chars):
+<div class="modal" id="fieldKitModal" aria-hidden="true">
+    <div class="modal-card help-modal-card">
+      <button class="close" data-close onclick="closeHelpModal()">×</button>
+      
+      <div class="help-modal-header">
+        <span class="help-modal-badge">● LIVE HIMALAYAN & NATIONAL EMERGENCY SYSTEM (SIH 2026)</span>
+        <h2>Himalayan Emergency Help & SOS Dispatch</h2>
+        <p>Instant satellite-linked distress transmitter, 24/7 tourist helpline, police command, and altitude trauma rescue.</p>
+      </div>
+
+      <!-- 1. SOS AT THE FIRST (TOP SECTION) -->
+      <div class="sos-beacon-box">
+        <div class="sos-beacon-top-row">
+          <div class="sos-status-tag">
+            <span class="live-dot"></span>
+            <span>SATELLITE BEACON STANDBY • READY TO TRANSMIT</span>
+          </div>
+          <div class="sos-gps-chip" id="sosGpsDisplay">
+            📍 <b>Acquiring device location...</b>
+          </div>
+        </div>
+
+        <div class="sos-input-grid">
+          <div class="sos-field">
+            <label for="sosEmergencyType">Emergency Distress Scenario *</label>
+            <select id="sosEmergencyType">
+              <option value="Altitude Sickness (AMS / SpO2 Hypoxia)">🏔️ Altitude Sickness (AMS / SpO2 &lt; 70% Hypoxia)</option>
+              <option value="Mountain Pass Blocked / Avalanche / Landslide">❄️ High Mountain Pass Blocked / Avalanche</option>
+              <option value="Vehicle Breakdown / Stranded Remote Sector">🚗 Vehicle Breakdown / Stranded Remote Sector</option>
+              <option value="Medical Trauma / Severe Injury">🏥 Medical Trauma / Severe Injury</option>
+              <option value="Lost / Search & Rescue Required">🆘 Search & Rescue / Lost in Wilderness</option>
+            </select>
+          </div>
+          <div class="sos-field">
+            <label for="sosSectorSelect">Override Location (Optional)</label>
+            <select id="sosSectorSelect">
+              <option value="current-device">📍 Current Device Location (Auto GPS)</option>
+              <option value="khardungla">Khardung La Pass (17,582 ft) - Leh Sector</option>
+              <option value="changla">Chang La Pass (17,688 ft) - Pangong Route</option>
+              <option value="tanglangla">Tanglang La Pass (17,480 ft) - Manali Hwy</option>
+              <option value="zojila">Zoji La Pass (11,575 ft) - Srinagar-Leh Hwy</option>
+              <option value="pangong">Pangong Tso Sector (14,270 ft)</option>
+              <option value="nubra">Diskit / Nubra Valley (10,000 ft)</option>
+              <option value="hanle">Hanle Dark Sky Reserve (14,900 ft)</option>
+              <option value="leh">Leh District SNM Trauma Base (11,500 ft)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sos-field" style="margin-bottom: 14px;">
+          <label for="sosNotes">Emergency Details / Notes</label>
+          <input type="text" id="sosNotes" placeholder="e.g. 2 travelers with severe headache, pulse ox dropping, need oxygen cylinder & evacuation" value="Altitude hypoxia symptoms detected. Oxygen support requested.">
+        </div>
+
+        <button type="button" class="sos-transmit-btn" id="transmitSosBtn">
+          🚨 <b>TRANSMIT EMERGENCY SOS DISTRESS SIGNAL</b>
+        </button>
+
+        <!-- Live Feedback Panel -->
+        <div class="sos-broadcast-feedback" id="sosBroadcastFeedback"></div>
+      </div>
+
+      <!-- 2. NATIONAL TOURIST HELPLINE & POLICE NUMBERS (IMMEDIATELY BELOW SOS) -->
+      <div class="hotlines-section">
+        <div class="hotlines-title">
+          <span>📞 24/7 National Emergency Hotlines & Police Response</span>
+        </div>
+        
+        <div class="hotlines-grid">
+          <!-- National Tourist Helpline -->
+          <div class="hotline-card tourist-card">
+            <div class="hotline-card-header">
+              <div class="hotline-card-icon">🇮🇳</div>
+              <div>
+                <div class="hotline-card-name">National Tourist Helpline (24/7)</div>
+                <div class="hotline-card-sub">Ministry of Tourism, Govt of India • Multi-lingual (12 Languages)</div>
+              </div>
+            </div>

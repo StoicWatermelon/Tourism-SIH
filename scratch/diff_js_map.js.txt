@@ -1,0 +1,455 @@
+--- js/map.js
++++ Bharat_Explore_SIH_Tourism\js/map.js
+@@ -956,7 +956,7 @@
+           <div class="map-card-season">Best: <b>${h.bestSeason}</b></div>
+           <div class="map-card-actions">
+             <button class="map-btn-action detail" onclick="focusHotspot('${h.id}')" title="Inspect Full Dossier">Details →</button>
+-            <button class="map-btn-action plan" onclick="planHotspot('${h.name}')" title="Generate AI Itinerary">Plan Trip ✦</button>
++            <button class="map-btn-action plan" onclick="planHotspot('${h.name}')" title="Generate AI Tour Plan">Plan Trip ✦</button>
+           </div>
+         </div>
+       </div>
+@@ -981,7 +981,7 @@
+     panel.innerHTML = `
+       <p class="eyebrow">SELECT A REGION</p>
+       <h3>Discover India</h3>
+-      <p>Click on any pulse marker on the map to inspect full interactive cards and regional telemetry, or connect immediately to the Smart Itinerary Planner.</p>
++      <p>Click on any pulse marker on the map to inspect full interactive cards and regional telemetry, or connect immediately to the Smart Tour Planner.</p>
+     `;
+   }
+ }
+@@ -1062,7 +1062,7 @@
+   const lblOverview = lang === "hi" ? "अवलोकन:" : lang === "bn" ? "সংক্ষিপ্ত বিবরণ:" : "Overview:";
+   const lblCulture = lang === "hi" ? "सजीव संस्कृति:" : lang === "bn" ? "জীবন্ত সংস্কৃতি:" : "Living Culture:";
+   const lblFood = lang === "hi" ? "स्थानीय स्वाद:" : lang === "bn" ? "স্থানীয় স্বাদ:" : "Local Zero-Mile Flavors:";
+-  const btnPlanText = lang === "hi" ? `योजना बनाएं (${h.name}) →` : lang === "bn" ? `ভ্রমণ পরিকল্পনা (${h.name}) →` : `Plan Itinerary for ${h.name} →`;
++  const btnPlanText = lang === "hi" ? `योजना बनाएं (${h.name}) →` : lang === "bn" ? `ভ্রমণ পরিকল্পনা (${h.name}) →` : `Plan Tour for ${h.name} →`;
+   const btnResetText = lang === "hi" ? "↺ संपूर्ण मानचित्र" : lang === "bn" ? "↺ সমগ্র মানচিত্র" : "↺ Overview Map";
+ 
+   panel.innerHTML = `
+@@ -1083,41 +1083,10 @@
+       <button class="btn primary" style="padding:9px 18px; font-size:13px;" onclick="loadStateIntoPlanner('${h.name}')">
+         ${btnPlanText}
+       </button>
+-      <button class="btn ghost" style="padding:9px 16px; font-size:13px; border:1px solid rgba(82,183,136,0.5); color:#74c69d;" onclick="triggerHotspotAIIntel('${h.id}')">
+-        ✨ AI Intel
+-      </button>
+       <button class="map-reset-btn" onclick="resetMapView()">${btnResetText}</button>
+     </div>
+   `;
+ }
+-
+-function triggerHotspotAIIntel(hotspotId) {
+-  const h = indiaHotspots.find(x => x.id === hotspotId || x.name.toLowerCase() === hotspotId.toLowerCase());
+-  if (!h) return;
+-  if (typeof window.openAICardInsight === "function") {
+-    window.openAICardInsight({
+-      title: h.name,
+-      category: h.badge || "Destination",
+-      location: h.state,
+-      desc: h.desc,
+-      img: h.img
+-    });
+-  }
+-}
+-window.triggerHotspotAIIntel = triggerHotspotAIIntel;
+-
+-function triggerStateAIIntel(stateName) {
+-  const s = indiaStates[stateName] || (typeof states !== "undefined" ? states[stateName] : null);
+-  if (typeof window.openAICardInsight === "function") {
+-    window.openAICardInsight({
+-      title: stateName,
+-      category: "State Circuit",
+-      location: stateName,
+-      desc: s ? s.exp : ""
+-    });
+-  }
+-}
+-window.triggerStateAIIntel = triggerStateAIIntel;
+ 
+ function statePanel(name) {
+   // Check if it's one of the rich hotspots
+@@ -1132,20 +1101,20 @@
+   }
+ 
+   // Fallback to legacy states dictionary
+-  const s = indiaStates[name] || (typeof states !== "undefined" ? states[name] : null);
++  const s = states[name];
+   const panel = $("#statePanel");
+-  if (!panel || !s) return;
++  if (!s || !panel) return;
+ 
+   currentActivePanelTarget = { type: 'state', data: name };
+   const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+   const lblCap = lang === "hi" ? "राजधानी:" : lang === "bn" ? "রাজধানী:" : "Capital:";
+   const lblAlt = lang === "hi" ? "ऊंचाई:" : lang === "bn" ? "উচ্চতা:" : "Altitude:";
+-  const lblSeason = lang === "hi" ? "सर्वश्रेष्ठ मौसम:" : lang === "bn" ? "সেরা মরশুম:" : "Ideal Season:";
+-  const lblHighlights = lang === "hi" ? "प्रमुख आकर्षण:" : lang === "bn" ? "প্রধান আকর্ষণ:" : "Top Highlights:";
+-  const lblExp = lang === "hi" ? "अनुभव:" : lang === "bn" ? "অভিজ্ঞতা:" : "Signature Experience:";
+-  const lblCulture = lang === "hi" ? "सांस्कृतिक विरासत:" : lang === "bn" ? "সাংস্কৃতিক ঐতিহ্য:" : "Living Heritage:";
+-  const lblFood = lang === "hi" ? "स्थानीय व्यंजन:" : lang === "bn" ? "স্থানীয় খাবার:" : "Local Cuisine:";
+-  const btnPlanText = lang === "hi" ? "योजना बनाएं →" : lang === "bn" ? "ভ্রমণ পরিকল্পনা →" : "Plan Itinerary →";
++  const lblSeason = lang === "hi" ? "मुख्य मौसम:" : lang === "bn" ? "প্রধান ঋতু:" : "Prime Season:";
++  const lblHighlights = lang === "hi" ? "मुख्य आकर्षण:" : lang === "bn" ? "প্রধান আকর্ষণ:" : "Highlights:";
++  const lblExp = lang === "hi" ? "प्रमुख अनुभव:" : lang === "bn" ? "বিশেষ অভিজ্ঞতা:" : "Signature Experiences:";
++  const lblCulture = lang === "hi" ? "सजीव संस्कृति:" : lang === "bn" ? "জীবন্ত সংস্কৃতি:" : "Living Culture:";
++  const lblFood = lang === "hi" ? "स्थानीय स्वाद:" : lang === "bn" ? "স্থানীয় খাদ্য:" : "Local Flavors:";
++  const btnPlanText = lang === "hi" ? `योजना बनाएं (${name}) →` : lang === "bn" ? `ভ্রমণ পরিকল্পনা (${name}) →` : `Plan Tour for ${name} →`;
+   const btnResetText = lang === "hi" ? "↺ संपूर्ण मानचित्र" : lang === "bn" ? "↺ সমগ্র মানচিত্র" : "↺ Overview Map";
+ 
+   panel.innerHTML = `
+@@ -1161,9 +1130,6 @@
+       <button class="btn primary" style="padding:9px 18px; font-size:13px;" onclick="loadStateIntoPlanner('${name}')">
+         ${btnPlanText}
+       </button>
+-      <button class="btn ghost" style="padding:9px 16px; font-size:13px; border:1px solid rgba(82,183,136,0.5); color:#74c69d;" onclick="triggerStateAIIntel('${name}')">
+-        ✨ AI Intel
+-      </button>
+       <button class="map-reset-btn" onclick="resetMapView()">${btnResetText}</button>
+     </div>
+   `;
+@@ -1180,43 +1146,27 @@
+ });
+ 
+ function loadStateIntoPlanner(stateName) {
+-  const el = $("#planDestination");
+-  if (!el) return;
+-
+-  if (el.tagName === "INPUT") {
+-    el.value = stateName;
+-    const listId = el.getAttribute("list");
+-    if (listId) {
+-      const dl = document.getElementById(listId);
+-      if (dl) {
+-        const opts = Array.from(dl.options || []);
+-        if (!opts.some(o => o.value.toLowerCase() === stateName.toLowerCase())) {
+-          const opt = document.createElement("option");
+-          opt.value = stateName;
+-          dl.appendChild(opt);
+-        }
+-      }
+-    }
+-  } else if (el.options) {
+-    let exists = false;
+-    for (let i = 0; i < el.options.length; i++) {
+-      if (el.options[i].value.toLowerCase() === stateName.toLowerCase() || el.options[i].text.toLowerCase().includes(stateName.toLowerCase())) {
+-        el.selectedIndex = i;
+-        exists = true;
+-        break;
+-      }
+-    }
+-
+-    if (!exists) {
+-      const opt = document.createElement("option");
+-      opt.value = stateName;
+-      opt.text = stateName;
+-      el.add(opt);
+-      el.value = stateName;
+-    }
+-  }
+-
+-  toast(`Selected ${stateName} for safety-audited itinerary generation.`);
++  const select = $("#planDestination");
++  if (!select) return;
++
++  let exists = false;
++  for (let i = 0; i < select.options.length; i++) {
++    if (select.options[i].value.toLowerCase() === stateName.toLowerCase() || select.options[i].text.toLowerCase().includes(stateName.toLowerCase())) {
++      select.selectedIndex = i;
++      exists = true;
++      break;
++    }
++  }
++
++  if (!exists) {
++    const opt = document.createElement("option");
++    opt.value = stateName;
++    opt.text = stateName;
++    select.add(opt);
++    select.value = stateName;
++  }
++
++  toast(`Selected ${stateName} for safety-audited tour plan generation.`);
+   const plannerSec = $("#planner");
+   if (plannerSec) {
+     plannerSec.scrollIntoView({ behavior: "smooth" });
+@@ -1400,6 +1350,212 @@
+     requestAnimationFrame(() => {
+       ensureCardFullyInView(tooltipEl);
+     });
++  }
++}
++
++// ═══════════════════════════════════════════════════════
++//  LIVE SOS DISTRESS TELEMETRY & RADAR DISPATCH ENGINE
++// ═══════════════════════════════════════════════════════
++
++let sosMarkersLayer = null;
++let activeSosSignals = [];
++let sosMarkersMap = {};
++let sosBannerEl = null;
++
++async function fetchAndRenderSosSignals() {
++  if (!leafletMap || !sosMarkersLayer) return;
++
++  let remoteSignals = [];
++  try {
++    const res = await fetch('/api/sos');
++    if (res.ok) {
++      const data = await res.json();
++      if (data && Array.isArray(data.signals)) {
++        remoteSignals = data.signals;
++      }
++    }
++  } catch (e) {
++    console.warn('[SOS] Remote fetch fallback active:', e);
++  }
++
++  // Load persistent local active SOS signals and resolved IDs
++  let localSignals = [];
++  let resolvedIds = [];
++  try {
++    localSignals = JSON.parse(localStorage.getItem('bharat_active_sos') || '[]');
++    resolvedIds = JSON.parse(localStorage.getItem('bharat_resolved_sos_ids') || '[]');
++  } catch (e) {}
++
++  // Merge remote and local by id, filtering out any explicitly resolved by user
++  const signalsMap = new Map();
++
++  // 1. Add remote signals first (if status is ACTIVE and not user-resolved)
++  remoteSignals.forEach(sig => {
++    if (sig && sig.id && sig.status === 'ACTIVE' && !resolvedIds.includes(sig.id)) {
++      signalsMap.set(sig.id, sig);
++    }
++  });
++
++  // 2. Merge local signals so user's active SOS beacon is NEVER wiped out by empty/reloaded server responses
++  localSignals.forEach(sig => {
++    if (sig && sig.id && sig.status === 'ACTIVE' && !resolvedIds.includes(sig.id)) {
++      signalsMap.set(sig.id, sig);
++    }
++  });
++
++  activeSosSignals = Array.from(signalsMap.values());
++  renderSosMarkers(activeSosSignals);
++  renderSosBanner(activeSosSignals);
++}
++
++function renderSosMarkers(signals) {
++  if (!sosMarkersLayer) return;
++  sosMarkersLayer.clearLayers();
++  sosMarkersMap = {};
++
++  signals.forEach(sig => {
++    if (sig.status !== 'ACTIVE') return;
++
++    const lat = parseFloat(sig.lat);
++    const lng = parseFloat(sig.lng);
++    if (isNaN(lat) || isNaN(lng)) return;
++
++    const customIcon = L.divIcon({
++      className: 'sos-beacon-wrapper',
++      html: `
++        <div class="sos-beacon-marker" title="ACTIVE SOS DISTRESS: ${sig.location_name || 'Emergency Beacon'}">
++          <div class="sos-ripple sos-ripple-1"></div>
++          <div class="sos-ripple sos-ripple-2"></div>
++          <div class="sos-core">🚨</div>
++          <span class="sos-label">SOS ACTIVE</span>
++        </div>
++      `,
++      iconSize: [44, 44],
++      iconAnchor: [22, 22]
++    });
++
++    const marker = L.marker([lat, lng], { icon: customIcon, zIndexOffset: 2000 });
++
++    const timeStr = sig.created_at ? formatTimeAgo(sig.created_at) : 'Active now';
++    const popupHtml = `
++      <div class="sos-popup-card">
++        <div class="sos-popup-header">
++          <span class="sos-popup-badge">🚨 CRITICAL DISTRESS</span>
++          <span class="sos-popup-time">${timeStr}</span>
++        </div>
++        <h3 class="sos-popup-title">${sig.emergency_type || 'Emergency Distress'}</h3>
++        <div class="sos-popup-loc">📍 <b>${sig.location_name || 'Himalayan Grid'}</b> (${lat.toFixed(4)}, ${lng.toFixed(4)})</div>
++        <div class="sos-popup-desc">
++          "${sig.description || 'Emergency assistance requested. Altitude hypoxia protocols engaged.'}"
++          <div style="margin-top:6px; font-size:11px; color:#cbd5e1;"><b>Traveler:</b> ${sig.traveler_name || 'Verified Explorer'} ${sig.phone ? '• Tel: ' + sig.phone : ''}</div>
++        </div>
++        <div class="sos-popup-hotlines">
++          <a href="tel:112" class="sos-call-btn police">🚨 Call 112 Police / Emergency</a>
++          <a href="tel:1363" class="sos-call-btn" style="background:rgba(245,158,11,0.2); border:1px solid #f59e0b; color:#fbbf24;">📞 Call 1363 Tourist Helpline</a>
++          <a href="tel:+911982252014" class="sos-call-btn hospital">🚑 Call SNM Trauma (+91-1982-252014)</a>
++        </div>
++        <button class="sos-resolve-btn" onclick="window.resolveSosSignal('${sig.id}')">✓ Mark Distress as Resolved / Stand Down</button>
++      </div>
++    `;
++
++    marker.bindPopup(popupHtml, {
++      className: 'sos-emergency-popup',
++      maxWidth: 340,
++      autoPanPadding: [20, 20]
++    });
++
++    sosMarkersMap[sig.id] = marker;
++    sosMarkersLayer.addLayer(marker);
++  });
++}
++
++function renderSosBanner(signals) {
++  const mapContainer = document.getElementById('map');
++  if (!mapContainer) return;
++
++  const active = signals.filter(s => s.status === 'ACTIVE');
++
++  if (!active.length) {
++    if (sosBannerEl) {
++      sosBannerEl.remove();
++      sosBannerEl = null;
++    }
++    return;
++  }
++
++  if (!sosBannerEl) {
++    sosBannerEl = document.createElement('div');
++    sosBannerEl.className = 'map-sos-floating-banner';
++    mapContainer.appendChild(sosBannerEl);
++  }
++
++  const first = active[0];
++  sosBannerEl.innerHTML = `
++    <span class="sos-banner-dot"></span>
++    <span class="sos-banner-text">
++      🚨 <b>${active.length} ACTIVE DISTRESS BEACON${active.length > 1 ? 'S' : ''}:</b>
++      ${first.location_name || 'High Altitude Sector'}
++    </span>
++    <button class="sos-focus-btn" onclick="window.focusSosBeacon('${first.id}')">Focus Beacon 🎯</button>
++  `;
++}
++
++function focusSosBeacon(sigId) {
++  if (!leafletMap) return;
++  const sig = activeSosSignals.find(s => s.id === sigId) || activeSosSignals[0];
++  if (!sig) return;
++
++  const lat = parseFloat(sig.lat);
++  const lng = parseFloat(sig.lng);
++  leafletMap.flyTo([lat, lng], 11, { duration: 1.5 });
++
++  setTimeout(() => {
++    const marker = sosMarkersMap[sig.id];
++    if (marker) {
++      marker.openPopup();
++    }
++  }, 1600);
++}
++
++async function resolveSosSignal(sigId) {
++  // 1. Instantly record resolution in localStorage so beacon is turned off only by user action
++  try {
++    const resolvedIds = JSON.parse(localStorage.getItem('bharat_resolved_sos_ids') || '[]');
++    if (!resolvedIds.includes(sigId)) {
++      resolvedIds.push(sigId);
++      localStorage.setItem('bharat_resolved_sos_ids', JSON.stringify(resolvedIds));
++    }
++    const local = JSON.parse(localStorage.getItem('bharat_active_sos') || '[]');
++    const updated = local.filter(s => s.id !== sigId);
++    localStorage.setItem('bharat_active_sos', JSON.stringify(updated));
++  } catch (e) {}
++
++  // 2. Remove from active state immediately
++  activeSosSignals = activeSosSignals.filter(s => s.id !== sigId);
++  renderSosMarkers(activeSosSignals);
++  renderSosBanner(activeSosSignals);
++
++  // 3. Notify backend
++  try {
++    await fetch(`/api/sos/${encodeURIComponent(sigId)}/resolve`, { method: 'POST' });
++  } catch (e) {
++    console.warn('[SOS] Resolve remote note:', e);
++  }
++
++  toast('Distress signal marked as resolved and stood down.');
++  window.dispatchEvent(new CustomEvent('bharat:sos-resolved', { detail: { id: sigId } }));
++}
++
++function formatTimeAgo(isoStr) {
++  try {
++    const diffSec = Math.floor((new Date() - new Date(isoStr)) / 1000);
++    if (diffSec < 60) return 'Just now';
++    const diffMin = Math.floor(diffSec / 60);
++    if (diffMin < 60) return `${diffMin}m ago`;
++    const diffHr = Math.floor(diffMin / 60);
++    return `${diffHr}h ago`;
++  } catch (e) {
++    return 'Active';
+   }
+ }
+ 
+@@ -1578,6 +1734,40 @@
+     hotspotMarkersLayer.addLayer(marker);
+   });
+ 
++  // Create SOS Distress Beacon Layer (SIH 2026)
++  sosMarkersLayer = L.layerGroup().addTo(leafletMap);
++  fetchAndRenderSosSignals();
++
++  // Periodic Telemetry Polling (Every 6 seconds so everybody sees live SOS signals)
++  if (!window._sosPollInterval) {
++    window._sosPollInterval = setInterval(fetchAndRenderSosSignals, 6000);
++  }
++
++  // Cross-Tab and Instant Event Listeners for real-time sync
++  window.addEventListener('storage', (e) => {
++    if (e.key === 'bharat_sos_broadcast' || e.key === 'bharat_active_sos') {
++      fetchAndRenderSosSignals();
++    }
++  });
++  window.addEventListener('bharat:sos-sent', () => {
++    fetchAndRenderSosSignals();
++    setTimeout(fetchAndRenderSosSignals, 1000);
++  });
++  window.addEventListener('bharat:sos-resolved', () => {
++    fetchAndRenderSosSignals();
++  });
++
++  // Check URL parameters for direct SOS beacon focus (e.g. map.html?sos=sos-demo-khardungla)
++  try {
++    const urlParams = new URLSearchParams(window.location.search);
++    const targetSos = urlParams.get('sos');
++    if (targetSos) {
++      setTimeout(() => {
++        focusSosBeacon(targetSos === 'latest' ? null : targetSos);
++      }, 900);
++    }
++  } catch (e) {}
++
+   // Load vivid state & country boundaries GeoJSON
+   loadStateBoundaries();
+ 
+@@ -1593,7 +1783,9 @@
+       if (target.closest('.hotspot-marker-wrapper') || 
+           target.closest('.hotspot-pin') || 
+           target.closest('.map-hover-card') ||
+-          target.closest('.leaflet-popup')) {
++          target.closest('.leaflet-popup') ||
++          target.closest('.sos-beacon-wrapper') ||
++          target.closest('.map-sos-floating-banner')) {
+         return;
+       }
+     }
+@@ -1651,6 +1843,9 @@
+   window.closeActiveTooltip = closeActiveTooltip;
+   window.filterMapHotspots = filterMapHotspots;
+   window.statePanel = statePanel;
++  window.fetchAndRenderSosSignals = fetchAndRenderSosSignals;
++  window.focusSosBeacon = focusSosBeacon;
++  window.resolveSosSignal = resolveSosSignal;
+ 
+   // Auto-initialize if DOM is ready, or on DOMContentLoaded
+   if (document.readyState === "complete" || document.readyState === "interactive") {
+@@ -1659,3 +1854,4 @@
+     document.addEventListener("DOMContentLoaded", initMap);
+   }
+ })();
++

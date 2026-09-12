@@ -159,6 +159,56 @@
 
     <!-- Dedicated Native AI Travel Workspace Console -->
     <section class="ai-console-section" id="ai">
+      <!-- Autonomous Travel Planner Pipeline Tracker (Execution Queue) -->
+      <div class="agent-tracker-wrap" id="agentTrackerWrap">
+        <div class="agent-tracker-header">
+          <div class="agent-tracker-title">
+            <span>⚡ Autonomous Travel Planner Pipeline (Execution Queue)</span>
+          </div>
+          <div class="agent-checkpoint-pill" id="agentCheckpointPill">
+            <span class="checkpoint-icon">🛡️</span>
+            <span id="checkpointCountText">Checkpoints Ready • Active Model: Gemini 3.1 Flash Lite</span>
+          </div>
+        </div>
+        <div class="agent-steps-grid" id="agentStepsGrid">
+          <div class="agent-step-item active" id="step-1">
+            <div class="step-badge-icon">1</div>
+            <div class="step-info">
+              <span class="step-name">1. Info Gathering</span>
+              <span class="step-status" id="step1Status">Listening for intent...</span>
+            </div>
+          </div>
+          <div class="agent-step-item pending" id="step-2">
+            <div class="step-badge-icon">2</div>
+            <div class="step-info">
+              <span class="step-name">2. Flight Comparison</span>
+              <span class="step-status" id="step2Status">Queued</span>
+            </div>
+          </div>
+          <div class="agent-step-item pending" id="step-3">
+            <div class="step-badge-icon">3</div>
+            <div class="step-info">
+              <span class="step-name">3. Hotel Shortlist</span>
+              <span class="step-status" id="step3Status">Queued</span>
+            </div>
+          </div>
+          <div class="agent-step-item pending" id="step-4">
+            <div class="step-badge-icon">4</div>
+            <div class="step-info">
+              <span class="step-name">4. Clustered Itinerary</span>
+              <span class="step-status" id="step4Status">Queued</span>
+            </div>
+          </div>
+          <div class="agent-step-item pending" id="step-5">
+            <div class="step-badge-icon">5</div>
+            <div class="step-info">
+              <span class="step-name">5. Budget &amp; Safety</span>
+              <span class="step-status" id="step5Status">Queued</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="ai-console-workspace">
         
         <!-- Left Companion Control Panel & Discovery Hub -->
@@ -226,6 +276,20 @@
             </div>
           </div>
 
+          <!-- Smart Intent Filter Pills -->
+          <div class="ai-sidebar-card">
+            <div class="ai-sidebar-title">
+              <span>🎯</span> TRAVEL STYLE &amp; INTENT
+            </div>
+            <div class="smart-intent-pills">
+              <button type="button" class="intent-pill" data-intent="Weekend Getaway">⚡ Weekend Getaway</button>
+              <button type="button" class="intent-pill" data-intent="Family Vacation">👨‍👩‍👦 Family Vacation</button>
+              <button type="button" class="intent-pill" data-intent="Budget Backpacker">🎒 Budget Backpacker</button>
+              <button type="button" class="intent-pill" data-intent="Royal Luxury">👑 Royal Luxury</button>
+              <button type="button" class="intent-pill" data-intent="High passes trek">🏔️ High Pass Trek</button>
+            </div>
+          </div>
+
           <!-- Thematic Fast Starters Card -->
           <div class="ai-sidebar-card">
             <div class="ai-sidebar-title">
@@ -253,21 +317,22 @@
         </aside>
 
         <!-- Main Dedicated Native Chat Canvas -->
-        <div class="ai-console-main">
-          <div class="chat chat-native-page" id="chatWindow" role="region" aria-label="Bharat AI chat">
+        <div class="ai-console-main chat-native-page">
+          <div class="chat" id="chatWindow" role="region" aria-label="Bharat AI chat">
             <div class="chat-head">
               <span class="ai-orb idle" id="aiOrb" aria-label="AI Status Indicator">✦</span>
               <div>
                 <b data-i18n="ai_bot_title">BHARAT AI</b>
                 <small id="aiStatusText" data-i18n="ai_bot_status">Active • Live Telemetry Online</small>
               </div>
-              <span class="chat-model-tag">Gemini 3.1 Flash Lite</span>
+              <span class="chat-model-tag" id="activeModelTag">Gemini 3.1 Flash Lite</span>
               <div class="chat-origin-chip" id="chatOriginChip" title="Your detected trip origin">
                 📍 <span class="detected-origin-badge" id="detectedOriginBadge">
                   <span class="origin-city-name">Detecting origin...</span>
                 </span>
               </div>
               <div class="chat-header-actions">
+                <button type="button" class="chat-head-btn" id="chatExportBtn" title="Export / Download Conversation Log" aria-label="Export Chat" onclick="window.exportChatLog && exportChatLog()">📥</button>
                 <button type="button" class="chat-head-btn" id="chatExpandBtn" title="Toggle Fullscreen Console" aria-label="Toggle Fullscreen Console" onclick="window.toggleFullscreenChat && toggleFullscreenChat()">⛶</button>
                 <button type="button" class="chat-head-btn" id="chatClearBtn" title="Reset Chat to Instructions" aria-label="Reset Chat" onclick="window.resetChatConsole && resetChatConsole()">🔄</button>
               </div>
@@ -300,7 +365,7 @@
                     ✨ Quick-Start Prompts (Click Any to Run Immediately):
                   </div>
                   <div class="quick-prompts-grid">
-                    <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan me 4 days in Kerala backwaters under ₹25,000 for 2 people')">🌊 Plan Kerala (4D • ₹25k)</button>
+                    <button type="button" class="chat-prompt-pill" data-goal="I don't want to plan anything. I have ₹25,000 for 4 days in Kerala." onclick="window.askAI && askAI('Plan me 4 days in Kerala backwaters under ₹25,000 for 2 people')">🌊 Plan Kerala (4D • ₹25k Goal)</button>
                     <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Tell me about Cooch Behar Rajbari palace, Madan Mohan Bari, and local food')">👑 Cooch Behar Heritage</button>
                     <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What are the best places to visit in Thane like Upvan Lake and Yeoor Hills?')">🌿 Thane City &amp; Nature</button>
                     <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('What is the mandatory 48-hr acclimatization protocol for Leh Ladakh?')">🏔️ Ladakh AMS Safety</button>
@@ -331,7 +396,7 @@
             <form class="chat-form" id="chatForm">
               <input id="chatInput" placeholder="Ask Bharat AI about destinations, routes, food, culture..." autocomplete="off" aria-label="Chat input" data-i18n-placeholder="ai_input_placeholder">
               <button type="button" class="chat-mic-btn" id="chatMicBtn" title="Voice Input" onclick="window.toggleSpeechInput && toggleSpeechInput('chatInput', 'chatMicBtn')">🎤</button>
-              <button type="submit" aria-label="Send message" data-i18n="ai_send">Send →</button>
+              <button type="submit" id="chatSubmitBtn" aria-label="Send message" data-i18n="ai_send">Send →</button>
             </form>
           </div>
         </div>

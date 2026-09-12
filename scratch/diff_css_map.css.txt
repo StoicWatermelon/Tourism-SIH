@@ -1,0 +1,354 @@
+--- css/map.css
++++ Bharat_Explore_SIH_Tourism\css/map.css
+@@ -6,7 +6,7 @@
+ /* Section Layout */
+ .map-section {
+   padding: 85px 8vw;
+-  background: linear-gradient(180deg, var(--bg-soft, #f4f8f6) 0%, #ecf4f0 100%);
++  background: linear-gradient(180deg, var(--paper, #f4efe4) 0%, #e5ddcc 100%);
+   position: relative;
+   z-index: 1;
+ }
+@@ -82,7 +82,7 @@
+ .india-map.leaflet-container,
+ .india-map .leaflet-container {
+   background: #b5dbff !important;
+-  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
++  font-family: var(--font-body, 'DM Sans', sans-serif);
+   width: 100%;
+   height: 100%;
+   min-height: 600px;
+@@ -131,7 +131,7 @@
+   background: rgba(255, 255, 255, 0.95);
+   border: 1px solid rgba(0, 0, 0, 0.15);
+   color: var(--ink, #0a1c14);
+-  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
++  font-family: var(--font-body, 'DM Sans', sans-serif);
+   font-size: 11.5px;
+   font-weight: 700;
+   padding: 6px 13px;
+@@ -302,7 +302,7 @@
+   padding: 0 !important;
+   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65) !important;
+   color: #fff !important;
+-  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif) !important;
++  font-family: var(--font-body, 'DM Sans', sans-serif) !important;
+   width: 290px !important;
+   max-width: 90vw !important;
+   pointer-events: auto !important; /* Critical: user can enter card & click actions! */
+@@ -614,12 +614,9 @@
+ }
+ 
+ .state-panel h3 {
+-  font-family: var(--font-main, 'Montserrat', sans-serif);
+-  font-size: 28px;
+-  font-weight: 700;
+-  line-height: 1.2;
++  font: 600 30px/1.15 "Playfair Display", serif;
+   margin: 6px 0 8px;
+-  color: var(--gold-pop, #f59e0b);
++  color: var(--gold-pop, #e9c46a);
+ }
+ 
+ .state-panel p:not(.eyebrow) {
+@@ -674,3 +671,300 @@
+     font-size: 24px;
+   }
+ }
++
++/* ═══════════════════════════════════════════════════════
++   EMERGENCY SOS DISTRESS BEACON & MAP RADAR TELEMETRY (SIH 2026)
++   ═══════════════════════════════════════════════════════ */
++
++/* Pulsing Radar SOS Marker */
++.sos-beacon-wrapper {
++  position: relative;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++}
++
++.sos-beacon-marker {
++  position: relative;
++  width: 44px;
++  height: 44px;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  cursor: pointer;
++}
++
++.sos-beacon-marker .sos-ripple {
++  position: absolute;
++  width: 100%;
++  height: 100%;
++  border-radius: 50%;
++  background: rgba(239, 68, 68, 0.4);
++  border: 2px solid rgba(239, 68, 68, 0.9);
++  pointer-events: none;
++  animation: sosRadarPing 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
++}
++
++.sos-beacon-marker .sos-ripple-2 {
++  animation-delay: 0.75s;
++}
++
++.sos-beacon-marker .sos-core {
++  position: relative;
++  width: 32px;
++  height: 32px;
++  border-radius: 50%;
++  background: radial-gradient(circle, #ff2a2a 0%, #b91c1c 100%);
++  border: 2px solid #ffffff;
++  box-shadow: 0 0 16px rgba(239, 68, 68, 0.9), 0 0 30px rgba(220, 38, 38, 0.5);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  font-size: 15px;
++  color: #fff;
++  animation: sosCorePulse 1s ease-in-out infinite alternate;
++  z-index: 2;
++}
++
++.sos-beacon-marker .sos-label {
++  position: absolute;
++  top: -24px;
++  left: 50%;
++  transform: translateX(-50%);
++  background: #b91c1c;
++  color: #fff;
++  font-size: 10px;
++  font-weight: 800;
++  letter-spacing: 0.5px;
++  padding: 2px 7px;
++  border-radius: 4px;
++  border: 1px solid rgba(255, 255, 255, 0.6);
++  white-space: nowrap;
++  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
++  pointer-events: none;
++  z-index: 3;
++}
++
++@keyframes sosRadarPing {
++  0% {
++    transform: scale(0.4);
++    opacity: 1;
++  }
++  100% {
++    transform: scale(2.8);
++    opacity: 0;
++  }
++}
++
++@keyframes sosCorePulse {
++  0% {
++    transform: scale(0.92);
++    box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
++  }
++  100% {
++    transform: scale(1.08);
++    box-shadow: 0 0 24px rgba(255, 34, 34, 1);
++  }
++}
++
++/* Floating SOS Distress Alert Banner on Map */
++.map-sos-floating-banner {
++  position: absolute;
++  top: 14px;
++  left: 50%;
++  transform: translateX(-50%);
++  z-index: 1000;
++  display: flex;
++  align-items: center;
++  gap: 12px;
++  background: rgba(15, 23, 42, 0.92);
++  backdrop-filter: blur(10px);
++  -webkit-backdrop-filter: blur(10px);
++  border: 1.5px solid rgba(239, 68, 68, 0.7);
++  border-radius: 999px;
++  padding: 8px 18px 8px 14px;
++  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
++  color: #fff;
++  font-size: 13px;
++  max-width: 90vw;
++  animation: sosBannerPulse 2s infinite ease-in-out;
++}
++
++@keyframes sosBannerPulse {
++  0%, 100% {
++    border-color: rgba(239, 68, 68, 0.6);
++    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
++  }
++  50% {
++    border-color: rgba(255, 80, 80, 1);
++    box-shadow: 0 12px 36px rgba(255, 40, 40, 0.55);
++  }
++}
++
++.map-sos-floating-banner .sos-banner-dot {
++  width: 10px;
++  height: 10px;
++  border-radius: 50%;
++  background: #ef4444;
++  box-shadow: 0 0 8px #ef4444;
++  animation: sosCorePulse 0.8s infinite alternate;
++  flex-shrink: 0;
++}
++
++.map-sos-floating-banner .sos-banner-text {
++  font-weight: 600;
++  display: flex;
++  align-items: center;
++  gap: 6px;
++}
++
++.map-sos-floating-banner .sos-focus-btn {
++  background: #ef4444;
++  color: #fff;
++  border: none;
++  border-radius: 999px;
++  padding: 4px 12px;
++  font-size: 11.5px;
++  font-weight: 700;
++  cursor: pointer;
++  transition: all 0.2s ease;
++  white-space: nowrap;
++}
++
++.map-sos-floating-banner .sos-focus-btn:hover {
++  background: #dc2626;
++  transform: scale(1.05);
++}
++
++/* Custom Leaflet SOS Emergency Popup */
++.sos-emergency-popup .leaflet-popup-content-wrapper {
++  background: #0f172a;
++  color: #f8fafc;
++  border-radius: 14px;
++  border: 2px solid #ef4444;
++  box-shadow: 0 14px 40px rgba(220, 38, 38, 0.45);
++  padding: 2px;
++}
++
++.sos-emergency-popup .leaflet-popup-tip {
++  background: #0f172a;
++  border: 1px solid #ef4444;
++}
++
++.sos-popup-card {
++  padding: 14px 16px;
++  min-width: 260px;
++  max-width: 320px;
++}
++
++.sos-popup-header {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  margin-bottom: 8px;
++}
++
++.sos-popup-badge {
++  background: rgba(239, 68, 68, 0.2);
++  color: #fca5a5;
++  border: 1px solid #ef4444;
++  font-size: 10px;
++  font-weight: 800;
++  letter-spacing: 0.5px;
++  padding: 3px 8px;
++  border-radius: 999px;
++  display: inline-flex;
++  align-items: center;
++  gap: 4px;
++}
++
++.sos-popup-time {
++  font-size: 11px;
++  color: #94a3b8;
++}
++
++.sos-popup-title {
++  font-size: 16px;
++  font-weight: 700;
++  color: #ffffff;
++  margin: 0 0 4px;
++}
++
++.sos-popup-loc {
++  font-size: 12px;
++  color: #cbd5e1;
++  margin-bottom: 8px;
++  display: flex;
++  align-items: center;
++  gap: 4px;
++}
++
++.sos-popup-desc {
++  background: rgba(255, 255, 255, 0.05);
++  border-radius: 8px;
++  padding: 8px 10px;
++  font-size: 12px;
++  color: #e2e8f0;
++  line-height: 1.4;
++  margin-bottom: 12px;
++  border-left: 3px solid #ef4444;
++}
++
++.sos-popup-hotlines {
++  display: flex;
++  flex-direction: column;
++  gap: 6px;
++  margin-bottom: 10px;
++}
++
++.sos-call-btn {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  gap: 6px;
++  padding: 7px 12px;
++  border-radius: 8px;
++  font-size: 11.5px;
++  font-weight: 700;
++  text-decoration: none;
++  transition: all 0.2s ease;
++}
++
++.sos-call-btn.hospital {
++  background: rgba(16, 185, 129, 0.2);
++  border: 1px solid #10b981;
++  color: #34d399;
++}
++
++.sos-call-btn.hospital:hover {
++  background: #10b981;
++  color: #fff;
++}
++
++.sos-call-btn.police {
++  background: rgba(59, 130, 246, 0.2);
++  border: 1px solid #3b82f6;
++  color: #93c5fd;
++}
++
++.sos-call-btn.police:hover {
++  background: #3b82f6;
++  color: #fff;
++}
++
++.sos-resolve-btn {
++  width: 100%;
++  background: transparent;
++  border: 1px solid rgba(255, 255, 255, 0.2);
++  color: #94a3b8;
++  font-size: 11px;
++  padding: 5px;
++  border-radius: 6px;
++  cursor: pointer;
++  transition: all 0.2s ease;
++}
++
++.sos-resolve-btn:hover {
++  background: rgba(255, 255, 255, 0.1);
++  color: #fff;
++}

@@ -162,24 +162,53 @@
       renderModalContent(data, cardData);
     } catch (err) {
       console.warn("AI card insight fetch error, using local card details:", err);
-      // Fallback display if network error
-      renderModalContent({
-        title: title,
-        category: cat,
-        location: loc,
-        summary: cardData.desc || "Verified cultural and destination profile on Bharat Explore.",
-        source_title: "Bharat Explore Field Knowledge Base",
-        source_url: "https://en.wikivoyage.org/wiki/India",
-        best_season: cardData.season || "October through May",
-        transit_hub: "Nearest domestic airport / railhead connections",
-        eco_tip: "Preserve local cultural integrity and support zero-single-use-plastic practices.",
-        highlights: [
-          "Authentic regional experience rooted in local heritage and nature.",
-          "Direct community benefits supporting indigenous artisan families.",
-          "Verified safety and sustainable travel guidelines."
-        ],
-        suggested_prompt: `Plan a trip to ${title}`
-      }, cardData);
+      const isCB = Boolean(
+        cardData?.isCodeBreakerz ||
+        (cardData?.category && cardData.category.toLowerCase().includes("innovation")) ||
+        (cardData?.location && (cardData.location.includes("Techno Main") || cardData.location.includes("Code Breakerz") || cardData.location.includes("TMSL"))) ||
+        window.location.pathname.toLowerCase().includes("codebreakerz")
+      );
+
+      if (isCB) {
+        renderModalContent({
+          title: title,
+          category: cat,
+          location: "Techno Main Salt Lake (TMSL), Kolkata",
+          summary: "Techno Main Salt Lake (TMSL), the premier flagship engineering and technology institution of Techno India Group located in Salt Lake City (Sector V), Kolkata, West Bengal. Affiliated with MAKAUT and approved by AICTE, TMSL is renowned for engineering excellence, computer science, and innovation, serving as the proud institutional home and incubation hub for Team Code Breakerz in Smart India Hackathon (SIH 2026).",
+          source_title: "Wikipedia: Techno Main Salt Lake (TMSL)",
+          source_url: "https://en.wikipedia.org/wiki/Techno_India_Group",
+          best_season: "Smart India Hackathon 2026 Innovation Cycle • Active Lab",
+          transit_hub: "Techno Main Salt Lake Campus, Sector V, Bidhannagar, Kolkata 700091 • Salt Lake Sector V Metro",
+          eco_tip: "Engineered at Techno Main Salt Lake (TMSL) to champion carbon-neutral travel, sustainable village homestays, and decentralized tourism across India.",
+          highlights: [
+            "Premier engineering and research institution situated in Kolkata's major IT and innovation hub (Sector V, Salt Lake City).",
+            "Flagship campus of Techno India Group, fostering advanced research in artificial intelligence, cloud architecture, and high-altitude telemetry systems.",
+            "Proud alma mater and innovation home of Team Code Breakerz, engineering the Bharat Explore sustainable tourism platform for SIH 2026."
+          ],
+          ai_perspective: "Techno Main Salt Lake (TMSL) is the proud innovation campus behind Team Code Breakerz, engineering intelligent pan-India travel companion systems and real-time high-altitude telemetry for Bharat Explore.",
+          is_innovation: true,
+          hide_actions: true
+        }, cardData);
+      } else {
+        // Fallback display if network error
+        renderModalContent({
+          title: title,
+          category: cat,
+          location: loc,
+          summary: cardData.desc || "Verified cultural and destination profile on Bharat Explore.",
+          source_title: "Bharat Explore Field Knowledge Base",
+          source_url: "https://en.wikivoyage.org/wiki/India",
+          best_season: cardData.season || "October through May",
+          transit_hub: "Nearest domestic airport / railhead connections",
+          eco_tip: "Preserve local cultural integrity and support zero-single-use-plastic practices.",
+          highlights: [
+            "Authentic regional experience rooted in local heritage and nature.",
+            "Direct community benefits supporting indigenous artisan families.",
+            "Verified safety and sustainable travel guidelines."
+          ],
+          suggested_prompt: `Plan a trip to ${title}`
+        }, cardData);
+      }
     }
   };
 
@@ -253,41 +282,58 @@
       ${ecoHtml}
     `;
 
-    // Action Buttons
-    const plannerQuery = encodeURIComponent(data.suggested_prompt || `Plan a trip to ${data.title}`);
-    const aiChatQuery = encodeURIComponent(`Tell me about ${data.title} and recommended travel tips`);
+    // Action Buttons: Hide buttons ONLY on CodeBreakerz cards, keeping all other cards unchanged
+    const isCodeBreakerz = Boolean(
+      data.is_innovation ||
+      data.hide_actions ||
+      rawCard?.isCodeBreakerz ||
+      (data.category && data.category.toLowerCase().includes("innovation")) ||
+      (rawCard?.category && rawCard.category.toLowerCase().includes("innovation")) ||
+      (data.location && (data.location.includes("Techno Main") || data.location.includes("Code Breakerz") || data.location.includes("TMSL"))) ||
+      (rawCard?.location && (rawCard.location.includes("Techno Main") || rawCard.location.includes("Code Breakerz") || rawCard.location.includes("TMSL"))) ||
+      window.location.pathname.toLowerCase().includes("codebreakerz")
+    );
 
-    footerEl.innerHTML = `
-      <a href="planner.html?q=${plannerQuery}" class="ai-card-action-plan">
-        <span>⚡</span> Plan Trip with Bharat AI
-      </a>
-      <a href="ai.html?q=${aiChatQuery}" class="ai-card-action-chat">
-        <span>💬</span> Ask AI More
-      </a>
-      <button class="ai-card-action-save" id="aiCardSaveBtn">
-        ♥ Bookmark
-      </button>
-    `;
+    if (isCodeBreakerz) {
+      footerEl.innerHTML = "";
+      footerEl.style.display = "none";
+    } else {
+      footerEl.style.display = "";
+      const plannerQuery = encodeURIComponent(data.suggested_prompt || `Plan a trip to ${data.title}`);
+      const aiChatQuery = encodeURIComponent(`Tell me about ${data.title} and recommended travel tips`);
 
-    const saveBtn = document.getElementById("aiCardSaveBtn");
-    if (saveBtn) {
-      saveBtn.addEventListener("click", function () {
-        if (typeof window.saveDestination === "function" && rawCard && rawCard.id) {
-          window.saveDestination(rawCard.id);
-        } else {
-          let saved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
-          const itemKey = data.title;
-          if (!saved.includes(itemKey)) {
-            saved.push(itemKey);
-            localStorage.setItem("bharatSaved", JSON.stringify(saved));
-            if (typeof window.toast === "function") window.toast(`Saved "${data.title}" to My Journey ♥`);
+      footerEl.innerHTML = `
+        <a href="planner.html?q=${plannerQuery}" class="ai-card-action-plan">
+          <span>⚡</span> Plan Trip with Bharat AI
+        </a>
+        <a href="ai.html?q=${aiChatQuery}" class="ai-card-action-chat">
+          <span>💬</span> Ask AI More
+        </a>
+        <button class="ai-card-action-save" id="aiCardSaveBtn">
+          ♥ Bookmark
+        </button>
+      `;
+
+      const saveBtn = document.getElementById("aiCardSaveBtn");
+      if (saveBtn) {
+        saveBtn.addEventListener("click", function () {
+          if (typeof window.saveDestination === "function" && rawCard && rawCard.id) {
+            window.saveDestination(rawCard.id);
           } else {
-            if (typeof window.toast === "function") window.toast(`"${data.title}" is already bookmarked ♥`);
+            let saved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
+            const itemKey = data.title;
+            if (!saved.includes(itemKey)) {
+              saved.push(itemKey);
+              localStorage.setItem("bharatSaved", JSON.stringify(saved));
+              if (typeof window.toast === "function") window.toast(`Saved "${data.title}" to My Journey ♥`);
+            } else {
+              if (typeof window.toast === "function") window.toast(`"${data.title}" is already bookmarked ♥`);
+            }
           }
-        }
-        saveBtn.textContent = "✓ Saved";
-        saveBtn.style.color = "#74c69d";
-      });
+          saveBtn.textContent = "✓ Saved";
+          saveBtn.style.color = "#74c69d";
+        });
+      }
     }
   }
 
@@ -555,8 +601,9 @@
         window.openAICardInsight({
           title: role ? `${title} (${role})` : title,
           category: "SIH 2026 Innovation Team",
-          location: "Team Code Breakerz",
-          desc: desc || "Smart India Hackathon 2026 Bharat Explore Developer"
+          location: "Techno Main Salt Lake (TMSL)",
+          desc: desc || "Smart India Hackathon 2026 Bharat Explore Developer",
+          isCodeBreakerz: true
         });
         return;
       }

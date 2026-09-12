@@ -333,28 +333,224 @@
     },
     decongest: {
       en: "**Smart Decongestion Strategy:** Visiting secondary corridors like Turtuk, Hanle, and Sham Valley diverts tourist footprint away from saturated hotspots like Pangong Lake. This reduces vehicle emissions, relieves alpine water tables, and redistributes 80%+ of tourism revenue directly to remote village families.",
-      hi: "**स्मार्ट भीड़-नियंत्रण रणनीति:** तुरतुक, हानले और शाम घाटी जैसे ऑफबीट स्थानों का दौरा करने से मुख्य केंद्रों पर दबाव घटता है और 80%+ आय सीधे स्थानीय परिवारों तक पहुंचती है।",
-      bn: "**স্মার্ট ভিড়-নিয়ন্ত্রণ কৌশল:** বিকল্প করিডোর পরিদর্শনে মূল পর্যটন কেন্দ্রের ভিড় কমে এবং ৮০%+ অর্থ সরাসরি স্থানীয় গ্রামবাসীর হাতে থাকে।"
-    }
-  };
+      hi: "**स्मार्ट भीड़-नियंत्रण रणनीति:** तुरतुक, हानले और शाम घाटी जैसे ऑफबीट स्थानों का दौरा करने से मुख्य केंद्रों प�  async function askAI(q) {
+    if (!q || !q.trim() || isGenerating) return;
 
-  const PAN_INDIA_FALLBACK = {
-    en: {
-      overview: "**Namaste! 🙏 I am Bharat AI — your verified travel intelligence guide for all of India.**\n\nI provide tailored, sustainable travel insights across all 28 states and union territories of Bharat:\n\n• **Kolkata & West Bengal** — Victoria Memorial, Howrah Bridge, Bengali cuisine, and historic trams\n• **Rajasthan & West India** — Majestic hill forts, palace architecture, and desert culture\n• **Kerala & South India** — Backwater eco-houseboats, spice trails, and tranquil beaches\n• **Himalayas & North** — Mountain valleys, high-altitude acclimatization, and live pass telemetry\n• **Sustainable Travel** — Certified community homestays, public EV transit, and zero single-use plastic\n\nAsk me about any destination, regional food, packing tips, or budget planning — I will stay strictly focused on your chosen topic!",
-      food: "**Pan-India Culinary Explorer — A Journey You Can Taste:**\n\n• **East India (Kolkata & Bengal):** Rosogolla, Mishti Doi, Kolkata Biryani with spiced potato, and Kathi Rolls.\n• **West India (Rajasthan & Gujarat):** Dal Baati Churma, Pyaaz Kachori, and authentic Gujarati Thali.\n• **South India (Kerala & Tamil Nadu):** Traditional Kerala Sadya, Appam with coconut stew, and crispy Dosa with Sambar.\n• **North India (Himalayas & Plains):** Kashmiri Rogan Josh, Ladakhi Thukpa, and Punjabi Dal Makhani with Kulcha.\n\nTell me which region or city you're exploring, and I'll detail the best authentic local eateries and dishes!",
-      pack: "**General Travel Packing Essentials for India:**\n\n• **Plains & Coastal Regions (Kolkata, Kerala, Goa):** Lightweight breathable cottons, comfortable walking shoes, umbrella, and sunglasses.\n• **Desert Regions (Rajasthan):** Cotton wear for warm days, warm layers for cool desert nights, and sun protection.\n• **Mountain Destinations (Himalayas):** Thermal base layers, fleece, down jacket, and sturdy trekking shoes.\n• **General Essentials:** Universal power bank, reusable water bottle, digital ID copies, and UPI payment app on your smartphone.",
-      budget: "**Pan-India Travel Budget Guide (Per Person/Day):**\n\n• **Budget Backpacker (₹1,200–2,200/day):** Clean hostels/homestays, authentic street dhabas, state buses & metro.\n• **Mid-Range Traveler (₹3,500–6,500/day):** 3-star boutique hotels, heritage dining, ride-hailing cabs, and guided tours.\n• **Luxury Traveler (₹10,000–25,000+/day):** 5-star palace hotels, private chauffeur-driven vehicles, and curated experiences.\n\nLet me know your target destination for an exact city-specific budget breakdown!",
-      safety: "**Pan-India Travel Safety & Etiquette Advice:**\n\n• **Emergency Numbers:** All-India Emergency Helpline: 112 (Police, Ambulance, Fire). Tourist Helpline: 1363.\n• **Digital Payments:** UPI (Google Pay, PhonePe, Paytm) is accepted nationwide from street stalls to luxury stores.\n• **Cultural Respect:** Remove shoes before entering temples and prayer halls; dress modestly at religious monuments.\n• **Transportation:** Use official prepaid taxi booths at airports/railway stations, or ride-hailing apps (Uber, Ola) with active GPS tracking."
-    },
-    hi: {
-      overview: "**नमस्ते! 🙏 मैं भारत एआई (Bharat AI) हूँ — संपूर्ण भारत यात्रा के लिए आपका बुद्धिमान मार्गदर्शक।**\n\nमैं भारत के सभी राज्यों एवं प्रमुख शहरों के लिए सटीक और स्थायी यात्रा जानकारी प्रदान करता हूँ:\n\n• **कोलकाता एवं पश्चिम बंगाल** — विक्टोरिया मेमोरियल, हावड़ा ब्रिज, प्रसिद्ध मिष्टी दोई व ट्राम संस्कृति\n• **राजस्थान व पश्चिमी भारत** — जयपुर का आमेर किला, हवेलियां और रेगिस्तानी संस्कृति\n• **केरल व दक्षिण भारत** — बैकवाटर हाउसबोट, मुन्नार चाय बागान और समुद्री तट\n• **हिमालयी गंतव्य** — लद्दाख, हिमाचल और उत्तराखंड के लिए ऊंचाई सुरक्षा व दर्रा सलाह\n\nआप जिस भी शहर या यात्रा विषय के बारे में पूछेंगे, मैं बिना भटके केवल उसी विषय पर मार्गदर्शन दूंगा!",
-      food: "**अखिल भारतीय खानपान गाइड:** पूर्व भारत में कोलकाता की बिरयानी व रसगुल्ला, पश्चिम में दाल बाटी चूरमा, दक्षिण में केरल साध्या और उत्तर में पहाड़ी व्यंजन।",
-      pack: "**भारत यात्रा पैकिंग:** मैदानी व तटीय क्षेत्रों (कोलकाता/केरल) के लिए हल्के सूती कपड़े व छाता; हिमालय के लिए गर्म कपड़े।",
-      budget: "**भारत यात्रा बजट:** ₹1,200–2,200/दिन (बजट); ₹3,500–6,500/दिन (मध्यम)।",
-      safety: "**सुरक्षा सुझाव:** राष्ट्रीय आपातकालीन नंबर: 112। पर्यटक हेल्पलाइन: 1363।"
-    },
-    bn: {
-      overview: "**নমস্কার! 🙏 আমি ভারত এআই (Bharat AI) — সমগ্র ভারত ভ্রমণের জন্য আপনার বুদ্ধিমান সহায়ক।**\n\nআমি ভারতের সমস্ত রাজ্য ও প্রধান শহরের জন্য নির্ভরযোগ্য ভ্রমণ পরামর্শ প্রদান করি:\n\n• **কলকাতা ও পশ্চিমবঙ্গ** — ভিক্টোরিয়া মেমোরিয়াল, হাওড়া ব্রিজ, ঐতিহ্যবাহী বাঙালি মিষ্টি ও ট্রাম\n• **রাজস্থান ও পশ্চিম ভারত** — প্রাচীন দুর্গ, রাজপুত স্থাপত্য ও রাজকীয় সংস্কৃতি\n• **কেরল ও দক্ষিণ ভারত** — ব্যাকওয়াটার্স হাউসবোট, চা বাগান ও সমুদ্রতট\n• **হিমালয় অঞ্চল** — লাদাখ ও হিমাচলের উচ্চতা সুরক্ষা ও গিরিপথ সতর্কতা\n\nআপনি যে শহর বা গন্তব্য সম্পর্কে জানতে চান আমাকে প্রশ্ন করুন — আমি সম্পূর্ণ সেই বিষয়ের উপর তথ্য জানাব!",
+    // Safety watchdog: ensure UI is never permanently locked
+    if (safetyUnlockTimer) clearTimeout(safetyUnlockTimer);
+    safetyUnlockTimer = setTimeout(() => {
+      console.warn("[Bharat AI] Safety unlock watchdog fired. Restoring chat responsiveness.");
+      isGenerating = false;
+      const chatForm = $("#chatForm");
+      const submitBtn = chatForm ? chatForm.querySelector("button[type='submit']") : null;
+      const chatInput = $("#chatInput");
+      if (submitBtn) submitBtn.disabled = false;
+      if (chatInput) chatInput.disabled = false;
+      const orb = $("#aiOrb");
+      if (orb) orb.className = "ai-orb idle";
+      const statusText = $("#aiStatusText");
+      if (statusText) statusText.textContent = "Bharat AI • Active";
+    }, 40000);
+
+    const box = $("#messages");
+    const orb = $("#aiOrb");
+    const statusText = $("#aiStatusText");
+    const chatForm = $("#chatForm");
+    const submitBtn = chatForm ? chatForm.querySelector("button[type='submit']") : null;
+    const chatInput = $("#chatInput");
+
+    // Detect and anchor destination if present in current query
+    const detected = detectDestination(q);
+    if (detected) {
+      activeDestination = detected;
+    }
+
+    const lang = (window.i18n && typeof window.i18n.getLanguage === "function") ? window.i18n.getLanguage() : "en";
+    const connectingText = lang === "hi" ? "भारत एआई • कनेक्ट हो रहा है..." : lang === "bn" ? "ভারত এআই • সংযুক্ত হচ্ছে..." : "Bharat AI • Connecting...";
+    const streamingText = lang === "hi" ? "भारत एआई • उत्तर आ रहा है..." : lang === "bn" ? "ভারত এআই • উত্তর লেখা হচ্ছে..." : "Bharat AI • Streaming...";
+    const activeText = lang === "hi" ? "भारत एआई • सक्रिय" : lang === "bn" ? "ভারত এআই • সক্রিয়" : "Bharat AI • Active";
+    const placeholderText = lang === "hi" ? "भारत एआई से संपर्क किया जा रहा है..." : lang === "bn" ? "ভারত এআই-এর সাথে যোগাযোগ করা হচ্ছে..." : "Connecting to Bharat AI...";
+
+    isGenerating = true;
+
+    // Safeguard: Disable submit button to prevent parallel conflicting requests
+    if (submitBtn) submitBtn.disabled = true;
+
+    // 1. Instantly append user message synchronously (<10ms)
+    const userMsg = document.createElement("div");
+    userMsg.className = "msg user";
+    userMsg.textContent = q;
+    box.appendChild(userMsg);
+    box.scrollTop = box.scrollHeight;
+
+    // 2. Instantly update orb & status indicator
+    if (orb) orb.className = "ai-orb thinking";
+    if (statusText) statusText.textContent = connectingText;
+
+    // 3. Mount bot message container synchronously with immediate typing placeholder & blinking cursor
+    const botMsg = document.createElement("div");
+    botMsg.className = "msg bot";
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "bot-text";
+    textSpan.textContent = placeholderText;
+    textSpan.style.opacity = "0.7";
+
+    const cursor = document.createElement("span");
+    cursor.textContent = "▍";
+    cursor.className = "typing-cursor";
+
+    botMsg.appendChild(textSpan);
+    botMsg.appendChild(cursor);
+    box.appendChild(botMsg);
+    box.scrollTop = box.scrollHeight;
+
+    // Check if user is asking for trip planning / itinerary — if so, run through autonomous agent and render full rich cards!
+    if (typeof detectPlanningIntent === "function" && detectPlanningIntent(q)) {
+      if (orb) orb.className = "ai-orb thinking";
+      if (statusText) statusText.textContent = "Formulating expedition plan...";
+      textSpan.textContent = "🗺️ Formulating your personalized expedition plan across flights, certified stays, daily itineraries, and budget allocations...";
+
+      try {
+        const userOrigin = await getUserDetectedOrigin();
+        const res = await fetch(`${AI_API_ORIGIN}/api/agent/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: q.trim(),
+            session_id: agentSessionId,
+            lang: lang,
+            starting_city: userOrigin
+          })
+        });
+
+        if (!res.ok) throw new Error(`Agent error: ${res.status}`);
+        const data = await res.json();
+
+        if (data.session_id) {
+          agentSessionId = data.session_id;
+          localStorage.setItem("bharat_agent_session_id", agentSessionId);
+        }
+
+        if (cursor && cursor.parentNode) cursor.remove();
+        textSpan.style.opacity = "1";
+        textSpan.innerHTML = renderMarkdown(data.message || "");
+
+        // Render interactive cards inside this bot message
+        if (data.plan) {
+          let cardsHtml = "";
+          if (data.plan.web_search_summary && typeof renderWebGroundedBadge === "function") {
+            cardsHtml += renderWebGroundedBadge(data.plan);
+          }
+          if (data.plan.flights && typeof renderFlightCard === "function") {
+            cardsHtml += renderFlightCard(data.plan.flights);
+          }
+          if (data.plan.hotels && typeof renderHotelCard === "function") {
+            cardsHtml += renderHotelCard(data.plan.hotels);
+          }
+          if (data.plan.itinerary && typeof renderItineraryCard === "function") {
+            cardsHtml += renderItineraryCard(data.plan.itinerary);
+          }
+          if (data.plan.budget && typeof renderBudgetCard === "function") {
+            cardsHtml += renderBudgetCard(data.plan.budget);
+          }
+          if (data.plan.emergency && typeof renderEmergencyCard === "function") {
+            cardsHtml += renderEmergencyCard(data.plan.emergency);
+          }
+
+          if (cardsHtml) {
+            const cardsContainer = document.createElement("div");
+            cardsContainer.className = "inbuilt-chat-cards-wrap";
+            cardsContainer.innerHTML = cardsHtml;
+            botMsg.appendChild(cardsContainer);
+          }
+        } else if (data.quick_presets && data.quick_presets.length > 0) {
+          const presetsWrap = document.createElement("div");
+          presetsWrap.className = "chat-quick-presets";
+          presetsWrap.style.marginTop = "12px";
+          presetsWrap.innerHTML = data.quick_presets.map(p => `
+            <button type="button" class="chat-prompt-pill" onclick="window.askAI && askAI('Plan a ${p.days}-day trip with budget ₹${p.budget}')">
+              ⚡ ${p.label}
+            </button>
+          `).join('');
+          botMsg.appendChild(presetsWrap);
+        }
+
+        if (safetyUnlockTimer) clearTimeout(safetyUnlockTimer);
+        attachMessageActions(botMsg, data.message || "");
+        if (orb) orb.className = "ai-orb idle";
+        if (statusText) statusText.textContent = activeText;
+        if (submitBtn) submitBtn.disabled = false;
+        if (chatInput) {
+          chatInput.disabled = false;
+          chatInput.focus();
+        }
+        box.scrollTop = box.scrollHeight;
+        isGenerating = false;
+
+        chatHistory.push({ role: "user", text: q });
+        chatHistory.push({ role: "model", text: (data.message || "Plan generated.") });
+        if (chatHistory.length > 16) {
+          chatHistory.splice(0, chatHistory.length - 16);
+        }
+        return;
+      } catch (agentErr) {
+        console.warn("[Agent Live Itinerary in chat failed, falling back to conversational stream]:", agentErr);
+        // continue to standard streaming
+      }
+    }
+
+    // 4. Token Queue & Typewriter Dispatcher State
+    const tokenQueue = [];
+    let displayedText = "";
+    let isStreamFinished = false;
+    let isDispatcherRunning = false;
+    let isFirstToken = true;
+
+    // Dynamic Activity Watchdog (resets on incoming chunks)
+    const controller = new AbortController();
+    activeChatController = controller;
+    let watchdogTimer = null;
+    const resetWatchdog = (ms = 30000) => {
+      if (watchdogTimer) clearTimeout(watchdogTimer);
+      watchdogTimer = setTimeout(() => {
+        console.warn("[Bharat AI] Activity watchdog timeout (30s inactivity). Aborting connection.");
+        controller.abort();
+      }, ms);
+    };
+    resetWatchdog(30000);
+
+    // Finalize UI once stream is done AND all tokens have rendered
+    function finalizeUI() {
+      if (safetyUnlockTimer) clearTimeout(safetyUnlockTimer);
+      if (watchdogTimer) clearTimeout(watchdogTimer);
+      activeChatController = null;
+      try {
+        if (cursor && cursor.parentNode) cursor.remove();
+        if (orb) orb.className = "ai-orb idle";
+        if (statusText) statusText.textContent = activeText;
+        attachMessageActions(botMsg, displayedText.trim());
+        box.scrollTop = box.scrollHeight;
+
+        // Persist in conversation history for multi-turn awareness
+        if (displayedText.trim()) {
+          chatHistory.push({ role: "user", text: q });
+          chatHistory.push({ role: "model", text: displayedText.trim() });
+          if (chatHistory.length > 16) {
+            chatHistory.splice(0, chatHistory.length - 16);
+          }
+        }
+      } catch (err) {
+        console.warn("[Bharat AI finalizeUI exception]:", err);
+      } finally {
+        isGenerating = false;
+        if (submitBtn) submitBtn.disabled = false;
+        if (chatInput) {
+          chatInput.disabled = false;
+          chatInput.focus();
+        }
+      }
+    }
       food: "**ভারতের খাদ্যসংস্কৃতি:** কলকাতায় বিরিয়ানি ও রসগোল্লা, রাজস্থানে ডাল বাটি চুরমা, কেরলে সাধ্য ভোজ।",
       pack: "**প্যাকিং গাইড:** সমতল অঞ্চলের জন্য হালকা সুতির পোশাক ও ছাতা; পাহাড়ি অঞ্চলের জন্য উলের জ্যাকেট।",
       budget: "**ভ্রমণ বাজেট:** ১,২০০–২,২০০ টাকা/দিন (বাজেট); ৩,৫০০–৬,৫০০ টাকা/দিন (মিড-রেঞ্জ)।",
@@ -397,6 +593,9 @@
   // ═══════════════════════════════════════════════════════
 
   let isGenerating = false;
+  let activeChatController = null;
+  let activeFloatingController = null;
+  let safetyUnlockTimer = null;
   let agentSessionId = localStorage.getItem("bharat_agent_session_id");
   if (!agentSessionId) {
     agentSessionId = "sess-" + Math.random().toString(36).substring(2, 10);
@@ -1023,6 +1222,7 @@
         chatInput.disabled = false;
         chatInput.focus();
       }
+      attachMessageActions(botMsg, displayedText.trim());
       box.scrollTop = box.scrollHeight;
       isGenerating = false;
 
@@ -2243,13 +2443,24 @@
     chat.classList.toggle("fullscreen-console", isFull);
     if (btn) {
       btn.textContent = isFull ? "✕" : "⛶";
-      btn.title = isFull ? "Minimize Console" : "Toggle Fullscreen Console";
+      btn.title = isFull ? "Minimize Console (Esc)" : "Toggle Fullscreen Console";
     }
     const input = $("#chatInput");
     if (input) input.focus();
   }
 
+  // Keyboard shortcut: ESC to minimize fullscreen console
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const chat = $("#chatWindow");
+      if (chat && chat.classList.contains("fullscreen-console")) {
+        toggleFullscreenChat(false);
+      }
+    }
+  });
+
   function resetChatConsole() {
+    stopTextToSpeech();
     chatHistory.length = 0;
     const box = $("#messages");
     const welcome = $("#botWelcomeMsg");
@@ -2258,11 +2469,17 @@
       box.innerHTML = "";
       box.appendChild(clone);
     }
+    if (typeof updateAgentTracker === "function") {
+      updateAgentTracker(1, null, "Gemini 3.1 Flash Lite", false);
+      const s1 = $("#step1Status");
+      if (s1) s1.textContent = "Listening for intent...";
+    }
     const input = $("#chatInput");
     if (input) {
       input.value = "";
       input.focus();
     }
+    toast("Conversation reset. Ready for a new journey!");
   }
 
   function togglePlannerLegacyForm() {
@@ -2496,6 +2713,9 @@
   window.toggleFullscreenChat = toggleFullscreenChat;
   window.resetChatConsole = resetChatConsole;
   window.toggleSpeechInput = toggleSpeechInput;
+  window.exportChatLog = exportChatLog;
+  window.stopTextToSpeech = stopTextToSpeech;
+  window.attachMessageActions = attachMessageActions;
 
   // Auto-initialize if DOM is ready, or on DOMContentLoaded
   if (document.readyState === "complete" || document.readyState === "interactive") {

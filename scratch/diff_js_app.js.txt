@@ -1,0 +1,1890 @@
+--- js/app.js
++++ Bharat_Explore_SIH_Tourism\js/app.js
+@@ -3,14 +3,6 @@
+  * Smart India Hackathon (SIH 2026) Official Platform
+  * Clean, flat modern UI with institutional glassmorphism & sustainable tourism engines
+  */
+-
+-// ── Apply saved theme immediately to prevent flash of wrong theme ──
+-(function() {
+-  const saved = localStorage.getItem("bharatExploreTheme");
+-  if (saved === "dark") {
+-    document.documentElement.setAttribute("data-theme", "dark");
+-  }
+-})();
+ 
+ // Curated destinations dataset featuring decongestion & offbeat corridors
+ const localDestinations = [
+@@ -520,28 +512,28 @@
+ let activeDestinations = [...localDestinations];
+ let currentFilter = "all";
+ 
+-// 20 Pan-India Regional Heritage & Eco Circuits with crisp, bounded assets & waypoint telemetry
++// 20 Pan-India Regional Heritage & Eco Circuits with crisp, bounded assets
+ const regionalCircuits = [
+-  { id: "srinagar", name: "Srinagar & Dal Lake", state: "Jammu & Kashmir", region: "north", theme: "himalayan", img: "assets/images/srinagar.jpg", desc: "Alpine water reflections, floating markets & Shalimar gardens", alt: "5,200 ft", elevationFt: 5200, season: "Apr–Oct", waypoints: ["Jammu Tawi", "Patnitop", "Banihal Tunnel", "Dal Lake Shikara", "Shalimar Bagh"] },
+-  { id: "kurukshetra", name: "Kurukshetra Sacred Sarovar", state: "Haryana", region: "north", theme: "spiritual", img: "assets/images/kurukshetra.png", desc: "Brahma Sarovar ghats, ancient pilgrimage corridors & epic history", alt: "850 ft", elevationFt: 850, season: "Oct–Mar", waypoints: ["Delhi Hub", "Panipat", "Brahma Sarovar", "Jyotisar Teerth", "Sannihit Sarovar"] },
+-  { id: "rockgarden", name: "Rock Garden Sculptures", state: "Chandigarh", region: "north", theme: "heritage", img: "assets/images/rockgarden.png", desc: "World-renowned zero-waste visionary sculpture oasis", alt: "1,050 ft", elevationFt: 1050, season: "Year Round", waypoints: ["Sukhna Lake", "Nek Chand Oasis", "Sector 1 Promenade", "Capitol Complex"] },
+-  { id: "tawang", name: "Tawang Monastery Corridor", state: "Arunachal Pradesh", region: "northeast", theme: "himalayan", img: "assets/images/tawang.png", desc: "High-altitude Tibetan monastery perched at 10,000 ft", alt: "10,000 ft", elevationFt: 10000, season: "Apr–Oct", waypoints: ["Guwahati Gateway", "Tezpur", "Dirang Valley", "Sela Pass (13,700 ft)", "Tawang Gompa"] },
+-  { id: "cherrapunji", name: "Cherrapunji Living Root Bridges", state: "Meghalaya", region: "northeast", theme: "rainforest", img: "assets/images/cherrapunji.png", desc: "Bio-engineered Ficus elastica bridges & mist-shrouded canyons", alt: "4,860 ft", elevationFt: 4860, season: "Sep–May", waypoints: ["Shillong Peak", "Mawkdok Valley", "Nohkalikai Falls", "Double Decker Living Root Bridge", "Dawki River"] },
+-  { id: "loktaklake", name: "Loktak Floating Lake", state: "Manipur", region: "northeast", theme: "rainforest", img: "assets/images/loktaklake.png", desc: "Unique circular floating biomass phumdis & Sangai deer sanctuary", alt: "2,520 ft", elevationFt: 2520, season: "Nov–Apr", waypoints: ["Imphal Kangla Fort", "Sendra Island", "Keibul Lamjao National Park", "Phumdi Floating Homestay"] },
+-  { id: "kohima", name: "Kohima & Naga Hills", state: "Nagaland", region: "northeast", theme: "heritage", img: "assets/images/kohima.png", desc: "Hornbill cultural heritage, scenic mountain ridges & tribal crafts", alt: "4,738 ft", elevationFt: 4738, season: "Oct–May", waypoints: ["Dimapur Railhead", "Kohima War Memorial", "Kisama Heritage Village", "Dzukou Valley Trailhead"] },
+-  { id: "aizawl", name: "Aizawl & Durtlang Ridge", state: "Mizoram", region: "northeast", theme: "himalayan", img: "assets/images/aizawl.png", desc: "Tranquil cloud-kissed ridges, Mizo bamboo crafts & church spires", alt: "3,700 ft", elevationFt: 3700, season: "Oct–Apr", waypoints: ["Lengpui Airport", "Bara Bazar", "Durtlang Hills", "Solomon's Temple", "Reiek Tlang"] },
+-  { id: "ujjayantapalace", name: "Ujjayanta Royal Palace", state: "Tripura", region: "northeast", theme: "heritage", img: "assets/images/ujjayantapalace.png", desc: "Neoclassical lakeside palace surrounded by Mughal gardens", alt: "42 ft", elevationFt: 42, season: "Oct–Mar", waypoints: ["Agartala Core", "Ujjayanta Royal Grounds", "Neermahal Water Palace", "Unakoti Rock Bas-reliefs"] },
+-  { id: "hampi", name: "Hampi UNESCO Ruins", state: "Karnataka", region: "south-islands", theme: "spiritual", img: "assets/images/hampi.png", desc: "Granite boulder empire, Tungabhadra River & Vijayanagara architecture", alt: "1,530 ft", elevationFt: 1530, season: "Oct–Mar", waypoints: ["Hospet Junction", "Virupaksha Sanctuary", "Vitthala Stone Chariot", "Lotus Mahal", "Matanga Hill Sunrise"] },
+-  { id: "hyderabad", name: "Hyderabad Heritage Core", state: "Telangana", region: "south-islands", theme: "heritage", img: "assets/images/hyderabad.png", desc: "Charminar, Golconda fortress acoustics & Nizami culinary trail", alt: "1,778 ft", elevationFt: 1778, season: "Oct–Mar", waypoints: ["Charminar Gateway", "Mecca Masjid", "Laad Bazaar", "Chowmahalla Palace", "Golconda Acoustic Fort"] },
+-  { id: "visakhapatnam", name: "Visakhapatnam Ghats Coast", state: "Andhra Pradesh", region: "south-islands", theme: "coastal", img: "assets/images/visakhapatnam.png", desc: "Where the Eastern Ghats plunge dramatically into the Bay of Bengal", alt: "150 ft", elevationFt: 150, season: "Nov–Feb", waypoints: ["Ramakrishna Beach", "Kailasagiri Hill", "INS Kursura Submarine", "Bheemili Dutch Port", "Araku Valley Escarpment"] },
+-  { id: "whitetown", name: "White Town Promenade", state: "Puducherry", region: "south-islands", theme: "coastal", img: "assets/images/whitetown.png", desc: "Cobblestone French colonial villas, cafes & Bay promenade", alt: "20 ft", elevationFt: 20, season: "Nov–Mar", waypoints: ["Goubert Avenue Promenade", "French Quarter Villas", "Aurobindo Ashram", "Paradise Beach Island"] },
+-  { id: "kavaratti", name: "Kavaratti Coral Lagoon", state: "Lakshadweep", region: "south-islands", theme: "coastal", img: "assets/images/kavaratti.png", desc: "Pristine white sand atolls, turquoise waters & marine reserves", alt: "10 ft", elevationFt: 10, season: "Oct–Apr", waypoints: ["Agatti Airstrip", "Kavaratti Marine Lagoon", "Urja Mosque Sanctuary", "Coral Reef Snorkeling Reserve"] },
+-  { id: "swarajdeep", name: "Swaraj Dweep (Havelock)", state: "Andaman & Nicobar", region: "south-islands", theme: "coastal", img: "assets/images/swarajdeep.png", desc: "Radhanagar Beach sunsets, bio-luminescent kayaking & reefs", alt: "30 ft", elevationFt: 30, season: "Nov–Apr", waypoints: ["Port Blair Haddo Jetty", "Havelock Ferry Terminal", "Radhanagar Beach No. 7", "Elephant Beach Reef", "Kalapathar Cove"] },
+-  { id: "mumbai", name: "Mumbai Marine Promenade", state: "Maharashtra", region: "west-central", theme: "coastal", img: "assets/images/mumbai.png", desc: "Gateway of India, Arabian Sea breeze & Victorian Gothic heritage", alt: "46 ft", elevationFt: 46, season: "Oct–Mar", waypoints: ["Gateway of India", "Taj Heritage Wing", "Colaba Causeway", "Marine Drive Promenade", "Chhatrapati Shivaji Terminus"] },
+-  { id: "daman", name: "Moti Daman Coastal Fort", state: "Daman & Diu", region: "west-central", theme: "coastal", img: "assets/images/daman.png", desc: "16th-century ramparts overlooking the Arabian sea & palm beaches", alt: "16 ft", elevationFt: 16, season: "Nov–Mar", waypoints: ["Daman Port Gate", "Moti Daman Bastion", "Bom Jesus Cathedral", "Jampore Casuarina Beach"] },
+-  { id: "khajuraho", name: "Khajuraho Temple Marvels", state: "Madhya Pradesh", region: "west-central", theme: "spiritual", img: "assets/images/khajuraho.png", desc: "Intricate Chandela dynasty sandstone art & living cultural legacy", alt: "930 ft", elevationFt: 930, season: "Oct–Mar", waypoints: ["Kandariya Mahadeva", "Lakshmana Temple", "Chausath Yogini", "Raneh Waterfalls Canyon"] },
+-  { id: "bastar", name: "Bastar Indigenous Corridors", state: "Chhattisgarh", region: "west-central", theme: "heritage", img: "assets/images/bastar.png", desc: "Chitrakote horseshoe falls & sacred Dhokra lost-wax bronze crafts", alt: "1,800 ft", elevationFt: 1800, season: "Oct–Mar", waypoints: ["Jagdalpur Palace", "Chitrakote Niagara Falls", "Kanger Valley Caves", "Kondagaon Dhokra Artisan Guild"] },
+-  { id: "hundrufalls", name: "Hundru Falls Cascade", state: "Jharkhand", region: "west-central", theme: "rainforest", img: "assets/images/hundrufalls.png", desc: "320 ft Subarnarekha drop carving spectacular granite rock pools", alt: "2,140 ft", elevationFt: 2140, season: "Jul–Feb", waypoints: ["Ranchi Plateau", "Subarnarekha River Gorge", "Hundru Plunge Pool", "Jonha & Dassam Loop"] }
++  { id: "srinagar", name: "Srinagar & Dal Lake", state: "Jammu & Kashmir", region: "north", img: "assets/images/srinagar.jpg", desc: "Alpine water reflections, floating markets & Shalimar gardens", alt: "5,200 ft" },
++  { id: "kurukshetra", name: "Kurukshetra Sacred Sarovar", state: "Haryana", region: "north", img: "assets/images/kurukshetra.png", desc: "Brahma Sarovar ghats, ancient pilgrimage corridors & epic history", alt: "850 ft" },
++  { id: "rockgarden", name: "Rock Garden Sculptures", state: "Chandigarh", region: "north", img: "assets/images/rockgarden.png", desc: "World-renowned zero-waste visionary sculpture oasis", alt: "1,050 ft" },
++  { id: "tawang", name: "Tawang Monastery Corridor", state: "Arunachal Pradesh", region: "northeast", img: "assets/images/tawang.png", desc: "High-altitude Tibetan monastery perched at 10,000 ft", alt: "10,000 ft" },
++  { id: "cherrapunji", name: "Cherrapunji Living Root Bridges", state: "Meghalaya", region: "northeast", img: "assets/images/cherrapunji.png", desc: "Bio-engineered Ficus elastica bridges & mist-shrouded canyons", alt: "4,860 ft" },
++  { id: "loktaklake", name: "Loktak Floating Lake", state: "Manipur", region: "northeast", img: "assets/images/loktaklake.png", desc: "Unique circular floating biomass phumdis & Sangai deer sanctuary", alt: "2,520 ft" },
++  { id: "kohima", name: "Kohima & Naga Hills", state: "Nagaland", region: "northeast", img: "assets/images/kohima.png", desc: "Hornbill cultural heritage, scenic mountain ridges & tribal crafts", alt: "4,738 ft" },
++  { id: "aizawl", name: "Aizawl & Durtlang Ridge", state: "Mizoram", region: "northeast", img: "assets/images/aizawl.png", desc: "Tranquil cloud-kissed ridges, Mizo bamboo crafts & church spires", alt: "3,700 ft" },
++  { id: "ujjayantapalace", name: "Ujjayanta Royal Palace", state: "Tripura", region: "northeast", img: "assets/images/ujjayantapalace.png", desc: "Neoclassical lakeside palace surrounded by Mughal gardens", alt: "42 ft" },
++  { id: "hampi", name: "Hampi UNESCO Ruins", state: "Karnataka", region: "south-islands", img: "assets/images/hampi.png", desc: "Granite boulder empire, Tungabhadra River & Vijayanagara architecture", alt: "1,530 ft" },
++  { id: "hyderabad", name: "Hyderabad Heritage Core", state: "Telangana", region: "south-islands", img: "assets/images/hyderabad.png", desc: "Charminar, Golconda fortress acoustics & Nizami culinary trail", alt: "1,778 ft" },
++  { id: "visakhapatnam", name: "Visakhapatnam Ghats Coast", state: "Andhra Pradesh", region: "south-islands", img: "assets/images/visakhapatnam.png", desc: "Where the Eastern Ghats plunge dramatically into the Bay of Bengal", alt: "150 ft" },
++  { id: "whitetown", name: "White Town Promenade", state: "Puducherry", region: "south-islands", img: "assets/images/whitetown.png", desc: "Cobblestone French colonial villas, cafes & Bay promenade", alt: "20 ft" },
++  { id: "kavaratti", name: "Kavaratti Coral Lagoon", state: "Lakshadweep", region: "south-islands", img: "assets/images/kavaratti.png", desc: "Pristine white sand atolls, turquoise waters & marine reserves", alt: "10 ft" },
++  { id: "swarajdeep", name: "Swaraj Dweep (Havelock)", state: "Andaman & Nicobar", region: "south-islands", img: "assets/images/swarajdeep.png", desc: "Radhanagar Beach sunsets, bio-luminescent kayaking & reefs", alt: "30 ft" },
++  { id: "mumbai", name: "Mumbai Marine Promenade", state: "Maharashtra", region: "west-central", img: "assets/images/mumbai.png", desc: "Gateway of India, Arabian Sea breeze & Victorian Gothic heritage", alt: "46 ft" },
++  { id: "daman", name: "Moti Daman Coastal Fort", state: "Daman & Diu", region: "west-central", img: "assets/images/daman.png", desc: "16th-century ramparts overlooking the Arabian sea & palm beaches", alt: "16 ft" },
++  { id: "khajuraho", name: "Khajuraho Temple Marvels", state: "Madhya Pradesh", region: "west-central", img: "assets/images/khajuraho.png", desc: "Intricate Chandela dynasty sandstone art & living cultural legacy", alt: "930 ft" },
++  { id: "bastar", name: "Bastar Indigenous Corridors", state: "Chhattisgarh", region: "west-central", img: "assets/images/bastar.png", desc: "Chitrakote horseshoe falls & sacred Dhokra lost-wax bronze crafts", alt: "1,800 ft" },
++  { id: "hundrufalls", name: "Hundru Falls Cascade", state: "Jharkhand", region: "west-central", img: "assets/images/hundrufalls.png", desc: "320 ft Subarnarekha drop carving spectacular granite rock pools", alt: "2,140 ft" }
+ ];
+ 
+ const categories = [
+@@ -638,7 +630,7 @@
+     desc: "Crisp multi-layered tandoori flatbread stuffed with spiced potatoes, served with slow-cooked pindi chole.",
+     tags: ["Locally Sourced", "Zero Food Miles", "Community Cooperative"],
+     revenueShare: "95% Direct Farmer Revenue",
+-    img: "/assets/images/AmritsariKulcha.png"
++    img: "assets/images/AmritsariKulcha.png"
+   },
+   {
+     name: "Dal Baati Churma",
+@@ -646,7 +638,7 @@
+     desc: "Wood-fired baked baatis drenched in pure desi ghee, paired with five-lentil panchmel dal and sweet churma.",
+     tags: ["Traditional Recipe", "Zero Food Miles", "Heritage Kitchens"],
+     revenueShare: "92% Direct Community Revenue",
+-    img: "/assets/images/dalbaatichurma.png"
++    img: "assets/images/dalbaatichurma.png"
+   },
+   {
+     name: "Kashmiri Kahwa",
+@@ -654,7 +646,7 @@
+     desc: "Gentle green tea infused with whole saffron strands, green cardamom pods, cinnamon bark, and slivered almonds.",
+     tags: ["High Altitude", "Zero Food Miles", "Artisan Harvested"],
+     revenueShare: "96% Direct Grower Revenue",
+-    img: "/assets/images/kahwa.png"
++    img: "assets/images/kahwa.png"
+   },
+   {
+     name: "Kerala Appam with Stew",
+@@ -662,7 +654,7 @@
+     desc: "Soft fermented rice batter hoppers with fluffy lace edges, served with aromatic coconut milk vegetable stew.",
+     tags: ["Zero Food Miles", "Organic Coconut", "Women's Cooperative"],
+     revenueShare: "94% Direct Community Revenue",
+-    img: "/assets/images/appam.png"
++    img: "assets/images/appam.png"
+   },
+   {
+     name: "Khaman Dhokla",
+@@ -670,7 +662,7 @@
+     desc: "Steamed fluffy gram flour cakes tempered with mustard seeds, curry leaves, and green chillies.",
+     tags: ["Locally Sourced", "Zero Food Miles", "Heritage Recipe"],
+     revenueShare: "91% Direct Community Revenue",
+-    img: "/assets/images/dhokla.png"
++    img: "assets/images/dhokla.png"
+   },
+   {
+     name: "Hyderabadi Dum Biryani",
+@@ -678,7 +670,7 @@
+     desc: "Fragrant aged basmati rice cooked in sealed handis with saffron, mint, fried shallots, and royal spice potpourri.",
+     tags: ["Slow Food", "Community Cooperative"],
+     revenueShare: "89% Direct Community Revenue",
+-    img: "/assets/images/biryani.png"
++    img: "assets/images/biryani.png"
+   },
+   {
+     name: "Traditional Bebinca",
+@@ -686,7 +678,7 @@
+     desc: "Indo-Portuguese seven-layered coconut milk and egg pudding delicately baked on gentle hearth embers.",
+     tags: ["Heritage Bakeries", "Artisan Recipe"],
+     revenueShare: "93% Direct Bakery Revenue",
+-    img: "/assets/images/bebinca.png"
++    img: "assets/images/bebinca.png"
+   },
+   {
+     name: "Crisp Masala Dosa",
+@@ -694,7 +686,7 @@
+     desc: "Fermented rice and black lentil crepe roasted golden with butter, filled with spiced potato masala and fresh coconut chutney.",
+     tags: ["Zero Food Miles", "Community Sourced"],
+     revenueShare: "90% Direct Community Revenue",
+-    img: "/assets/images/dosa.png"
++    img: "assets/images/dosa.png"
+   },
+   {
+     name: "Goan Coastal Fish Curry",
+@@ -702,7 +694,7 @@
+     desc: "Fresh catch simmered in rich Kashmiri chilli and tangy kokum coconut gravy, honoring sustainable coastal fisheries.",
+     tags: ["Sustainable Catch", "Zero Food Miles", "Fisherfolk Cooperative"],
+     revenueShare: "95% Direct Fisherfolk Revenue",
+-    img: "/assets/images/fishcurry.png"
++    img: "assets/images/fishcurry.png"
+   },
+   {
+     name: "Aloo ke Gutke",
+@@ -710,7 +702,7 @@
+     desc: "Kumaoni mountain potatoes stir-fried in fragrant mustard oil with wild Himalayan jumboo herb and red chillies.",
+     tags: ["Mountain Foraged", "Zero Food Miles", "Village Organic"],
+     revenueShare: "97% Direct Homestay Revenue",
+-    img: "/assets/images/alookegutke.png"
++    img: "assets/images/alookegutke.png"
+   },
+   {
+     name: "Himachali Dham",
+@@ -718,7 +710,7 @@
+     desc: "Traditional satvik festive feast cooked in brass pots by Botis, featuring Madra, Mah ki Dal, and Khatta.",
+     tags: ["Ancient Feast", "Zero Food Miles", "Solar Kitchens"],
+     revenueShare: "93% Direct Community Revenue",
+-    img: "/assets/images/dham.png"
++    img: "assets/images/dham.png"
+   },
+   {
+     name: "Chhena Poda",
+@@ -726,167 +718,7 @@
+     desc: "Baked cottage cheese confection wrapped in sal leaves and caramelized slowly over charcoal embers.",
+     tags: ["Dairy Cooperative", "Zero Food Miles"],
+     revenueShare: "94% Direct Dairy Farmer Revenue",
+-    img: "/assets/images/chhenapoda.png"
+-  },
+-  {
+-    name: "Bhutte ka Kees",
+-    origin: "Madhya Pradesh",
+-    desc: "Fresh sweet corn grated and simmered in spiced milk with mustard seeds, coconut, and green chillies.",
+-    tags: ["Zero Food Miles", "Malwa Heritage", "Farm Fresh"],
+-    revenueShare: "95% Direct Farmer Revenue",
+-    img: "/assets/images/bhuttekakees.png"
+-  },
+-  {
+-    name: "Bisi Bele Bhath",
+-    origin: "Karnataka",
+-    desc: "Traditional hot lentil rice preparation slow-cooked with tamarind, nutmeg, marathi moggu, and pure ghee.",
+-    tags: ["Zero Food Miles", "Heritage Kitchens", "Probiotic Pulse"],
+-    revenueShare: "93% Direct Farmer Revenue",
+-    img: "/assets/images/bisibelebhath.png"
+-  },
+-  {
+-    name: "Jharkhandi Dhuska & Ghugni",
+-    origin: "Jharkhand",
+-    desc: "Golden fried rice and chana dal batter cakes paired with rustic kala chana curry and spicy tomato chutney.",
+-    tags: ["Tribal Kitchens", "Zero Food Miles", "Community Sourced"],
+-    revenueShare: "96% Direct Tribal Revenue",
+-    img: "/assets/images/dhuska.png"
+-  },
+-  {
+-    name: "Melt-in-Mouth Kebabs",
+-    origin: "Uttar Pradesh",
+-    desc: "Aromatic slow-smoked galouti kebabs infused with 16 royal spices, served with fresh mint and roomali roti.",
+-    tags: ["Slow Food", "Heritage Recipe", "Artisan Kitchens"],
+-    revenueShare: "91% Direct Kitchen Revenue",
+-    img: "/assets/images/kebabs.png"
+-  },
+-  {
+-    name: "Shahi Hyderabadi Haleem",
+-    origin: "Telangana",
+-    desc: "Slow-pounded wheat, barley, and lentils simmered overnight with pure ghee, rose petals, and fried cashew.",
+-    tags: ["Slow Food", "GI Tagged", "Heritage Guild"],
+-    revenueShare: "90% Direct Artisan Revenue",
+-    img: "/assets/images/haleem.png"
+-  },
+-  {
+-    name: "Pahadi Kafuli",
+-    origin: "Uttarakhand",
+-    desc: "Nutritious thick green gravy of mountain spinach and fenugreek leaves slow-cooked in traditional iron pots.",
+-    tags: ["Mountain Foraged", "Iron Rich", "Homestay Organic"],
+-    revenueShare: "98% Direct Homestay Revenue",
+-    img: "/assets/images/kafuli.png"
+-  },
+-  {
+-    name: "Assamese Khar",
+-    origin: "Assam",
+-    desc: "Ancestral alkaline broth prepared by filtering water through sun-dried banana peel ashes, with raw papaya.",
+-    tags: ["Ancestral Alkaline", "Zero Food Miles", "Wild Foraged"],
+-    revenueShare: "96% Direct Grower Revenue",
+-    img: "/assets/images/khar.png"
+-  },
+-  {
+-    name: "Khasi Jadoh",
+-    origin: "Meghalaya",
+-    desc: "Fragrant red hill rice cooked with indigenous wild mountain herbs, bay leaves, ginger, and black sesame.",
+-    tags: ["Indigenous Red Rice", "Zero Food Miles", "Women's Guild"],
+-    revenueShare: "95% Direct Farmer Revenue",
+-    img: "/assets/images/jadoh.png"
+-  },
+-  {
+-    name: "Manipuri Eromba",
+-    origin: "Manipur",
+-    desc: "Boiled mountain vegetables mashed with fiery King Chilli (U-Morok), wild herbs, and fermented local fish.",
+-    tags: ["Probiotic", "Wild Harvest", "Zero Preservatives"],
+-    revenueShare: "97% Direct Homestay Revenue",
+-    img: "/assets/images/eromba.png"
+-  },
+-  {
+-    name: "Naga Axone Stew",
+-    origin: "Nagaland",
+-    desc: "Naturally fermented organic soybeans stewed with smoked chillies, wild herbs, and bamboo shoot broth.",
+-    tags: ["Fermented Superfood", "Tribal Organic", "Zero Food Miles"],
+-    revenueShare: "96% Direct Tribal Revenue",
+-    img: "/assets/images/axone.png"
+-  },
+-  {
+-    name: "Mizo Bai Broth",
+-    origin: "Mizoram",
+-    desc: "Steamed organic mustard greens and bamboo shoots cooked with local soda and fermented pork/mushrooms.",
+-    tags: ["Alkaline", "Zero Oil", "Organic Garden"],
+-    revenueShare: "95% Direct Grower Revenue",
+-    img: "/assets/images/bai.png"
+-  },
+-  {
+-    name: "Tripuri Chakhwi",
+-    origin: "Tripura",
+-    desc: "Traditional alkaline bamboo shoot preparation slow-cooked with jackfruit seeds and wild mountain leaves.",
+-    tags: ["Forest Foraged", "Zero Food Miles", "Indigenous Recipe"],
+-    revenueShare: "97% Direct Tribal Revenue",
+-    img: "/assets/images/chakhwi.png"
+-  },
+-  {
+-    name: "Haryanvi Bajra Khichdi",
+-    origin: "Haryana",
+-    desc: "Nutrient-dense winter pearl millet and yellow lentils cooked on slow embers, served with fresh hand-churned white butter.",
+-    tags: ["Millets Superfood", "Zero Food Miles", "Farmer Cooperative"],
+-    revenueShare: "94% Direct Farmer Revenue",
+-    img: "/assets/images/bajrakhicdi.png"
+-  },
+-  {
+-    name: "Andhra Gongura Pachadi",
+-    origin: "Andhra Pradesh",
+-    desc: "Tangy red sorrel leaves ground in stone mortars with roasted red chillies, garlic, and cold-pressed sesame oil.",
+-    tags: ["Iron Rich", "Heritage Recipe", "Farmer Cooperative"],
+-    revenueShare: "93% Direct Farmer Revenue",
+-    img: "/assets/images/gongura.png"
+-  },
+-  {
+-    name: "Thukpa",
+-    origin: "Ladakh",
+-    desc: "Hearty noodle soup with vegetables and meat, a staple of high-altitude comfort.",
+-    tags: ["High Altitude", "Warm Soup", "Community Kitchen"],
+-    revenueShare: "95% Direct Farmer Revenue",
+-    img: "/assets/images/thukpa.png"
+-  },
+-  {
+-    name: "Skyu",
+-    origin: "Ladakh",
+-    desc: "Thick wheat flour dumplings simmered in broth, enjoyed during winter festivals.",
+-    tags: ["Winter Warmth", "Traditional", "Handmade"],
+-    revenueShare: "94% Direct Farmer Revenue",
+-    img: "/assets/images/skyu.png"
+-  },
+-  {
+-    name: "Butter Tea (Gur Gur)",
+-    origin: "Ladakh",
+-    desc: "Salted butter tea brewed with yak tea leaves, energizing for trekkers.",
+-    tags: ["Energy Boost", "Cultural", "High Altitude"],
+-    revenueShare: "96% Direct Farmer Revenue",
+-    img: "/assets/images/gurgurtea.png"
+-  },
+-  {
+-    name: "Tingmo",
+-    origin: "Ladakh",
+-    desc: "Steamed fluffy wheat buns served with soups and stews.",
+-    tags: ["Steamed Bread", "Soft", "Companion Dish"],
+-    revenueShare: "93% Direct Farmer Revenue",
+-    img: "/assets/images/tingmo.png"
+-  },
+-  {
+-    name: "Momos",
+-    origin: "Sikkim",
+-    desc: "Steamed dumplings filled with vegetables or meat, a Himalayan street snack.",
+-    tags: ["Dumpling", "Snack", "Popular"],
+-    revenueShare: "92% Direct Farmer Revenue",
+-    img: "/assets/images/momos.png"
+-  },
+-  {
+-    name: "Tsampa",
+-    origin: "Tibet",
+-    desc: "Roasted barley flour mixed with tea butter, a high-energy staple.",
+-    tags: ["Barley", "Energy", "Portable"],
+-    revenueShare: "95% Direct Farmer Revenue",
+-    img: "/assets/images/tsampa.png"
++    img: "assets/images/chhenapoda.png"
+   }
+ ];
+ 
+@@ -1113,70 +945,17 @@
+   }
+ }
+ 
+-let currentCircuitFilter = {
+-  region: "all",
+-  theme: "all",
+-  search: "",
+-  sort: "default"
+-};
+-
+-function renderCircuits(opts = {}) {
++function renderCircuits(region = "all") {
+   const grid = $("#circuitsGrid");
+   if (!grid) return;
+ 
+-  if (typeof opts === "string") {
+-    currentCircuitFilter.region = opts;
+-  } else if (typeof opts === "object") {
+-    currentCircuitFilter = { ...currentCircuitFilter, ...opts };
+-  }
+-
+-  let filtered = [...regionalCircuits];
+-
+-  // Filter by region
+-  if (currentCircuitFilter.region && currentCircuitFilter.region !== "all") {
+-    filtered = filtered.filter(c => c.region === currentCircuitFilter.region);
+-  }
+-
+-  // Filter by theme
+-  if (currentCircuitFilter.theme && currentCircuitFilter.theme !== "all") {
+-    filtered = filtered.filter(c => c.theme === currentCircuitFilter.theme);
+-  }
+-
+-  // Filter by search query
+-  if (currentCircuitFilter.search && currentCircuitFilter.search.trim()) {
+-    const q = currentCircuitFilter.search.toLowerCase().trim();
+-    filtered = filtered.filter(c => 
+-      c.name.toLowerCase().includes(q) || 
+-      c.state.toLowerCase().includes(q) || 
+-      c.desc.toLowerCase().includes(q) ||
+-      (c.alt && c.alt.toLowerCase().includes(q))
+-    );
+-  }
+-
+-  // Sort
+-  if (currentCircuitFilter.sort === "alt-high") {
+-    filtered.sort((a, b) => (b.elevationFt || 0) - (a.elevationFt || 0));
+-  } else if (currentCircuitFilter.sort === "alt-low") {
+-    filtered.sort((a, b) => (a.elevationFt || 0) - (b.elevationFt || 0));
+-  } else if (currentCircuitFilter.sort === "name-az") {
+-    filtered.sort((a, b) => a.name.localeCompare(b.name));
+-  }
+-
+-  if (filtered.length === 0) {
+-    grid.innerHTML = `
+-      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #ffffff; border-radius: var(--radius); border: 1px dashed rgba(13, 148, 136, 0.3);">
+-        <p style="font-size: 28px; margin: 0 0 10px;">🔍</p>
+-        <h3 style="font-family: var(--font-main); font-size: 18px; color: var(--ink); margin: 0 0 6px;">No regional corridor portals found</h3>
+-        <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px;">Try adjusting your search query or selecting "All India".</p>
+-        <button class="btn light" onclick="resetCircuitFilters()">Reset Filters</button>
+-      </div>
+-    `;
+-    return;
+-  }
++  const filtered = region === "all" 
++    ? regionalCircuits 
++    : regionalCircuits.filter(c => c.region === region);
+ 
+   const actionText = (window.i18n && typeof window.i18n.t === "function")
+     ? window.i18n.t("btn_explore_node")
+-    : "3D Waypoints & Telemetry →";
++    : "Explore Regional Node →";
+ 
+   grid.innerHTML = filtered.map(c => {
+     const customDesc = (window.i18n && typeof window.i18n.getCircuitTranslation === "function")
+@@ -1184,17 +963,12 @@
+       : c.desc;
+ 
+     return `
+-      <article class="circuit-card" style="background-image: url('${c.img}')" onclick="openPortalDossier(event, '${c.id}')" title="Explore 3D Portal Telemetry for ${c.name} (${c.state})">
++      <article class="circuit-card" style="background-image: url('${c.img}')" onclick="selectCircuit('${c.state}')" title="Explore ${c.name} (${c.state})">
+         <div class="circuit-card-overlay">
+-          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+-            <span class="circuit-tag">${c.state}</span>
+-            <span style="background: rgba(245, 158, 11, 0.28); border: 1px solid rgba(245, 158, 11, 0.6); color: #fbbf24; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;">⛰️ ${c.alt}</span>
+-          </div>
++          <span class="circuit-tag">${c.state} • ${c.alt}</span>
+           <h3>${c.name}</h3>
+           <p>${customDesc}</p>
+-          <div style="display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 10px; flex-wrap: wrap;">
+-            <span class="circuit-action">${actionText}</span>
+-          </div>
++          <span class="circuit-action">${actionText}</span>
+         </div>
+       </article>
+     `;
+@@ -1204,129 +978,12 @@
+   addCard3D(grid.querySelectorAll(".circuit-card"), { maxTilt: 9, glow: true });
+ }
+ 
+-function resetCircuitFilters() {
+-  currentCircuitFilter = { region: "all", theme: "all", search: "", sort: "default" };
+-  const searchInput = $("#portalSearchInput");
+-  if (searchInput) searchInput.value = "";
+-  const sortSelect = $("#portalSortSelect");
+-  if (sortSelect) sortSelect.value = "default";
+-  $$(".circuit-pill").forEach(p => p.classList.toggle("active", p.dataset.region === "all"));
+-  $$(".portal-theme-pill").forEach(p => p.classList.toggle("active", p.dataset.theme === "all"));
+-  renderCircuits();
+-}
+-
+-function selectCircuit(stateName, circuitId) {
++function selectCircuit(stateName) {
++  toast(`Selected ${stateName} regional circuit.`);
++  statePanel(stateName);
+   const mapSec = $("#mapSection");
+   if (mapSec) {
+-    toast(`Selected ${stateName} regional circuit.`);
+-    statePanel(stateName);
+     mapSec.scrollIntoView({ behavior: "smooth" });
+-  } else if (circuitId) {
+-    openPortalDossier(null, circuitId);
+-  } else if (typeof window.openAICardInsight === "function") {
+-    const circ = (typeof regionalCircuits !== "undefined") ? regionalCircuits.find(c => c.state === stateName) : null;
+-    window.openAICardInsight({
+-      title: circ ? circ.name : `${stateName} Heritage Circuit`,
+-      location: stateName,
+-      category: "Heritage Circuit",
+-      desc: circ ? circ.desc : `Comprehensive heritage and eco-corridor exploration across ${stateName}.`,
+-      img: circ ? circ.img : ""
+-    });
+-  } else {
+-    toast(`Selected ${stateName} regional circuit.`);
+-  }
+-}
+-
+-function openPortalDossier(event, id) {
+-  if (event) event.stopPropagation();
+-  const c = regionalCircuits.find(item => item.id === id);
+-  if (!c) return;
+-
+-  const modal = $("#portalDossierModal");
+-  if (!modal) {
+-    selectCircuit(c.state);
+-    return;
+-  }
+-
+-  const titleEl = $("#portalModalTitle");
+-  const stateEl = $("#portalModalState");
+-  const descEl = $("#portalModalDesc");
+-  const altEl = $("#portalModalAlt");
+-  const seasonEl = $("#portalModalSeason");
+-  const elevEl = $("#portalModalElevation");
+-
+-  if (titleEl) titleEl.textContent = c.name;
+-  if (stateEl) stateEl.textContent = `${c.state} • ${c.theme ? c.theme.toUpperCase() : 'HERITAGE'} CORRIDOR`;
+-  if (descEl) descEl.textContent = c.desc;
+-  if (altEl) altEl.textContent = c.alt || "N/A";
+-  if (seasonEl) seasonEl.textContent = c.season || "Apr–Oct";
+-  if (elevEl) elevEl.textContent = `${(c.elevationFt || 0).toLocaleString()} ft`;
+-
+-  const waypointsWrap = $("#portalModalWaypoints");
+-  if (waypointsWrap && c.waypoints) {
+-    waypointsWrap.innerHTML = c.waypoints.map((wp, idx) => `
+-      <div class="portal-node-chip">
+-        <span style="color: #34d399; font-weight: 700;">${idx + 1}.</span>
+-        <span>${wp}</span>
+-        ${idx < c.waypoints.length - 1 ? '<span class="portal-node-arrow">→</span>' : ''}
+-      </div>
+-    `).join("");
+-  }
+-
+-  const planBtn = $("#portalModalPlanBtn");
+-  if (planBtn) {
+-    planBtn.onclick = () => {
+-      localStorage.setItem("planned_corridor", JSON.stringify({
+-        id: c.id,
+-        name: c.name,
+-        state: c.state,
+-        waypoints: c.waypoints || [c.name]
+-      }));
+-      toast(`Added ${c.name} to Custom Itinerary Planner!`);
+-      setTimeout(() => {
+-        window.location.href = "planner.html";
+-      }, 600);
+-    };
+-  }
+-
+-  const bookmarkBtn = $("#portalModalBookmarkBtn");
+-  if (bookmarkBtn) {
+-    bookmarkBtn.onclick = () => {
+-      saveDestination(c.id, {
+-        name: c.name,
+-        location: c.state,
+-        budget: 4500,
+-        img: c.img,
+-        altitude: c.alt
+-      });
+-    };
+-  }
+-
+-  const aiInsightBtn = $("#portalModalAIBtn");
+-  if (aiInsightBtn) {
+-    aiInsightBtn.onclick = () => {
+-      closePortalDossier();
+-      if (typeof window.openAICardInsight === "function") {
+-        window.openAICardInsight({
+-          title: c.name,
+-          location: c.state,
+-          category: "Heritage Circuit",
+-          desc: c.desc,
+-          img: c.img
+-        });
+-      }
+-    };
+-  }
+-
+-  modal.classList.add("active");
+-  modal.setAttribute("aria-hidden", "false");
+-}
+-
+-function closePortalDossier() {
+-  const modal = $("#portalDossierModal");
+-  if (modal) {
+-    modal.classList.remove("active");
+-    modal.setAttribute("aria-hidden", "true");
+   }
+ }
+ 
+@@ -1424,147 +1081,32 @@
+ function supportLocalFood(event, foodName) {
+   if (event) event.stopPropagation();
+   updateResponsibleScore(5, `Zero-Food-Miles choice: Supported ${foodName}!`);
+-  if (typeof window.openAICardInsight === "function") {
+-    const f = (typeof foods !== "undefined") ? foods.find(x => x.name === foodName) : null;
+-    window.openAICardInsight({
+-      title: foodName,
+-      category: "Indigenous Cuisine",
+-      location: f ? f.origin : "Himalayas",
+-      desc: f ? f.desc : `Authentic regional culinary delicacy from ${f ? f.origin : 'India'}.`,
+-      img: f ? f.img : ""
+-    });
+-  }
+-}
+-
+-let currentFoodFilter = {
+-  diet: "all",
+-  search: ""
+-};
+-
+-const foodDetailsData = {
+-  "Kashmiri Kahwa": {
+-    prep: "Whole saffron stigmas steeped with crushed green cardamom and cinnamon on traditional brass samovars. Poured steaming over freshly slivered almonds and wild acacia honey.",
+-    coop: "Pampore Saffron Growers Cooperative (Jammu & Kashmir)",
+-    pair: "Fresh baked girda or sheermaal bread",
+-    carbonSaved: "1.4 kg CO2e / pot",
+-    nutrition: "High polyphenol antioxidant density; natural altitude respiratory soothing."
+-  },
+-  "Kerala Appam with Stew": {
+-    prep: "Stone-ground parboiled rice batter fermented overnight with natural coconut toddy yeasts. Swirled in iron appachatti pans for fluffy pillowed centers and paper-thin crisp lace edges.",
+-    coop: "Wayanad Organic Spices & Coconut Guild (Kerala)",
+-    pair: "Steamed banana and aromatic cardamom ginger tea",
+-    carbonSaved: "0.8 kg CO2e / meal",
+-    nutrition: "Naturally probiotic; 100% plant-based healthy fats."
+-  },
+-  "Himachali Dham": {
+-    prep: "Slow-cooked in heavy tin-lined brass pots (charoti) over wood hearths by generational community cooks (Botis). Free of onions and garlic, relying on yogurt, asafoetida, and dry ginger.",
+-    coop: "Kangra Valley Homestay & Farm Collective (Himachal Pradesh)",
+-    pair: "Red mountain rice and spicy Khatta tamarind chutney",
+-    carbonSaved: "2.1 kg CO2e / thali",
+-    nutrition: "Zero commercial preservatives; alkaline satvik nutrition."
+-  },
+-  "Aloo ke Gutke": {
+-    prep: "Mountain red potatoes boiled in mineral spring water, cubed, and flash-sautéed in cold-pressed mustard oil with Himalayan wild jumboo (allium) herb and toasted coriander.",
+-    coop: "Kumaon Alpine Women Farmers Network (Uttarakhand)",
+-    pair: "Cucumber Kheera Raita seasoned with mountain mustard seeds",
+-    carbonSaved: "1.2 kg CO2e / serving",
+-    nutrition: "High potassium & iron; natural cold-defense thermogenesis."
+-  },
+-  "Traditional Bebinca": {
+-    prep: "Indo-Portuguese delicacy crafted with rich pressed coconut milk, eggs, nutmeg, and ghee. Patiently layered and browned one tier at a time under hot coconut husk embers.",
+-    coop: "Old Goa Heritage Bakery Guild (Goa)",
+-    pair: "Espresso or light roasted chicory coffee",
+-    carbonSaved: "0.6 kg CO2e / slice",
+-    nutrition: "Rich in medium-chain triglycerides (MCTs)."
+-  },
+-  "Chhena Poda": {
+-    prep: "Fresh cow-milk cottage cheese kneaded with wild cardamom and raw unrefined cane sugar, securely wrapped in green sal leaves and baked slowly inside charcoal embers until charred and caramelized.",
+-    coop: "Nayagarh Dairy Artisans Union (Odisha)",
+-    pair: "Spring water or chilled rabri",
+-    carbonSaved: "0.9 kg CO2e / slice",
+-    nutrition: "High bioavailable casein protein and calcium."
+-  }
+-};
+-
+-function renderFood(opts = {}) {
++}
++
++function renderFood() {
+   const grid = $("#foodGrid");
+   if (!grid) return;
+-
+-  if (typeof opts === "string") {
+-    currentFoodFilter.diet = opts;
+-  } else if (typeof opts === "object") {
+-    currentFoodFilter = { ...currentFoodFilter, ...opts };
+-  }
+-
+-  let filtered = [...foods];
+-
+-  // Filter by diet
+-  if (currentFoodFilter.diet === "plant") {
+-    filtered = filtered.filter(f => !f.name.toLowerCase().includes("fish") && !f.name.toLowerCase().includes("mutton"));
+-  } else if (currentFoodFilter.diet === "warming") {
+-    filtered = filtered.filter(f => ["Kashmir", "Ladakh", "Himachal Pradesh", "Uttarakhand"].includes(f.origin) || f.tags.some(t => t.toLowerCase().includes("altitude")));
+-  } else if (currentFoodFilter.diet === "probiotic") {
+-    filtered = filtered.filter(f => ["Appam", "Dosa", "Dhokla", "Gundruk", "Siddu"].some(k => f.name.includes(k)));
+-  } else if (currentFoodFilter.diet === "sweet") {
+-    filtered = filtered.filter(f => ["Chhena Poda", "Bebinca", "Apricot", "Kahwa"].some(k => f.name.includes(k)));
+-  } else if (currentFoodFilter.diet === "coastal") {
+-    filtered = filtered.filter(f => ["Goa", "Kerala", "Karnataka", "Andhra Pradesh"].includes(f.origin));
+-  }
+-
+-  // Filter by search
+-  if (currentFoodFilter.search && currentFoodFilter.search.trim()) {
+-    const q = currentFoodFilter.search.toLowerCase().trim();
+-    filtered = filtered.filter(f => 
+-      f.name.toLowerCase().includes(q) || 
+-      f.origin.toLowerCase().includes(q) || 
+-      f.desc.toLowerCase().includes(q) ||
+-      f.tags.some(t => t.toLowerCase().includes(q))
+-    );
+-  }
+-
+-  if (filtered.length === 0) {
+-    grid.innerHTML = `
+-      <div class="food-empty-state">
+-        <p style="font-size: 28px; margin: 0 0 10px;">🍲</p>
+-        <h3 style="font-family: var(--font-main); font-size: 18px; color: var(--ink); margin: 0 0 6px;">No culinary specialties found</h3>
+-        <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 16px;">Try clearing your flavor search or view all delicacies.</p>
+-        <button class="btn light" onclick="resetFoodFilters()">Reset Dietary Filters</button>
+-      </div>
+-    `;
+-    return;
+-  }
+ 
+   const supportTitle = (window.i18n && typeof window.i18n.t === "function") 
+     ? window.i18n.t("title_food_support") 
+     : "Click to support zero-food-mile local produce (+5 pts)";
+ 
+-  grid.innerHTML = filtered.map(f => {
++  grid.innerHTML = foods.map(f => {
+     const trans = (window.i18n && typeof window.i18n.getFoodTranslation === "function")
+       ? window.i18n.getFoodTranslation(f.name)
+       : null;
+     const displayName = (trans && trans.name) ? trans.name : f.name;
+     const displayDesc = (trans && trans.desc) ? trans.desc : f.desc;
++
+     const tagsHtml = f.tags.map(t => `<span class="food-tag">${t}</span>`).join("");
+-
+-    let flavor = "Indigenous Specialty";
+-    if (f.name.includes("Kahwa") || f.name.includes("Gutke") || f.name.includes("Thukpa")) flavor = "🔥 Warming Spice";
+-    else if (f.name.includes("Appam") || f.name.includes("Dosa") || f.name.includes("Dhokla")) flavor = "🌾 Slow Fermented";
+-    else if (f.name.includes("Fish")) flavor = "🌊 Sustainable Catch";
+-    else if (f.name.includes("Chhena") || f.name.includes("Bebinca")) flavor = "🍯 Hearth Sweet";
+-    else if (f.name.includes("Dham")) flavor = "🛕 Satvik Temple Feast";
+-
+     return `
+       <article class="food" style="background-image:url('${f.img}')" onclick="supportLocalFood(event, '${f.name}')" title="${supportTitle}">
+         <div>
+-          <span class="food-flavor-badge">${flavor}</span>
+           <span class="eyebrow">${f.origin.toUpperCase()}</span>
+           <h3>${displayName}</h3>
+           <div class="food-tags">${tagsHtml}</div>
+           <p>${displayDesc}</p>
+-          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 8px; flex-wrap: wrap; gap: 6px;">
+-            <span class="food-revenue-share">🤝 ${f.revenueShare}</span>
+-            <button class="food-recipe-btn" onclick="openFoodRecipeModal(event, '${f.name}')">📖 Recipe & Story</button>
+-          </div>
++          <span class="food-revenue-share">🤝 ${f.revenueShare}</span>
+         </div>
+       </article>
+     `;
+@@ -1572,562 +1114,6 @@
+ 
+   // Add mouse-tracking 3D tilt + specular glow to food cards
+   addCard3D(grid.querySelectorAll(".food"), { maxTilt: 8 });
+-}
+-
+-function resetFoodFilters() {
+-  currentFoodFilter = { diet: "all", search: "" };
+-  const input = $("#foodSearchInput");
+-  if (input) input.value = "";
+-  $$(".food-diet-pill").forEach(p => p.classList.toggle("active", p.dataset.diet === "all"));
+-  renderFood();
+-}
+-
+-function openFoodRecipeModal(event, foodName) {
+-  if (event) event.stopPropagation();
+-  const f = foods.find(x => x.name === foodName) || { name: foodName, origin: "India", revenueShare: "90% Direct Farmer Margin", desc: "" };
+-  const detail = foodDetailsData[foodName] || {
+-    prep: `Traditional preparation crafted with local heirloom ingredients and zero food miles, passed down through generations.`,
+-    coop: `Local Village Farmers & Homestay Collective (${f.origin})`,
+-    pair: `Locally harvested herbal tea or regional whole-grain flatbreads`,
+-    carbonSaved: `1.0 kg CO2e / serving`,
+-    nutrition: `100% locally sourced, chemical-free wholesome harvest.`
+-  };
+-
+-  const modal = $("#foodRecipeModal");
+-  if (!modal) {
+-    toast(`Viewing recipe secrets for ${foodName}!`);
+-    return;
+-  }
+-
+-  const tEl = $("#recipeModalTitle");
+-  const oEl = $("#recipeModalOrigin");
+-  const dEl = $("#recipeModalDesc");
+-  const pEl = $("#recipeModalPrep");
+-  const cEl = $("#recipeModalCoop");
+-  const prEl = $("#recipeModalPair");
+-  const cbEl = $("#recipeModalCarbon");
+-  const nEl = $("#recipeModalNutrition");
+-
+-  if (tEl) tEl.textContent = f.name;
+-  if (oEl) oEl.textContent = `${f.origin} • ${f.revenueShare}`;
+-  if (dEl) dEl.textContent = f.desc;
+-  if (pEl) pEl.textContent = detail.prep;
+-  if (cEl) cEl.textContent = detail.coop;
+-  if (prEl) prEl.textContent = detail.pair;
+-  if (cbEl) cbEl.textContent = detail.carbonSaved;
+-  if (nEl) nEl.textContent = detail.nutrition;
+-
+-  const bookmarkBtn = $("#recipeModalBookmarkBtn");
+-  if (bookmarkBtn) {
+-    bookmarkBtn.onclick = () => {
+-      saveDestination(`food_${f.name.toLowerCase().replace(/\s+/g, '_')}`, {
+-        name: `${f.name} Dining Stop`,
+-        location: f.origin,
+-        budget: 650,
+-        img: f.img,
+-        altitude: "Culinary"
+-      });
+-      toast(`Saved ${f.name} to your Expedition Dining List! ♥`);
+-    };
+-  }
+-
+-  const aiBtn = $("#recipeModalAIBtn");
+-  if (aiBtn) {
+-    aiBtn.onclick = () => {
+-      openRecipeAIInsight(f.name);
+-    };
+-  }
+-
+-  modal.classList.add("active");
+-  modal.setAttribute("aria-hidden", "false");
+-}
+-
+-function closeFoodRecipeModal() {
+-  const modal = $("#foodRecipeModal");
+-  if (modal) {
+-    modal.classList.remove("active");
+-    modal.setAttribute("aria-hidden", "true");
+-  }
+-}
+-
+-// ── Superfood Carbon & Nutrient Calculator ──
+-const superfoodMetrics = {
+-  tsampa: { name: "Tsampa (Roasted Barley)", carbon: 3.2, nutrient: 94, coop: "95%" },
+-  seabuckthorn: { name: "Wild Seabuckthorn", carbon: 4.8, nutrient: 99, coop: "98%" },
+-  chhurpi: { name: "Yak Chhurpi Cheese", carbon: 2.6, nutrient: 92, coop: "94%" },
+-  saffron: { name: "Pampore Saffron", carbon: 1.8, nutrient: 96, coop: "96%" },
+-  apricot: { name: "Wild Apricot Kernel", carbon: 3.5, nutrient: 91, coop: "92%" },
+-  blackrice: { name: "Chak-Hao Black Rice", carbon: 2.9, nutrient: 95, coop: "93%" }
+-};
+-
+-let activeSuperfoods = new Set(["tsampa", "seabuckthorn"]);
+-
+-function toggleSuperfood(id) {
+-  if (activeSuperfoods.has(id)) {
+-    if (activeSuperfoods.size > 1) activeSuperfoods.delete(id);
+-  } else {
+-    activeSuperfoods.add(id);
+-  }
+-  updateSuperfoodCalcUI();
+-}
+-
+-function updateSuperfoodCalcUI() {
+-  let totalCarbon = 0;
+-  let totalNutrient = 0;
+-  let count = activeSuperfoods.size;
+-
+-  activeSuperfoods.forEach(id => {
+-    const m = superfoodMetrics[id];
+-    if (m) {
+-      totalCarbon += m.carbon;
+-      totalNutrient += m.nutrient;
+-    }
+-  });
+-
+-  const avgNutrient = count > 0 ? Math.round(totalNutrient / count) : 90;
+-  const carbonSavedKg = totalCarbon.toFixed(1);
+-
+-  const carbonEl = $("#calcCarbonSaved");
+-  const nutrientEl = $("#calcNutrientScore");
+-  const countEl = $("#calcItemCount");
+-
+-  if (carbonEl) carbonEl.textContent = `${carbonSavedKg} kg`;
+-  if (nutrientEl) nutrientEl.textContent = `${avgNutrient} / 100`;
+-  if (countEl) countEl.textContent = `${count} Superfoods`;
+-
+-  $$(".superfood-btn").forEach(btn => {
+-    const id = btn.dataset.sfId;
+-    if (activeSuperfoods.has(id)) {
+-      btn.classList.add("selected");
+-    } else {
+-      btn.classList.remove("selected");
+-    }
+-  });
+-}
+-
+-// ═══════════════════════════════════════════════════════
+-//  CULTURE PAGE - LIVING TRADITIONS & AUDIO SUITE
+-// ═══════════════════════════════════════════════════════
+-
+-const culturalTraditions = [
+-  {
+-    id: "lungta",
+-    category: "sacred",
+-    region: "Himalayas • Ladakh",
+-    badge: "✦ Sacred Symbolism",
+-    title: "Lung-ta: Wind Horse Prayer Flags",
+-    img: "/assets/images/tawang.png",
+-    desc: "The 5 primary colors represent the 5 cosmic elements: Blue (Sky), White (Air/Wind), Red (Fire), Green (Water), and Yellow (Earth). Placed on mountain ridges so the wind carries compassionate blessings across the cosmos.",
+-    protocol: "Always hang with reverence; never discard on soil",
+-    aiQuery: "Prayer flag Lung ta Ladakh"
+-  },
+-  {
+-    id: "cham",
+-    category: "dance",
+-    region: "Ladakh • Spiti • Sikkim",
+-    badge: "✦ Monastic Rituals",
+-    title: "Sacred Cham Masked Dances",
+-    img: "/assets/images/dharamshala.png",
+-    desc: "Performed in Buddhist monasteries during annual festivals such as Hemis Tsechu and Gustor. Lamas don ornate silk brocades and sacred deity masks symbolizing the triumph of wisdom over spiritual ignorance.",
+-    protocol: "Silent reverence; observe photography restrictions in sanctum",
+-    aiQuery: "Cham dance Tibetan Buddhist monastery"
+-  },
+-  {
+-    id: "solarmud",
+-    category: "architecture",
+-    region: "Ladakh • Zanskar",
+-    badge: "✦ Vernacular Design",
+-    title: "Mud-Brick Passive Solar Architecture",
+-    img: "/assets/images/srinagar.jpg",
+-    desc: "Century-old Ladakhi rammed-earth and sun-dried mud bricks with southward-facing timber balconies. In -25°C Himalayan winters, thermal mass stores heat during the day without consuming fossil fuels.",
+-    protocol: "Eco-Heritage: Preserved by local artisan stone masons",
+-    aiQuery: "Vernacular architecture of Ladakh passive solar"
+-  },
+-  {
+-    id: "pashmina",
+-    category: "crafts",
+-    region: "Changthang Plateau",
+-    badge: "✦ Grassroots Guild",
+-    title: "Pashmina & Changpa Nomads",
+-    img: "/assets/images/gulmarg.png",
+-    desc: "The semi-nomadic Changpa graze Capra hircus goats at 15,000+ ft. The ultra-fine underfleece (pashm) is spun on traditional handlooms into authentic GI-tagged pashmina shawls by women's cooperatives.",
+-    protocol: "Verify genuine Ladakh GI tag; support direct loom prices",
+-    aiQuery: "Changpa pashmina nomads Changthang"
+-  },
+-  {
+-    id: "rootbridges",
+-    category: "architecture",
+-    region: "Meghalaya • Khasi Hills",
+-    badge: "✦ Bio-Engineering",
+-    title: "Jingkieng Jri: Living Root Bridges",
+-    img: "/assets/images/cherrapunji.png",
+-    desc: "Centuries-old suspension bridges trained across torrential rainforest rivers using aerial roots of Ficus elastica trees by Khasi and Jaintia tribal communities. Unlike concrete, these living bridges grow stronger with age.",
+-    protocol: "Walk bare-foot or soft-soled; never damage live root shoots",
+-    aiQuery: "Living root bridges Cherrapunji Meghalaya"
+-  },
+-  {
+-    id: "dhokra",
+-    category: "crafts",
+-    region: "Chhattisgarh • Bastar",
+-    badge: "✦ Ancient Metallurgy",
+-    title: "Bastar Dhokra Lost-Wax Casting",
+-    img: "/assets/images/bastar.png",
+-    desc: "An unbroken 4,000-year metallurgic tradition descending directly from the Indus Valley Civilization's 'Dancing Girl'. Uses beeswax coils, river clay molds, and recycled scrap brass to create spiritual totems.",
+-    protocol: "Purchase directly from Bastar tribal artisan panchayats",
+-    aiQuery: "Dhokra lost wax casting Bastar Chhattisgarh"
+-  },
+-  {
+-    id: "kalbelia",
+-    category: "dance",
+-    region: "Rajasthan • Thar Desert",
+-    badge: "✦ UNESCO Intangible",
+-    title: "Kalbelia Nomadic Songs & Serpent Dance",
+-    img: "/assets/images/jaisalmer.png",
+-    desc: "A mesmerizing rhythmic dance of nomadic desert communities once renowned as snake-charmers. Performed to the drone of the poongi gourd instrument with flowing black swirling skirts embroidered with mirrors.",
+-    protocol: "Support authentic nomadic folk performers at Jaisalmer",
+-    aiQuery: "Kalbelia dance Rajasthan UNESCO"
+-  },
+-  {
+-    id: "theyyam",
+-    category: "sacred",
+-    region: "Kerala • Malabar",
+-    badge: "✦ Sacred Invocation",
+-    title: "Theyyam: Living Deity Shrines",
+-    img: "/assets/images/kochi.png",
+-    desc: "An archaic ritualistic performance art of northern Kerala where performers invoke divine ancestors in sacred groves (Kavu). Intricate face-painting and monumental headdresses (Mudi) transcend caste barriers.",
+-    protocol: "Respect sacred grove sanctum; avoid flash photography",
+-    aiQuery: "Theyyam ritual dance Kerala sacred groves"
+-  },
+-  {
+-    id: "sankirtana",
+-    category: "dance",
+-    region: "Manipur • Imphal Valley",
+-    badge: "✦ UNESCO Heritage",
+-    title: "Manipuri Nat Sankirtana & Raas Leela",
+-    img: "/assets/images/imphal.png",
+-    desc: "A devotional temple art blending Vaishnavite lyrical drama, classical cymbals (Kartal), and drum beats (Pung Cholom) with lyrical circular movements in hand-embroidered Kumil skirts.",
+-    protocol: "Maintain prayerful quietude in temple mandapam",
+-    aiQuery: "Manipuri Sankirtana classical dance"
+-  },
+-  {
+-    id: "konark",
+-    category: "architecture",
+-    region: "Odisha • Puri Coast",
+-    badge: "✦ Sun Temple Marvel",
+-    title: "Konark Stone Chariot & Classical Odissi",
+-    img: "/assets/images/konark.png",
+-    desc: "Monumental 13th-century Sun Temple carved as a cosmic chariot with 24 colossal stone wheels. The temple mandapas inspired classical Odissi dance postures celebrating cosmic rhythms.",
+-    protocol: "Protect fragile carved chlorite reliefs; walk on marked wooden walkways",
+-    aiQuery: "Konark Sun Temple architecture Odissi classical dance"
+-  },
+-  {
+-    id: "hampi",
+-    category: "sacred",
+-    region: "Karnataka • Tungabhadra",
+-    badge: "✦ UNESCO Sanctuary",
+-    title: "Hampi Stone Chariot & Vijayanagara Heritage",
+-    img: "/assets/images/hampi.png",
+-    desc: "Spiritual granite sanctuaries overlooking the rocky Tungabhadra river. Musical pillars, chariot shrines, and active Virupaksha worship have continued unbroken for over six centuries.",
+-    protocol: "Observe sacred temple protocols at Virupaksha shrine",
+-    aiQuery: "Hampi Vijayanagara temple architecture stone chariot"
+-  },
+-  {
+-    id: "ajanta",
+-    category: "sacred",
+-    region: "Maharashtra • Sahyadri",
+-    badge: "✦ Rock-Cut Sanctuaries",
+-    title: "Ajanta & Ellora Monolithic Kailash",
+-    img: "/assets/images/agantaandellora.png",
+-    desc: "Kailash Temple carved top-down from a single basalt cliff face by Rashtrakuta artisans, alongside ancient Buddhist cave chaityas preserving 2,000-year-old fresco murals.",
+-    protocol: "No flash photography inside painting-lined cave sanctums",
+-    aiQuery: "Ajanta Ellora caves Kailash temple monolithic architecture"
+-  },
+-  {
+-    id: "anandpur",
+-    category: "crafts",
+-    region: "Punjab • Shivalik Foothills",
+-    badge: "✦ Martial Arts & Valor",
+-    title: "Hola Mohalla & Gatka Martial Traditions",
+-    img: "/assets/images/anandpursahib.png",
+-    desc: "A vibrant living tradition founded in 1701 by Guru Gobind Singh Ji, featuring equestrian sports, poetry recitations, community langar feasting, and the Gatka martial art.",
+-    protocol: "Cover head with cloth and remove shoes inside Anandpur Sahib",
+-    aiQuery: "Hola Mohalla Anandpur Sahib Gatka martial art Sikh heritage"
+-  },
+-  {
+-    id: "auroville",
+-    category: "architecture",
+-    region: "Tamil Nadu • Coromandel",
+-    badge: "✦ Universal Sanctuary",
+-    title: "Auroville Matrimandir & Bioclimatic Design",
+-    img: "/assets/images/auroville.png",
+-    desc: "An international spiritual township dedicated to human unity. The golden sphere of the Matrimandir houses a silent crystal meditation chamber illuminated by directed solar beams.",
+-    protocol: "Pre-book silence concentration passes; maintain complete quiet",
+-    aiQuery: "Auroville Matrimandir sustainable architecture integral yoga"
+-  }
+-];
+-
+-let currentCultureCategory = "all";
+-let currentCultureSearch = "";
+-
+-function renderCultureCards(cat = "all", search = "") {
+-  const grid = $("#cultureCardsGrid");
+-  if (!grid) return;
+-
+-  currentCultureCategory = cat;
+-  currentCultureSearch = search;
+-
+-  let filtered = [...culturalTraditions];
+-  if (cat !== "all") {
+-    filtered = filtered.filter(item => item.category === cat);
+-  }
+-  if (search && search.trim()) {
+-    const q = search.toLowerCase().trim();
+-    filtered = filtered.filter(item => 
+-      item.title.toLowerCase().includes(q) || 
+-      item.region.toLowerCase().includes(q) || 
+-      item.desc.toLowerCase().includes(q) ||
+-      item.protocol.toLowerCase().includes(q)
+-    );
+-  }
+-
+-  if (filtered.length === 0) {
+-    grid.innerHTML = `
+-      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #ffffff; border-radius: var(--radius); border: 1px dashed rgba(13, 148, 136, 0.3);">
+-        <p style="font-size: 28px; margin: 0 0 10px;">📜</p>
+-        <h3 style="font-family: var(--font-main); font-size: 18px; color: var(--ink); margin: 0 0 6px;">No living traditions match your search</h3>
+-        <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px;">Try clearing your search term or exploring "All Traditions".</p>
+-        <button class="btn light" onclick="resetCultureFilters()">View All Traditions</button>
+-      </div>
+-    `;
+-    return;
+-  }
+-
+-  grid.innerHTML = filtered.map(item => `
+-    <article class="culture-card" onclick="openCultureInsight(event, '${item.title}', '${item.region}', '${item.aiQuery}')">
+-      <div class="culture-card-img-wrap" style="background-image: url('${item.img}');">
+-        <span class="card-badge">${item.badge}</span>
+-        <span class="culture-region-tag">${item.region}</span>
+-      </div>
+-      <div class="culture-card-body">
+-        <h3>${item.title}</h3>
+-        <p>${item.desc}</p>
+-        <div class="card-footer">
+-          <span class="culture-protocol-pill" title="Ethical Travel Protocol">🌿 ${item.protocol}</span>
+-          <button class="culture-explore-btn" onclick="openCultureInsight(event, '${item.title}', '${item.region}', '${item.aiQuery}')">Explore Story ↗</button>
+-        </div>
+-      </div>
+-    </article>
+-  `).join("");
+-}
+-
+-function resetCultureFilters() {
+-  currentCultureCategory = "all";
+-  currentCultureSearch = "";
+-  const input = $("#cultureSearchInput");
+-  if (input) input.value = "";
+-  $$(".culture-filter-pill").forEach(p => p.classList.toggle("active", p.dataset.cat === "all"));
+-  renderCultureCards();
+-}
+-
+-function quickFilterCulture(keyword) {
+-  const searchInput = $("#cultureSearchInput");
+-  if (searchInput) {
+-    searchInput.value = keyword;
+-  }
+-  $$(".culture-filter-pill").forEach(p => p.classList.remove("active"));
+-  renderCultureCards("all", keyword);
+-  const grid = $("#cultureCardsGrid");
+-  if (grid) {
+-    grid.scrollIntoView({ behavior: "smooth", block: "start" });
+-  }
+-  toast(`Filtered living traditions: "${keyword}"`);
+-}
+-
+-function exploreCultureAI() {
+-  if (typeof window.openAICardInsight === "function") {
+-    window.openAICardInsight({
+-      title: "Living Heritage & Sacred Traditions of Ladakh",
+-      location: "Ladakh & Western Himalayas",
+-      category: "Living Traditions",
+-      desc: "Immerse in ancient Gompa rituals, sacred Cham dances, mud-brick solar architectural wisdom, and nomadic Changpa Pashmina weaving.",
+-      query: "Ladakh Buddhist culture monasteries Cham dance Losar prayer flags"
+-    });
+-  } else {
+-    window.location.href = "ai.html?q=" + encodeURIComponent("Tell me about Buddhist monasteries, sacred Cham dance, and living traditions of Ladakh");
+-  }
+-}
+-
+-function openCultureInsight(event, title, region, query) {
+-  if (event) event.stopPropagation();
+-  if (typeof window.openAICardInsight === "function") {
+-    window.openAICardInsight({
+-      title: title,
+-      location: region,
+-      category: "Living Heritage",
+-      desc: `Traditional cultural wisdom and living practices from ${region}.`,
+-      query: query || title
+-    });
+-  } else {
+-    toast(`Exploring cultural storylines for: ${title}`);
+-  }
+-}
+-
+-function openRecipeAIInsight(foodName) {
+-  closeFoodRecipeModal();
+-  const f = foods.find(x => x.name === foodName) || { name: foodName, origin: "India", desc: "" };
+-  if (typeof window.openAICardInsight === "function") {
+-    window.openAICardInsight({
+-      title: `${f.name} Culinary Heritage`,
+-      category: "Indigenous Cuisine",
+-      location: f.origin,
+-      desc: f.desc,
+-      img: f.img,
+-      query: `${f.name} traditional preparation heirloom ingredients history ${f.origin}`
+-    });
+-  } else {
+-    toast(`Exploring AI insights for ${f.name}`);
+-  }
+-}
+-
+-// Web Audio API harmonic bell & Tibetan singing bowl synthesis
+-let audioCtx = null;
+-function playCultureBell(freq = 280) {
+-  try {
+-    const AudioContext = window.AudioContext || window.webkitAudioContext;
+-    if (!AudioContext) return;
+-    if (!audioCtx) audioCtx = new AudioContext();
+-    if (audioCtx.state === 'suspended') audioCtx.resume();
+-
+-    const now = audioCtx.currentTime;
+-    const harmonics = [1, 2.76, 5.4, 8.93];
+-    const gains = [0.45, 0.25, 0.12, 0.05];
+-
+-    harmonics.forEach((h, idx) => {
+-      const osc = audioCtx.createOscillator();
+-      const gain = audioCtx.createGain();
+-      osc.type = idx === 0 ? "sine" : "triangle";
+-      osc.frequency.setValueAtTime(freq * h, now);
+-
+-      gain.gain.setValueAtTime(gains[idx], now);
+-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+-
+-      osc.connect(gain);
+-      gain.connect(audioCtx.destination);
+-
+-      osc.start(now);
+-      osc.stop(now + 4);
+-    });
+-
+-    const waveBars = document.querySelectorAll(".soundwave-bar");
+-    waveBars.forEach(b => b.classList.add("playing"));
+-    setTimeout(() => {
+-      waveBars.forEach(b => b.classList.remove("playing"));
+-    }, 3800);
+-
+-    toast("🔔 Resonant sound of sacred Himalayan bowls (280 Hz)");
+-  } catch (err) {
+-    console.warn("Audio synthesis note:", err);
+-  }
+-}
+-
+-// Cultural Quest Mini-Quiz logic
+-const cultureQuizData = [
+-  {
+-    q: "What element does the Blue flag represent in traditional Himalayan Lung-ta prayer flags?",
+-    opts: ["Fire", "Sky / Space", "Earth", "Water"],
+-    correct: 1,
+-    exp: "Blue symbolizes the boundless Sky and Space in sacred Himalayan Tibetan cosmology."
+-  },
+-  {
+-    q: "How are the living root bridges (Jingkieng Jri) of Meghalaya constructed?",
+-    opts: [
+-      "Carved from hollowed teak trunks",
+-      "Trained aerial roots of living Ficus elastica trees",
+-      "Braided bamboo soaked in resin",
+-      "Mud-plastered stone foundations"
+-    ],
+-    correct: 1,
+-    exp: "Khasi elders guide live aerial roots through betel-nut trunks; they take 15–25 years to mature and last for centuries."
+-  },
+-  {
+-    q: "Why do high-altitude Ladakhi homes traditionally use sun-dried mud bricks rather than concrete?",
+-    opts: [
+-      "They store thermal heat during sun hours and insulate down to -25°C",
+-      "They are lighter for mountain transport",
+-      "They are mandatory by religious decree",
+-      "They reflect solar radiation"
+-    ],
+-    correct: 0,
+-    exp: "Mud bricks provide high thermal mass that captures passive solar heat during the daytime and radiates it indoors during icy nights."
+-  }
+-];
+-
+-let currentQuizIndex = 0;
+-let userQuizScore = 0;
+-
+-function initCultureQuest() {
+-  const qBox = $("#cultureQuizQuestionBox");
+-  if (!qBox) return;
+-
+-  const q = cultureQuizData[currentQuizIndex];
+-  qBox.innerHTML = `
+-    <h4><b>Question ${currentQuizIndex + 1} of ${cultureQuizData.length}:</b> ${q.q}</h4>
+-    <div class="quiz-options-grid">
+-      ${q.opts.map((opt, idx) => `
+-        <button class="quiz-opt-btn" onclick="answerCultureQuiz(${idx})">${opt}</button>
+-      `).join("")}
+-    </div>
+-    <div id="quizFeedbackBox" style="display: none; margin-top: 16px; padding: 12px 16px; border-radius: 10px; font-size: 13px;"></div>
+-  `;
+-}
+-
+-function answerCultureQuiz(chosenIdx) {
+-  const q = cultureQuizData[currentQuizIndex];
+-  const buttons = document.querySelectorAll(".quiz-opt-btn");
+-  buttons.forEach((b, idx) => {
+-    b.disabled = true;
+-    if (idx === q.correct) b.classList.add("correct");
+-    if (idx === chosenIdx && idx !== q.correct) b.classList.add("wrong");
+-  });
+-
+-  const feedback = $("#quizFeedbackBox");
+-  if (feedback) {
+-    feedback.style.display = "block";
+-    if (chosenIdx === q.correct) {
+-      userQuizScore += 5;
+-      updateResponsibleScore(5, "Cultural Heritage Discovery Quest: Correct answer!");
+-      feedback.style.background = "rgba(16, 185, 129, 0.2)";
+-      feedback.style.color = "#a7f3d0";
+-      feedback.innerHTML = `<b>✓ Correct! (+5 Pts)</b> ${q.exp}`;
+-      playCultureBell(320);
+-    } else {
+-      feedback.style.background = "rgba(239, 68, 68, 0.2)";
+-      feedback.style.color = "#fca5a5";
+-      feedback.innerHTML = `<b>Explanation:</b> ${q.exp}`;
+-    }
+-  }
+-
+-  const scoreEl = $("#quizScoreValue");
+-  if (scoreEl) scoreEl.textContent = `${userQuizScore} Pts`;
+-
+-  setTimeout(() => {
+-    if (currentQuizIndex < cultureQuizData.length - 1) {
+-      currentQuizIndex++;
+-      initCultureQuest();
+-    } else {
+-      if (feedback) {
+-        feedback.innerHTML += `<div style="margin-top: 10px; font-weight: 700; color: #fbbf24;">🎉 Cultural Quest Completed! You earned total ${userQuizScore} points for your traveler dossier!</div>`;
+-      }
+-    }
+-  }, 2400);
+-}
+-
+-function selectKoraStep(stepNum) {
+-  $$(".kora-step-card").forEach((card, idx) => {
+-    card.classList.toggle("active-kora", idx + 1 === stepNum);
+-  });
+-  playCultureBell(350 + stepNum * 40);
+-  toast(`Sacred Protocol Step ${stepNum} focused.`);
+ }
+ 
+ // Universal 3D Card Interactivity — specular glow + tilt on any card selector
+@@ -2197,23 +1183,7 @@
+ function showDestination(id) {
+   const d = activeDestinations.find(x => x.id === id);
+   if (!d) return;
+-  if (typeof window.openAICardInsight === "function") {
+-    window.openAICardInsight({
+-      id: d.id,
+-      title: d.name,
+-      category: d.type || "Destination",
+-      location: d.location,
+-      desc: d.desc,
+-      img: d.img,
+-      altitude: d.altitude,
+-      season: d.bestSeason || d.best_season,
+-      budget: d.budget,
+-      communityBenefit: d.communityBenefit,
+-      ecoBadges: d.ecoBadges
+-    });
+-  } else {
+-    toast(`${d.name} (${d.location}): Altitude ${d.altitude || "High Altitude"} • ${d.communityBenefit || "Eco Certified"}`);
+-  }
++  toast(`${d.name} (${d.location}): Altitude ${d.altitude || "High Altitude"} • ${d.communityBenefit || "Eco Certified"}`);
+ }
+ 
+ // --- Journey Bookmarks & Drawer Flow ---
+@@ -2227,24 +1197,16 @@
+   if (drawerCount) drawerCount.textContent = saved.length;
+ }
+ 
+-function saveDestination(id, extraData) {
++function saveDestination(id) {
+   let saved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
+-  let customItems = JSON.parse(localStorage.getItem("bharatCustomSaved") || "{}");
+-
+-  if (extraData) {
+-    customItems[id] = extraData;
+-    localStorage.setItem("bharatCustomSaved", JSON.stringify(customItems));
+-  }
+-
++  const dest = activeDestinations.find(d => d.id === id);
+   if (!saved.includes(id)) {
+     saved.push(id);
+     localStorage.setItem("bharatSaved", JSON.stringify(saved));
+     syncSavedToBackend(saved);
+-    const dest = activeDestinations.find(d => d.id === id);
++    // Pillar 3: Award eco points for saving offbeat/eco-dispersion destinations
+     if (dest && dest.isOffbeat) {
+       updateResponsibleScore(10, `Eco-Dispersion gem saved: ${dest.name}!`);
+-    } else if (extraData && extraData.name) {
+-      updateResponsibleScore(5, `Saved ${extraData.name} to My Journey!`);
+     } else {
+       toast("Saved to My Journey ♥");
+     }
+@@ -2257,11 +1219,8 @@
+ 
+ function removeSavedDestination(id) {
+   let saved = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
+-  let customItems = JSON.parse(localStorage.getItem("bharatCustomSaved") || "{}");
+   saved = saved.filter(x => x !== id);
+-  delete customItems[id];
+   localStorage.setItem("bharatSaved", JSON.stringify(saved));
+-  localStorage.setItem("bharatCustomSaved", JSON.stringify(customItems));
+   syncSavedToBackend(saved);
+   updateSavedCount();
+   renderJourneyDrawer();
+@@ -2274,26 +1233,7 @@
+   if (!container) return;
+ 
+   const savedIds = JSON.parse(localStorage.getItem("bharatSaved") || "[]");
+-  const customItems = JSON.parse(localStorage.getItem("bharatCustomSaved") || "{}");
+-
+-  const savedItems = savedIds.map(id => {
+-    let item = activeDestinations.find(d => d.id === id);
+-    if (item) return item;
+-    if (customItems[id]) {
+-      return { id, ...customItems[id] };
+-    }
+-    // Check in foods
+-    const f = foods.find(x => `food_${x.name.toLowerCase().replace(/\s+/g, '_')}` === id || x.name === id);
+-    if (f) {
+-      return { id, name: f.name, location: f.origin, img: f.img, budget: 650, communityBenefit: f.revenueShare };
+-    }
+-    // Check in regionalCircuits
+-    const c = regionalCircuits.find(x => x.id === id);
+-    if (c) {
+-      return { id, name: c.name, location: c.state, img: c.img, budget: 4500, communityBenefit: "3D Regional Corridor" };
+-    }
+-    return null;
+-  }).filter(Boolean);
++  const savedItems = activeDestinations.filter(d => savedIds.includes(d.id));
+ 
+   if (!savedItems.length) {
+     const emptyMsg = (window.i18n && typeof window.i18n.t === "function") 
+@@ -2319,7 +1259,7 @@
+ 
+     return `
+       <div class="drawer-item">
+-        <img src="${item.img}" alt="${itemName}" style="object-fit:cover;">
++        <img src="${item.img}" alt="${itemName}">
+         <div class="drawer-item-info">
+           <h4>${itemName}</h4>
+           <p>📍 ${item.location} • ₹${(item.budget || 3500).toLocaleString()}</p>
+@@ -2433,6 +1373,247 @@
+     updateResponsibleScore(5, "Pledged Plastic-Free & Reusable Flask commitment!");
+   }
+ }
++
++// ═══════════════════════════════════════════════════════
++//  EMERGENCY HELP & SOS DISTRESS DISPATCH ENGINE (SIH 2026)
++// ═══════════════════════════════════════════════════════
++
++// detectedGpsCoords is null until device GPS or IP-lookup resolves
++let detectedGpsCoords = null;
++
++const PASS_SECTOR_COORDS = {
++  "khardungla": { lat: 34.2787, lng: 77.6047, name: "Khardung La Pass (17,582 ft)", alt: "17,582 ft" },
++  "changla": { lat: 34.0489, lng: 77.9304, name: "Chang La Pass (17,688 ft)", alt: "17,688 ft" },
++  "tanglangla": { lat: 33.5083, lng: 77.7028, name: "Tanglang La Pass (17,480 ft)", alt: "17,480 ft" },
++  "zojila": { lat: 34.2800, lng: 75.4700, name: "Zoji La Pass (11,575 ft)", alt: "11,575 ft" },
++  "pangong": { lat: 33.7595, lng: 78.4072, name: "Pangong Tso Sector (14,270 ft)", alt: "14,270 ft" },
++  "nubra": { lat: 34.5424, lng: 77.5645, name: "Diskit / Nubra Valley (10,000 ft)", alt: "10,000 ft" },
++  "hanle": { lat: 32.7756, lng: 78.9667, name: "Hanle Dark Sky Reserve (14,900 ft)", alt: "14,900 ft" },
++  "leh": { lat: 34.1526, lng: 77.5771, name: "Leh District Trauma Base (11,500 ft)", alt: "11,500 ft" }
++};
++
++// IP-based geolocation fallback (no key needed)
++async function _acquireIpLocation(gpsDisplay) {
++  try {
++    const res = await fetch("https://get.geojs.io/v1/ip/geo.json");
++    if (!res.ok) throw new Error("geojs failed");
++    const d = await res.json();
++    const lat = parseFloat(parseFloat(d.latitude).toFixed(4));
++    const lng = parseFloat(parseFloat(d.longitude).toFixed(4));
++    const city = d.city || d.region || "Device Location";
++    detectedGpsCoords = {
++      lat,
++      lng,
++      name: `${city} (IP Location: ${lat}, ${lng})`,
++      alt: "IP-based"
++    };
++    if (gpsDisplay) {
++      gpsDisplay.innerHTML = `📍 IP Location: <b>${city}</b> (${lat}, ${lng})`;
++    }
++  } catch (e) {
++    // All fallbacks exhausted — show generic message, do NOT default to Khardung La
++    if (gpsDisplay) {
++      gpsDisplay.innerHTML = `📍 <b>Location unavailable</b> — please enable GPS or select a sector below`;
++    }
++  }
++}
++
++function tryAcquireGpsCoordinates() {
++  const gpsDisplay = document.getElementById("sosGpsDisplay");
++  if (gpsDisplay) {
++    gpsDisplay.innerHTML = `📍 <b>Acquiring device location...</b>`;
++  }
++
++  if ("geolocation" in navigator) {
++    navigator.geolocation.getCurrentPosition(
++      (pos) => {
++        const lat = parseFloat(pos.coords.latitude.toFixed(4));
++        const lng = parseFloat(pos.coords.longitude.toFixed(4));
++        detectedGpsCoords = {
++          lat,
++          lng,
++          name: `Device Location (${lat}, ${lng})`,
++          alt: "GPS"
++        };
++        if (gpsDisplay) {
++          gpsDisplay.innerHTML = `📍 GPS Acquired: <b>${lat}, ${lng}</b> ✅`;
++        }
++      },
++      (err) => {
++        // GPS denied or unavailable — try IP fallback
++        _acquireIpLocation(gpsDisplay);
++      },
++      { timeout: 8000, enableHighAccuracy: true, maximumAge: 30000 }
++    );
++  } else {
++    // No geolocation API — try IP fallback
++    _acquireIpLocation(gpsDisplay);
++  }
++}
++
++// Kick off GPS acquisition immediately on page load (silent, no modal needed)
++tryAcquireGpsCoordinates();
++
++function playEmergencyChime() {
++  try {
++    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
++    const osc = audioCtx.createOscillator();
++    const gain = audioCtx.createGain();
++    osc.type = "sine";
++    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
++    osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.15);
++    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
++    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
++    osc.connect(gain);
++    gain.connect(audioCtx.destination);
++    osc.start();
++    osc.stop(audioCtx.currentTime + 0.36);
++  } catch (e) {}
++}
++
++async function transmitEmergencySOS() {
++  const transmitBtn = document.getElementById("transmitSosBtn");
++  const feedbackEl = document.getElementById("sosBroadcastFeedback");
++  const emergencyTypeSelect = document.getElementById("sosEmergencyType");
++  const notesInput = document.getElementById("sosNotes");
++  const sectorSelect = document.getElementById("sosSectorSelect");
++
++  const emergencyType = emergencyTypeSelect ? emergencyTypeSelect.value : "Altitude Sickness (AMS / SpO2 Hypoxia)";
++  const notes = notesInput && notesInput.value.trim() ? notesInput.value.trim() : "Urgent assistance requested. AMS hypoxia protocol active.";
++  
++  // Resolve which coordinates to use:
++  // - If user explicitly selected a named pass → use that
++  // - Otherwise → use device GPS/IP coords
++  let targetCoords = null;
++  const sectorVal = sectorSelect ? sectorSelect.value : "current-device";
++  if (sectorVal && sectorVal !== "current-device" && PASS_SECTOR_COORDS[sectorVal]) {
++    targetCoords = PASS_SECTOR_COORDS[sectorVal];
++  } else if (detectedGpsCoords) {
++    targetCoords = detectedGpsCoords;
++  } else {
++    // Still waiting for GPS — block transmission and retry
++    if (feedbackEl) {
++      feedbackEl.classList.add("active");
++      feedbackEl.innerHTML = `<div class="sos-feedback-text"><span>⏳</span><div><strong>Acquiring your location...</strong><div style="font-size:11.5px;">Please wait a moment and try again, or select a sector manually.</div></div></div>`;
++    }
++    tryAcquireGpsCoordinates();
++    return;
++  }
++
++  let travelerName = "Explorer";
++  let phone = "";
++  try {
++    const rawUser = localStorage.getItem("bharat_auth_user");
++    if (rawUser) {
++      const u = JSON.parse(rawUser);
++      travelerName = u.fullName || u.full_name || travelerName;
++      phone = u.phone || "";
++    }
++  } catch (e) {}
++
++  if (transmitBtn) {
++    transmitBtn.disabled = true;
++    transmitBtn.innerHTML = `🛰️ <b>Transmitting Distress Signal to Himalayan Grid...</b>`;
++  }
++
++  playEmergencyChime();
++
++  const payload = {
++    id: `sos-${Date.now()}`,
++    lat: targetCoords.lat,
++    lng: targetCoords.lng,
++    location_name: targetCoords.name,
++    emergency_type: emergencyType,
++    description: notes,
++    traveler_name: travelerName,
++    phone: phone,
++    altitude: targetCoords.alt || "17,582 ft",
++    status: "ACTIVE"
++  };
++
++  try {
++    const res = await fetch("/api/sos", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify(payload)
++    });
++
++    if (!res.ok) {
++      console.warn("[SOS] Remote API status:", res.status);
++    }
++  } catch (err) {
++    console.warn("[SOS] Network fallback active:", err);
++  }
++
++  try {
++    const resolvedIds = JSON.parse(localStorage.getItem("bharat_resolved_sos_ids") || "[]");
++    const updatedResolved = resolvedIds.filter(id => id !== payload.id);
++    localStorage.setItem("bharat_resolved_sos_ids", JSON.stringify(updatedResolved));
++
++    const stored = JSON.parse(localStorage.getItem("bharat_active_sos") || "[]");
++    const filteredStored = stored.filter(s => s.id !== payload.id);
++    filteredStored.unshift(payload);
++    localStorage.setItem("bharat_active_sos", JSON.stringify(filteredStored));
++    localStorage.setItem("bharat_sos_broadcast", JSON.stringify(payload));
++  } catch (e) {}
++
++  window.dispatchEvent(new CustomEvent("bharat:sos-sent", { detail: payload }));
++
++  setTimeout(playEmergencyChime, 250);
++
++  if (transmitBtn) {
++    transmitBtn.disabled = false;
++    transmitBtn.innerHTML = `🚨 <b>TRANSMIT ANOTHER EMERGENCY BEACON</b>`;
++  }
++
++  if (feedbackEl) {
++    feedbackEl.classList.add("active");
++    feedbackEl.innerHTML = `
++      <div class="sos-feedback-text">
++        <span>✅</span>
++        <div>
++          <strong>DISTRESS SIGNAL BROADCASTED ACROSS THE STATE MAP!</strong>
++          <div style="font-size:11.5px; opacity:0.9;">Beacons active at ${targetCoords.name}. High-altitude medical responders alerted.</div>
++        </div>
++      </div>
++      <a href="map.html?sos=${payload.id}" class="sos-view-map-link" onclick="handleViewSosOnMap(event, '${payload.id}')">
++        🗺️ View Live on Map →
++      </a>
++    `;
++  }
++
++  toast("🚨 Emergency SOS Distress Signal Broadcasted to State Map!");
++}
++
++function handleViewSosOnMap(e, sosId) {
++  const mapContainer = document.getElementById("map");
++  if (mapContainer && typeof window.focusSosBeacon === "function") {
++    e.preventDefault();
++    closeHelpModal();
++    window.focusSosBeacon(sosId);
++  }
++}
++
++function openHelpModal() {
++  const modal = document.getElementById("fieldKitModal");
++  if (modal) {
++    modal.classList.add("open");
++    tryAcquireGpsCoordinates();
++  }
++}
++
++function closeHelpModal() {
++  const modal = document.getElementById("fieldKitModal");
++  if (modal) {
++    modal.classList.remove("open");
++  }
++}
++
++window.transmitEmergencySOS = transmitEmergencySOS;
++window.openHelpModal = openHelpModal;
++window.closeHelpModal = closeHelpModal;
++window.tryAcquireGpsCoordinates = tryAcquireGpsCoordinates;
++
+ 
+ // --- Global Search ---
+ 
+@@ -2599,19 +1780,7 @@
+ 
+   // Itinerary form submission
+   const plannerForm = $("#plannerForm");
+-  if (plannerForm) {
+-    plannerForm.onsubmit = e => {
+-      if (typeof window.itinerary === "function") return window.itinerary(e);
+-      if (typeof window.askPlannerAI === "function") {
+-        e.preventDefault();
+-        const dest = ($("#planDestination") && $("#planDestination").value) || "Ladakh";
+-        const days = ($("#planDays") && $("#planDays").value) || 5;
+-        const budget = ($("#planBudget") && $("#planBudget").value) || 30000;
+-        const style = ($("#planStyle") && $("#planStyle").value) || "Adventure";
+-        return window.askPlannerAI(`Plan me a ${days}-day trip to ${dest} with budget ₹${budget} in ${style} travel style`);
+-      }
+-    };
+-  }
++  if (plannerForm) plannerForm.onsubmit = itinerary;
+ 
+   // AI Chat form submission
+   const chatForm = $("#chatForm");
+@@ -2619,21 +1788,14 @@
+     chatForm.onsubmit = e => {
+       e.preventDefault();
+       const input = $("#chatInput");
+-      const val = input ? input.value.trim() : "";
+-      if (val && typeof window.askAI === "function") {
+-        window.askAI(val);
+-      }
+-      if (input) input.value = "";
++      askAI(input.value);
++      input.value = "";
+     };
+   }
+ 
+   // Suggestion buttons
+   $$(".ai-suggestions button").forEach(b => {
+-    b.onclick = () => {
+-      if (typeof window.askAI === "function") {
+-        window.askAI(b.dataset.question);
+-      }
+-    };
++    b.onclick = () => askAI(b.dataset.question);
+   });
+ 
+   // Global search buttons
+@@ -2671,11 +1833,48 @@
+     };
+   }
+ 
+-  // Emergency & Eco Field Kit quick button in Navbar
++  // Dashboard Help & SOS button
++  const dashHelpBtn = $("#dashHelpBtn");
++  if (dashHelpBtn) {
++    dashHelpBtn.onclick = () => openHelpModal();
++  }
++
++  // Emergency Help & Field Kit quick button in Navbar
+   const fieldKitQuickBtn = $("#fieldKitQuickBtn");
+   if (fieldKitQuickBtn) {
+-    fieldKitQuickBtn.onclick = () => {
+-      $("#fieldKitModal").classList.add("open");
++    fieldKitQuickBtn.onclick = () => openHelpModal();
++  }
++
++  // Transmit SOS button in modal
++  const transmitSosBtn = $("#transmitSosBtn");
++  if (transmitSosBtn) {
++    transmitSosBtn.onclick = (e) => {
++      e.preventDefault();
++      transmitEmergencySOS();
++    };
++  }
++
++  // Sector selector in SOS box — update GPS display when user manually picks a pass
++  const sosSectorSelect = $("#sosSectorSelect");
++  if (sosSectorSelect) {
++    sosSectorSelect.onchange = (e) => {
++      const val = e.target.value;
++      const gpsDisplay = $("#sosGpsDisplay");
++      if (val === "current-device" || !val) {
++        // Switch back to device GPS
++        if (detectedGpsCoords) {
++          if (gpsDisplay) {
++            gpsDisplay.innerHTML = `📍 Device Location: <b>${detectedGpsCoords.lat}, ${detectedGpsCoords.lng}</b> ✅`;
++          }
++        } else {
++          tryAcquireGpsCoordinates();
++        }
++      } else if (PASS_SECTOR_COORDS[val]) {
++        const c = PASS_SECTOR_COORDS[val];
++        if (gpsDisplay) {
++          gpsDisplay.innerHTML = `📍 Selected Sector: <b>${c.name}</b>`;
++        }
++      }
+     };
+   }
+ 
+@@ -2683,14 +1882,14 @@
+   const footerFieldKitLink = $("#footerFieldKitLink");
+   if (footerFieldKitLink) {
+     footerFieldKitLink.onclick = () => {
+-      $("#fieldKitModal").classList.add("open");
++      openHelpModal();
+     };
+   }
+ 
+   const footerAmsLink = $("#footerAmsLink");
+   if (footerAmsLink) {
+     footerAmsLink.onclick = () => {
+-      $("#fieldKitModal").classList.add("open");
++      openHelpModal();
+     };
+   }
+ 
+@@ -2699,7 +1898,7 @@
+   if (openFieldKitBtn) {
+     openFieldKitBtn.onclick = () => {
+       $("#journeyDrawer").classList.remove("open");
+-      $("#fieldKitModal").classList.add("open");
++      openHelpModal();
+     };
+   }
+ 
+@@ -2778,7 +1977,11 @@
+   const cultureBtn = $("#cultureBtn");
+   if (cultureBtn) {
+     cultureBtn.onclick = () => {
+-      exploreCultureAI();
++      if (typeof window.askAI === "function") {
++        window.askAI("Tell me about the Buddhist culture, monasteries, Losar festival, and traditional attire of Ladakh.");
++      }
++      const aiSec = $("#ai");
++      if (aiSec) aiSec.scrollIntoView({ behavior: "smooth" });
+     };
+   }
+ 
+@@ -2792,59 +1995,6 @@
+     };
+   }
+ 
+-  // --- Interactive Thematic Pages Initializers ---
+-  // 1. Culture Page
+-  if ($("#cultureCardsGrid")) {
+-    renderCultureCards();
+-    initCultureQuest();
+-    const cInput = $("#cultureSearchInput");
+-    if (cInput) {
+-      cInput.addEventListener("input", e => renderCultureCards(currentCultureCategory, e.target.value));
+-    }
+-    $$(".culture-filter-pill").forEach(pill => {
+-      pill.onclick = () => {
+-        $$(".culture-filter-pill").forEach(p => p.classList.remove("active"));
+-        pill.classList.add("active");
+-        renderCultureCards(pill.dataset.cat, currentCultureSearch);
+-      };
+-    });
+-  }
+-
+-  // 2. Portals (Circuits) Page
+-  if ($("#circuitsGrid")) {
+-    const pInput = $("#portalSearchInput");
+-    if (pInput) {
+-      pInput.addEventListener("input", e => renderCircuits({ search: e.target.value }));
+-    }
+-    const pSort = $("#portalSortSelect");
+-    if (pSort) {
+-      pSort.addEventListener("change", e => renderCircuits({ sort: e.target.value }));
+-    }
+-    $$(".portal-theme-pill").forEach(pill => {
+-      pill.onclick = () => {
+-        $$(".portal-theme-pill").forEach(p => p.classList.remove("active"));
+-        pill.classList.add("active");
+-        renderCircuits({ theme: pill.dataset.theme });
+-      };
+-    });
+-  }
+-
+-  // 3. Cuisine (Food) Page
+-  if ($("#foodGrid")) {
+-    const fInput = $("#foodSearchInput");
+-    if (fInput) {
+-      fInput.addEventListener("input", e => renderFood({ search: e.target.value }));
+-    }
+-    $$(".food-diet-pill").forEach(pill => {
+-      pill.onclick = () => {
+-        $$(".food-diet-pill").forEach(p => p.classList.remove("active"));
+-        pill.classList.add("active");
+-        renderFood({ diet: pill.dataset.diet });
+-      };
+-    });
+-    updateSuperfoodCalcUI();
+-  }
+-
+   // --- 3D Immersive Systems Initialization ---
+   initScrollReveal();
+ 
+@@ -2852,37 +2002,6 @@
+     initAmbientParticles();
+     initExperienceCard3D();
+   });
+-
+-  // ── Theme Toggle ───────────────────────────────────────
+-  initThemeToggle();
+-}
+-
+-// ═══════════════════════════════════════════════════════
+-//  DAY / NIGHT MODE TOGGLE
+-// ═══════════════════════════════════════════════════════
+-
+-function initThemeToggle() {
+-  const btn = document.getElementById("themeToggleBtn");
+-  if (!btn) return;
+-
+-  // Apply saved preference immediately (before paint)
+-  const saved = localStorage.getItem("bharatExploreTheme") || "light";
+-  applyTheme(saved, btn);
+-
+-  btn.addEventListener("click", () => {
+-    const current = document.documentElement.getAttribute("data-theme") || "light";
+-    const next = current === "dark" ? "light" : "dark";
+-    applyTheme(next, btn);
+-    localStorage.setItem("bharatExploreTheme", next);
+-  });
+-}
+-
+-function applyTheme(theme, btn) {
+-  document.documentElement.setAttribute("data-theme", theme);
+-  if (btn) {
+-    btn.textContent = theme === "dark" ? "🌙" : "☀️";
+-    btn.title = theme === "dark" ? "Switch to Day Mode" : "Switch to Night Mode";
+-  }
+ }
+ 
+ // ═══════════════════════════════════════════════════════
+@@ -2996,22 +2115,3 @@
+ window.fetchPassesFromAPI = fetchPassesFromAPI;
+ window.activeDestinations = activeDestinations;
+ window.localDestinations = localDestinations;
+-window.regionalCircuits = regionalCircuits;
+-window.foods = foods;
+-window.playCultureBell = playCultureBell;
+-window.renderCultureCards = renderCultureCards;
+-window.resetCultureFilters = resetCultureFilters;
+-window.openCultureInsight = openCultureInsight;
+-window.answerCultureQuiz = answerCultureQuiz;
+-window.selectKoraStep = selectKoraStep;
+-window.openPortalDossier = openPortalDossier;
+-window.closePortalDossier = closePortalDossier;
+-window.resetCircuitFilters = resetCircuitFilters;
+-window.openFoodRecipeModal = openFoodRecipeModal;
+-window.closeFoodRecipeModal = closeFoodRecipeModal;
+-window.resetFoodFilters = resetFoodFilters;
+-window.toggleSuperfood = toggleSuperfood;
+-window.exploreCultureAI = exploreCultureAI;
+-window.quickFilterCulture = quickFilterCulture;
+-window.openRecipeAIInsight = openRecipeAIInsight;
+-

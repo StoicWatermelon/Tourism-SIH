@@ -1,0 +1,188 @@
+--- js/i18n.js
++++ Bharat_Explore_SIH_Tourism\js/i18n.js
+@@ -18,12 +18,13 @@
+       nav_explore: "Destinations",
+       nav_circuits: "Portals",
+       nav_map: "State Map",
+-      nav_planner: "Itinerary",
++      nav_planner: "Tour Planner",
+       nav_ai: "Bharat AI",
+       nav_responsible: "Eco Travel",
+       nav_culture: "Culture",
+       nav_food: "Cuisine",
+       nav_search: "Global Search",
++      nav_help_sos: "🆘 Help",
+       nav_offline_pass: "🛡️ Offline Pass",
+       nav_saved_title: "My Journey Bookmarks",
+ 
+@@ -69,7 +70,7 @@
+       // Map
+       map_eyebrow: "INTERACTIVE DISCOVERY",
+       map_title: "India, State by State.",
+-      map_sub: "Interactive spatial discovery powered by Leaflet.js. Hover over any pulse node to preview its live telemetry card, or click to inspect and plan itineraries.",
++      map_sub: "Interactive spatial discovery powered by Leaflet.js. Hover over any pulse node to preview its live telemetry card, or click to inspect and plan tour routes.",
+       map_filter_all: "All Hotspots (44)",
+       map_filter_mountains: "🏔️ High Passes & Peaks (11)",
+       map_filter_heritage: "🏛️ Heritage & Culture (13)",
+@@ -77,7 +78,7 @@
+       map_filter_coastal: "🏖️ Coastal & Islands (8)",
+       map_panel_eyebrow: "SELECT A REGION",
+       map_panel_title: "Discover India",
+-      map_panel_desc: "Hover over any pulse marker on the map to preview interactive cards, or click to inspect full regional telemetry and connect immediately to the Smart Itinerary Planner.",
++      map_panel_desc: "Hover over any pulse marker on the map to preview interactive cards, or click to inspect full regional telemetry and connect immediately to the Smart Tour Planner.",
+ 
+       // Decongestion & Destinations
+       dest_eyebrow: "HIMALAYAN DESTINATION EXPLORER & DECONGESTION",
+@@ -103,14 +104,14 @@
+       sug_passes: "Live Pass Conditions",
+       ai_bot_title: "BHARAT AI",
+       ai_bot_status: "Bharat AI • Active",
+-      ai_welcome: "Namaste! 🙏 I am Bharat AI, your intelligent travel companion for all of India. Ask me about Kolkata, Rajasthan, Kerala, the Himalayas, local cuisine, sustainable homestays, or custom itineraries!",
++      ai_welcome: "Namaste! 🙏 I am Bharat AI, your intelligent travel companion for all of India. Ask me about Kolkata, Rajasthan, Kerala, the Himalayas, local cuisine, sustainable homestays, or custom tour plans!",
+       ai_input_placeholder: "Ask Bharat AI about destinations, routes, food, culture...",
+       ai_send: "Send →",
+ 
+       // Planner
+-      plan_eyebrow: "SMART ITINERARY BUILDER",
++      plan_eyebrow: "SMART TOUR PLANNER",
+       plan_title: "Turn days into lifelong memories.",
+-      plan_sub: "AI-audited itinerary generator factoring in live mountain pass safety alerts, acclimatization pacing, and responsible travel choices.",
++      plan_sub: "AI-audited tour planner factoring in live mountain pass safety alerts, acclimatization pacing, and responsible travel choices.",
+       plan_lbl_dest: "Destination",
+       plan_lbl_days: "Days",
+       plan_lbl_budget: "Budget per person (₹)",
+@@ -118,9 +119,9 @@
+       plan_lbl_interest: "Primary Interest",
+       plan_chk_homestays: "Prioritize Certified Eco-Homestays (+15 Responsible Score)",
+       plan_chk_transit: "Opt for Shared/EV Transits & Carbon-Neutral Trails (+10 Score)",
+-      plan_btn_generate: "⚡ Generate Safety-Audited Itinerary",
++      plan_btn_generate: "⚡ Generate Safety-Audited Tour Plan",
+       plan_empty_title: "Safety-Audited Dynamic Route",
+-      plan_empty_sub: "Fill out the expedition parameters on the left to compute a live itinerary audited against real-time mountain pass telemetry and AMS acclimatization pacing.",
++      plan_empty_sub: "Fill out the expedition parameters on the left to compute a live tour plan audited against real-time mountain pass telemetry and AMS acclimatization pacing.",
+       
+       // Planner Select Options
+       opt_ladakh: "Ladakh (High Altitude Focus)",
+@@ -199,7 +200,7 @@
+       game_btn_restart: "↺ Restart Quest",
+       drawer_eyebrow: "MY CURATED EXPEDITION",
+       drawer_title: "Saved Destinations",
+-      drawer_plan: "Plan Custom Itinerary →",
++      drawer_plan: "Plan Custom Tour →",
+       drawer_clear: "Clear All",
+ 
+       // Field Kit Modal
+@@ -299,12 +300,13 @@
+       nav_explore: "गंतव्य स्थल",
+       nav_circuits: "पोर्टल्स",
+       nav_map: "मानचित्र",
+-      nav_planner: "यात्रा योजना",
++      nav_planner: "टूर प्लानर",
+       nav_ai: "भारत AI",
+       nav_responsible: "इको ट्रैवल",
+       nav_culture: "संस्कृति",
+       nav_food: "व्यंजन",
+       nav_search: "खोजें",
++      nav_help_sos: "🆘 सहायता (Help)",
+       nav_offline_pass: "🛡️ ऑफलाइन पास",
+       nav_saved_title: "मेरी सुरक्षित यात्रा",
+ 
+@@ -358,7 +360,7 @@
+       map_filter_coastal: "🏖️ तटीय और द्वीप (8)",
+       map_panel_eyebrow: "एक क्षेत्र चुनें",
+       map_panel_title: "भारत की खोज करें",
+-      map_panel_desc: "नक्शे पर किसी भी मार्कर पर कर्सर ले जाकर कार्ड देखें, या पूर्ण विवरण देखने और सीधे यात्रा योजनाकार से जुड़ने के लिए क्लिक करें।",
++      map_panel_desc: "नक्शे पर किसी भी मार्कर पर कर्सर ले जाकर कार्ड देखें, या पूर्ण विवरण देखने और सीधे टूर प्लानर से जुड़ने के लिए क्लिक करें।",
+ 
+       // Decongestion & Destinations
+       dest_eyebrow: "हिमालयी गंतव्य और भीड़-नियंत्रण",
+@@ -389,9 +391,9 @@
+       ai_send: "भेजें →",
+ 
+       // Planner
+-      plan_eyebrow: "स्मार्ट यात्रा योजनाकार",
++      plan_eyebrow: "स्मार्ट टूर प्लानर",
+       plan_title: "दिनों को सुनहरी यादों में बदलें।",
+-      plan_sub: "लाइव दर्रा सुरक्षा अलर्ट, ऊंचाई अनुकूलन और जिम्मेदार यात्रा विकल्पों को ध्यान में रखकर तैयार की जाने वाली यात्रा योजना।",
++      plan_sub: "लाइव दर्रा सुरक्षा अलर्ट, ऊंचाई अनुकूलन और जिम्मेदार यात्रा विकल्पों को ध्यान में रखकर तैयार की जाने वाली टूर योजना।",
+       plan_lbl_dest: "गंतव्य",
+       plan_lbl_days: "दिन",
+       plan_lbl_budget: "प्रति व्यक्ति बजट (₹)",
+@@ -399,9 +401,9 @@
+       plan_lbl_interest: "प्राथमिक रुचि",
+       plan_chk_homestays: "प्रमाणित पर्यावरण-अनुकूल होमस्टे को प्राथमिकता दें (+15 स्कोर)",
+       plan_chk_transit: "साझा/EV वाहनों और कार्बन-तटस्थ मार्गों का चयन करें (+10 स्कोर)",
+-      plan_btn_generate: "⚡ सुरक्षा-समीक्षित यात्रा बनाएं",
++      plan_btn_generate: "⚡ सुरक्षा-समीक्षित टूर प्लान बनाएं",
+       plan_empty_title: "सुरक्षा-समीक्षित गतिशील मार्ग",
+-      plan_empty_sub: "वास्तविक समय के दर्रा डेटा और ऊंचाई अनुकूलन के आधार पर एक लाइव यात्रा कार्यक्रम तैयार करने के लिए बाईं ओर पैरामीटर भरें।",
++      plan_empty_sub: "वास्तविक समय के दर्रा डेटा और ऊंचाई अनुकूलन के आधार पर एक लाइव टूर प्लान तैयार करने के लिए बाईं ओर पैरामीटर भरें।",
+ 
+       // Planner Select Options
+       opt_ladakh: "लद्दाख (उच्च तुंगता केंद्र)",
+@@ -480,7 +482,7 @@
+       game_btn_restart: "↺ अभियान पुनः प्रारंभ करें",
+       drawer_eyebrow: "मेरी चुनिंदा यात्रा",
+       drawer_title: "सुरक्षित गंतव्य",
+-      drawer_plan: "कस्टम यात्रा योजना बनाएं →",
++      drawer_plan: "कस्टम टूर प्लान करें →",
+       drawer_clear: "सभी हटाएं",
+ 
+       // Field Kit Modal
+@@ -580,12 +582,13 @@
+       nav_explore: "গন্তব্যসমূহ",
+       nav_circuits: "পোর্টাল",
+       nav_map: "মানচিত্র",
+-      nav_planner: "ভ্রমণ পরিকল্পনা",
++      nav_planner: "ট্যুর প্ল্যানার",
+       nav_ai: "ভারত AI",
+       nav_responsible: "ইকো ট্রাভেল",
+       nav_culture: "সংস্কৃতি",
+       nav_food: "খাবার",
+       nav_search: "অনুসন্ধান",
++      nav_help_sos: "🆘 সাহায্য (Help)",
+       nav_offline_pass: "🛡️ অফলাইন পাস",
+       nav_saved_title: "আমার সংরক্ষিত ভ্রমণ",
+ 
+@@ -639,7 +642,7 @@
+       map_filter_coastal: "🏖️ উপকূল ও দ্বীপপুঞ্জ (৮)",
+       map_panel_eyebrow: "একটি অঞ্চল নির্বাচন করুন",
+       map_panel_title: "ভারত আবিষ্কার করুন",
+-      map_panel_desc: "মানচিত্রের যেকোনো মার্কারে কার্সার রেখে কার্ড দেখুন, অথবা সম্পূর্ণ তথ্য জানতে এবং সরাসরি ভ্রমণ পরিকল্পনাকারীর সাথে যুক্ত হতে ক্লিক করুন।",
++      map_panel_desc: "মানচিত্রের যেকোনো মার্কারে কার্সার রেখে কার্ড দেখুন, অথবা সম্পূর্ণ তথ্য জানতে এবং সরাসরি ট্যুর প্ল্যানারের সাথে যুক্ত হতে ক্লিক করুন।",
+ 
+       // Decongestion & Destinations
+       dest_eyebrow: "হিমালয় ভ্রমণ ও ভিড়-নিয়ন্ত্রণ",
+@@ -670,9 +673,9 @@
+       ai_send: "পাঠান →",
+ 
+       // Planner
+-      plan_eyebrow: "স্মার্ট ভ্রমণ পরিকল্পনাকারী",
++      plan_eyebrow: "স্মার্ট ট্যুর প্ল্যানার",
+       plan_title: "দিনগুলোকে আজীবন স্মৃতিতে রূপ দিন।",
+-      plan_sub: "লাইভ গিরিপথ সতর্কতা, উচ্চতা অভিযোজন এবং দায়িত্বশীল ভ্রমণ পছন্দের ভিত্তিতে তৈরি এআই-পর্যালোচিত ভ্রমণসূচি।",
++      plan_sub: "লাইভ গিরিপথ সতর্কতা, উচ্চতা অভিযোজন এবং দায়িত্বশীল ভ্রমণ পছন্দের ভিত্তিতে তৈরি এআই-পর্যালোচিত ট্যুর প্ল্যান।",
+       plan_lbl_dest: "গন্তব্য",
+       plan_lbl_days: "দিন",
+       plan_lbl_budget: "জনপ্রতি বাজেট (₹)",
+@@ -680,9 +683,9 @@
+       plan_lbl_interest: "মূল আগ্রহ",
+       plan_chk_homestays: "প্রত্যয়িত পরিবেশবান্ধব হোমস্টেকে অগ্রাধিকার দিন (+১৫ স্কোর)",
+       plan_chk_transit: "শেয়ার্ড/EV যান এবং কার্বন-মুক্ত রুট বেছে নিন (+১০ স্কোর)",
+-      plan_btn_generate: "⚡ নিরাপদ ভ্রমণসূচি তৈরি করুন",
++      plan_btn_generate: "⚡ নিরাপদ ট্যুর প্ল্যান তৈরি করুন",
+       plan_empty_title: "নিরাপদ গতিশীল ভ্রমণপথ",
+-      plan_empty_sub: "রিয়েল-টাইম গিরিপথের অবস্থা এবং উচ্চতা অভিযোজনের ভিত্তিতে ভ্রমণসূচি তৈরি করতে বাঁদিকের ফর্মটি পূরণ করুন।",
++      plan_empty_sub: "রিয়েল-টাইম গিরিপথের অবস্থা এবং উচ্চতা অভিযোজনের ভিত্তিতে ট্যুর প্ল্যান তৈরি করতে বাঁদিকের ফর্মটি পূরণ করুন।",
+ 
+       // Planner Select Options
+       opt_ladakh: "লাদাখ (উচ্চ পর্বত কেন্দ্র)",
+@@ -761,7 +764,7 @@
+       game_btn_restart: "↺ অভিযান পুনরায় শুরু করুন",
+       drawer_eyebrow: "আমার নির্বাচিত ভ্রমণসূচি",
+       drawer_title: "সংরক্ষিত গন্তব্যসমূহ",
+-      drawer_plan: "কাস্টম ভ্রমণ পরিকল্পনা তৈরি করুন →",
++      drawer_plan: "কাস্টম ট্যুর প্ল্যান তৈরি করুন →",
+       drawer_clear: "সব সাফ করুন",
+ 
+       // Field Kit Modal
